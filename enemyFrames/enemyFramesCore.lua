@@ -3,6 +3,8 @@ local playerFaction
 local bgs = {['Warsong Gulch'] = 10, 
 			 ['Arathi Basin'] = 15, 
 			 ['Blood Ring'] = 10,
+			 ['Lordaeron Arena'] = 10,
+			 ['Sunstrider Court'] = 10,
 			 --['Alterac Valley'] = 40
 			 }
 -- TIMERS
