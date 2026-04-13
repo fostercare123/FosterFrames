@@ -1,4 +1,3 @@
-
 local playerFaction
 local bgs = {['Warsong Gulch'] = 10, 
 			 ['Arathi Basin'] = 15, 
@@ -29,35 +28,36 @@ local f = CreateFrame('Frame', 'fosterFramesCore', UIParent)
 local playerTargetCounter = 0
 
 local function fillPlayerList()
-	local f
+	local factionID
 	local gotData = false
 	local l = {}
 	
-	if UnitFactionGroup('player') == 'Alliance' then f = 0 else f = 1 end
-	-- get opposing faction players
+	if UnitFactionGroup('player') == 'Alliance' then factionID = 0 else factionID = 1 end
+	-- get opposing faction players from scoreboard
 	for i=1, GetNumBattlefieldScores() do
 		local name, killingBlows, honorableKills, deaths, honorGained, faction, rank, race, class = GetBattlefieldScore(i)
-		if faction == f then
+		if faction == factionID then
+			-- In scoreboard we only have names, use name as key if GUID not known
 			l[name] = {['name'] = name, ['class'] = string.upper(class)}
 			l[name]['powerType']  =  l[name]['class'] == 'ROGUE' and 'energy' or l[name]['class'] == 'WARRIOR' and 'rage' or 'mana'
 			gotData = true
 		end
 	end	
 	
-	-- add new players
-	for k, v in pairs(l) do
-		if playerList[v['name']] == nil then	
-			playerList[v['name']] = v 		
+	-- add new players or update existing
+	for name, v in pairs(l) do
+		if playerList[name] == nil then	
+			playerList[name] = v 		
 			refreshUnits = true 
 		end
 	end
-	-- remove aabsent players
-	for k, v in pairs(playerList) do
-		if l[v['name']] == nil then	
-			playerList[v['name']] = nil
+	-- remove absent players
+	for name, v in pairs(playerList) do
+		if l[name] == nil then	
+			playerList[name] = nil
 			-- check if a nearby player left
 			for r, t in pairs(nearbyList) do
-				if t['name'] == v['name'] then
+				if t['name'] == name then
 					nearbyList[r] = nil
 				end
 			end				
@@ -70,61 +70,69 @@ end
 
 -- confirm hostile nearbyPlayers
 local function applyNearbyPlayer(v, now, nextCheck)
-	if insideBG then
-		if playerList[v['name']] then
-				--if not playerList[v['name']]['nearby'] or playerList[v['name']]['health'] 	~= v['health'] or playerList[v['name']]['mana'] ~= v['mana'] then
-				refreshUnits = true
-
-				playerList[v['name']]['health'] 	= v['health']
-
-				if v['maxhealth']	then	playerList[v['name']]['maxhealth'] 	= v['maxhealth']		end
-				if v['mana']	then		playerList[v['name']]['mana'] 		= v['mana']				end
-				if v['maxmana']	then		playerList[v['name']]['maxmana'] 	= v['maxmana']			end
-
-				if v['sex']	then			playerList[v['name']]['sex']		= v['sex'] 				end
-				if v['powerType'] then		playerList[v['name']]['powerType']	= v['powerType'] 		end
-
-				if now > enemyNearbyRefresh then
-					playerList[v['name']]['targetcount'] = playerList[v['name']]['targetcount'] and  playerList[v['name']]['targetcount'] + 1 or 1
-				end
-				--end
-
-			playerList[v['name']]['nextCheck'] 	= nextCheck
-			playerList[v['name']]['nearby'] 	= true			
+	local identifier = v.guid or v.name
+	local p = playerList[identifier] or playerList[v.name]
+	
+	if not p then
+		if not insideBG then
+			playerList[identifier] = v
+			p = playerList[identifier]
+			refreshUnits = true
+		else
+			return -- Don't add if in BG but not in scoreboard?
 		end
-	else
+	end
+
+	if p then
 		refreshUnits = true
-		playerList[v['name']] = v
+		p['health'] = v['health']
+		if v['maxhealth'] then p['maxhealth'] = v['maxhealth'] end
+		if v['mana'] then p['mana'] = v['mana'] end
+		if v['maxmana'] then p['maxmana'] = v['maxmana'] end
+		if v['sex'] then p['sex'] = v['sex'] end
+		if v['powerType'] then p['powerType'] = v['powerType'] end
+		if v['guid'] then p['guid'] = v['guid'] end
 
-		playerList[v['name']]['nextCheck'] 	= nextCheck
-		playerList[v['name']]['nearby'] 	= true
+		if now > enemyNearbyRefresh then
+			p['targetcount'] = p['targetcount'] and p['targetcount'] + 1 or 1
+		end
 
-		--if GetTime() > enemyNearbyRefresh then
-		--	playerList[v['name']]['targetcount'] = playerList[v['name']]['targetcount'] and  playerList[v['name']]['targetcount'] + 1 or 1
-		--end
+		p['nextCheck'] = nextCheck
+		p['nearby'] = true
 	end
 end
 
-local function verifyUnitInfo(unit, now) --/run print(UnitIsPlayer('target') and 'true' or 'false')
+local function verifyUnitInfo(unit, now)
 	now = now or GetTime()
-	if UnitExists(unit) and UnitIsPlayer(unit) and UnitFactionGroup(unit) ~= playerFaction then --UnitIsEnemy(unit, 'player') then
+	if UnitExists(unit) and UnitIsPlayer(unit) and UnitFactionGroup(unit) ~= playerFaction then
 		local u = {}
-		u['name']		= UnitName(unit)
+		u['name'] = UnitName(unit)
+		u['guid'] = UnitGUID(unit)
+		
 		if not insideBG then
 			local _, c = UnitClass(unit)
-			u['class']		= c
+			u['class'] = c
 		end
-		u['health'] 	= UnitHealth(unit)
-		u['maxhealth'] 	= UnitHealthMax(unit)
-		u['mana'] 		= UnitMana(unit)
-		u['maxmana']	= UnitManaMax(unit)
+
+		-- Use UnitXP for actual health values if available
+		if FOSTERFRAMESHasUnitXP() and type(UnitXP) == 'function' then
+			u['health'] = UnitXP(unit) or UnitHealth(unit)
+			u['maxhealth'] = UnitXP(unit, true) or UnitHealthMax(unit) -- Assuming UnitXP(u, true) returns max
+		else
+			u['health'] = UnitHealth(unit)
+			u['maxhealth'] = UnitHealthMax(unit)
+		end
+		
+		u['mana'] = UnitMana(unit)
+		u['maxmana'] = UnitManaMax(unit)
 		local power = UnitPowerType(unit)
-		u['powerType']  =  power == 3 and 'energy' or power == 1 and 'rage' or 'mana'
+		u['powerType'] = power == 3 and 'energy' or power == 1 and 'rage' or 'mana'
 
 		applyNearbyPlayer(u, now, now + nextPlayerCheck)
-		-- update fc health text
-		if playerList[u['name']] and playerList[u['name']]['fc'] then WSGUIupdateFChealth(unit) end
 		
+		-- update fc health text
+		local p = playerList[u.guid or u.name]
+		if p and p['fc'] then WSGUIupdateFChealth(unit) end
 		
 		return true
 	end
@@ -133,11 +141,10 @@ end
 
 local function checkPrioMembers(now)
 	for k, v in pairs(prioMembers) do
-		if not verifyUnitInfo(v, now) then	prioMembers[k] = nil end
+		if not verifyUnitInfo(v, now) then prioMembers[k] = nil end
 	end
 end
---	attempt to get enemy info from raid's targets
--- 	check one every frame rather than all every other frame
+
 local function getRaidMembersTarget(now)
 	local numRaidMembers = UnitInRaid('player') and GetNumRaidMembers() or GetNumPartyMembers() 
 	if numRaidMembers == 0 then return end
@@ -156,24 +163,40 @@ local function updatePlayerListInfo(now)
 	local nextCheck = now + nextPlayerCheck
 
 	for k, v in pairs(playerList) do
-		local c = v['castinfo']
-		v['castinfo'] 	= SPELLCASTINGCOREgetCast(v['name'])
-		local unitID = (UnitExists('target') and v['name'] == UnitName('target')) and 'target' or (UnitExists('mouseover') and v['name'] == UnitName('mouseover')) and 'mouseover' or nil
-                local buffList = SPELLCASTINGCOREgetBuffs(v['name'], unitID)
+		-- Determine unitID if target or mouseover using GUID for reliability
+		local unitID = (UnitExists('target') and v['guid'] == UnitGUID('target')) and 'target' or (UnitExists('mouseover') and v['guid'] == UnitGUID('mouseover')) and 'mouseover' or nil
 		
-		if v['castinfo'] or tlength(buffList) > 0 then
-			v['nextCheck'] 	= nextCheck	
-			-- set health to 100 for newly seen players
-			if v['nearby'] == false then	v['health'] = v['maxhealth'] and v['maxhealth'] or 100	v['mana'] = v['maxmana'] and v['maxmana'] or 100	refreshUnits 	= true	v['refresh'] 	= true	end
-			v['nearby'] 	= true
-			
+		-- Also check raid targets
+		if not unitID then
+			for i=1, 40 do
+				local rTarget = 'raid'..i..'target'
+				if UnitExists(rTarget) and UnitName(rTarget) == v['name'] then
+					unitID = rTarget
+					break
+				end
+			end
+		end
+
+		v['castinfo'] = SPELLCASTINGCOREgetCast(v['name'], unitID)
+		local buffList = SPELLCASTINGCOREgetBuffs(v['name'], unitID)
+		
+		if v['castinfo'] or (buffList and table.getn(buffList) > 0) then
+			v['nextCheck'] = nextCheck	
+			-- set health to 100 for newly seen players if unknown
+			if v['nearby'] == false then
+				v['health'] = v['maxhealth'] or 100
+				v['mana'] = v['maxmana'] or 100
+				refreshUnits = true
+				v['refresh'] = true
+			end
+			v['nearby'] = true
 		end
 		
 		-- outdoors
 		if not insideBG then
 			if not v['nearby'] and v['lastSeen'] and now > v['lastSeen'] then
-				playerList[v['name']] 	= nil
-				refreshUnits 			= true				
+				playerList[k] = nil
+				refreshUnits = true				
 			end
 		end		
 	end
@@ -181,32 +204,31 @@ end
 
 local function globalNearbyMaintenance(now)
 	now = now or GetTime()
-	local nextSeen	= now + playerOutdoorLastseen
+	local nextSeen = now + playerOutdoorLastseen
 	for k, v in pairs(playerList) do
 		-- remove inactive player
 		if v['nextCheck'] and v['nearby'] then
 			if now > v['nextCheck'] then	
-				refreshUnits 	= true 	
-				v['nearby'] 	= false
-				v['health']		= v['maxhealth'] and v['maxhealth'] or 100
-				v['mana'] 		= v['class'] == 'WARRIOR' and 0 or v['maxmana'] and v['maxmana']  or 100
+				refreshUnits = true 	
+				v['nearby'] = false
+				v['health'] = v['maxhealth'] or 100
+				v['mana'] = v['class'] == 'WARRIOR' and 0 or v['maxmana'] or 100
 				
-				if not insideBG then v['lastSeen'] = nextSeen	end 
+				if not insideBG then v['lastSeen'] = nextSeen end 
 			end	
 		end
 	end
 end
 
 local function removeRaidTarget(tar, icon)
-	-- one icon one target
 	for k, v in pairs(raidTargets) do
 		if v['icon'] == icon or v['name'] == tar then
-			raidTargets[v['name']] = nil
+			raidTargets[k] = nil
 		end
 	end
 end
 
-local function verifynearbylist( p)
+local function verifynearbylist(p)
 	for k, v in pairs(nearbyList) do
 		if v['name'] == p['name'] then
 			return k
@@ -228,20 +250,19 @@ end
 
 local function orderUnitsforOutput()
 	local list, listb = {}, {}
-	-- order nearby units first -- this loop avoid units jumping from hopping around in the unit matrix
 	local i = 1
 	
 	for k, v in pairs(playerList) do
 		if v['nearby'] then
 			i = verifynearbylist(v)
-			if i ~= 0  then
+			if i ~= 0 then
 				nearbyList[i] = v
 			else
 				table.insert(nearbyList, v)
 			end
 		else
 			i = verifynearbylist(v)
-			if i ~= 0 then table.remove(nearbyList, i)	end
+			if i ~= 0 then table.remove(nearbyList, i) end
 			listb = orderByClass(listb, v)
 		end
 	end
@@ -268,28 +289,6 @@ local function resetTargetCount()
 	end
 end
 
-local playerTargetCounterMaintenance = function()
-	if not insideBG then playerTargetCounter = 0 return end
-	
-	local currentTarget = UnitName'target'
-	for k, v in pairs(playerTargetCounterList) do
-		if not playerList[v] or not playerList[v]['nearby'] then
-			playerTargetCounterList[v] = nil
-		--[[else
-			TargetByName(v, true)
-			if  UnitName'target' ~= v or UnitName'targettarget' ~= UnitName'player' then
-				playerTargetCounterList[v] = nil
-			end]]--
-		end
-	end
-	--[[
-	if not currentTarget then
-		ClearTarget()
-	else
-		TargetByName(currentTarget, true)
-	end]]--
-end
-
 --- GLOBAL ACCESS ---
 function FOSTERFRAMECOREgetPlayer(name)
 	return playerList[name]
@@ -297,61 +296,43 @@ end
 
 function FOSTERFRAMECOREUpdateFlagCarriers(fc)
 	for k, v in pairs(playerList) do
-		-- no carriers
 		local f = v['fc']
 		if fc[playerFaction] == nil then
 			v['fc'] = false
 		else
-			v['fc'] = (v['name'] == fc[playerFaction]) and true or false
+			v['fc'] = (v['name'] == fc[playerFaction])
 		end
-		-- refresh if player's fc status changed
-		v['refresh'] = f ~= v['fc'] and true or false
+		v['refresh'] = (f ~= v['fc'])
 	end
 	
 	refreshUnits = true
 	TARGETFRAMEsetFC(fc)
 	WSGUIupdateFC(fc)
 	WSGHANDLERsetFlagCarriers(fc)
-	--[[
-	if fc['Alliance'] then
-		print('Alliance: ' .. fc['Alliance'])
-	else
-		print('Alliance: none')
-	end
-	if fc['Horde'] then
-		print('Horde: ' .. fc['Horde'])
-	else
-		print('Horde: none')
-	end]]--
 end
 
 function FOSTERFRAMECORESetPlayersData(list)
 	local nextCheck = GetTime() + nextPlayerCheck
-	
 	for k, v in pairs(list) do
 		if playerList[k] then
-			playerList[k]['health'] 	= v['health']
-			playerList[k]['nextCheck'] 	= nextCheck
-			playerList[k]['nearby'] 	= true
-
+			playerList[k]['health'] = v['health']
+			playerList[k]['nextCheck'] = nextCheck
+			playerList[k]['nearby'] = true
 			refreshUnits = true
 		end
 	end
 end
 
--- raid target functions
-function  FOSTERFRAMECORESendRaidTarget(icon, name)
+function FOSTERFRAMECORESendRaidTarget(icon, name)
 	if name == nil or (raidTargets[name] and raidTargets[name]['icon'] == icon) then
 		name = 0
 	end
-	
 	sendMSG('RT', name, icon, insideBG)
 	FOSTERFRAMECORESetRaidTarget(nil, name, icon)
 end
 
-function  FOSTERFRAMECORESetRaidTarget(sender, tar, icon)
+function FOSTERFRAMECORESetRaidTarget(sender, tar, icon)
 	removeRaidTarget(tar, icon)
-	
 	if playerList[tar] then
 		raidTargets[tar] = {['name'] = tar, ['icon'] = icon}
 		if sender ~= nil and sender ~= UnitName'player' then
@@ -360,7 +341,7 @@ function  FOSTERFRAMECORESetRaidTarget(sender, tar, icon)
 	end
 end
 
-function  FOSTERFRAMECOREGetRaidTarget()
+function FOSTERFRAMECOREGetRaidTarget()
 	return raidTargets
 end
 
@@ -379,160 +360,96 @@ end
 FOSTERFRAMECOREgetPlayerTargetCounter = function()
 	return tlength(playerTargetCounterList)
 end
---
---#################--
----------------------
 
 local function fosterFramesCoreOnUpdate()
-        local now = GetTime()
-        -- get battleground members on UPDATE_BATTLEFIELD_SCORE
-        if insideBG and type(RequestBattlefieldScoreData) == 'function' then RequestBattlefieldScoreData() end
+	local now = GetTime()
+	if insideBG then RequestBattlefieldScoreData() end
 
-        -- use target & mouseover to further populate list
-        verifyUnitInfo('target', now)
-        verifyUnitInfo('mouseover', now)
+	verifyUnitInfo('target', now)
+	verifyUnitInfo('mouseover', now)
+	getRaidMembersTarget(now)
 
-        getRaidMembersTarget(now)
-        -- check raid targets every enemyNearbyInterval seconds
-        if now > enemyNearbyRefresh then
-                resetTargetCount()
-                checkPrioMembers(now)
-                enemyNearbyRefresh = now + enemyNearbyInterval
-        end
+	if now > enemyNearbyRefresh then
+		resetTargetCount()
+		checkPrioMembers(now)
+		enemyNearbyRefresh = now + enemyNearbyInterval
+	end
 
-        -- update player list
-        updatePlayerListInfo(now)
+	updatePlayerListInfo(now)
 
-        if now > globalNearbyCheckNext then
-                globalNearbyMaintenance(now)
-                globalNearbyCheckNext = now + globalNearbyCheckTimer
-        end
+	if now > globalNearbyCheckNext then
+		globalNearbyMaintenance(now)
+		globalNearbyCheckNext = now + globalNearbyCheckTimer
+	end
 
-        if FOSTERFRAMESPLAYERDATA['enableFrames'] then
-                if refreshUnits then
-                        refreshUnits = false
-                        FOSTERFRAMESUpdatePlayers(orderUnitsforOutput())
-                end
+	if FOSTERFRAMESPLAYERDATA and FOSTERFRAMESPLAYERDATA['enableFrames'] then
+		if refreshUnits then
+			refreshUnits = false
+			FOSTERFRAMESUpdatePlayers(orderUnitsforOutput())
+		end
 
-                if not _G['fosterFramesSettings']:IsShown() then
-                        if next(playerList) == nil then
-                                _G['fosterFrameDisplay']:Hide()
-                        else
-                                _G['fosterFrameDisplay']:Show()
-                        end
-                else
-                        _G['fosterFrameDisplay']:Show()
-                end
-        end
+		if _G['fosterFramesSettings'] and not _G['fosterFramesSettings']:IsShown() then
+			if next(playerList) == nil then
+				_G['fosterFrameDisplay']:Hide()
+			else
+				_G['fosterFrameDisplay']:Show()
+			end
+		elseif _G['fosterFrameDisplay'] then
+			_G['fosterFrameDisplay']:Show()
+		end
+	end
 end
-
 
 local function initializeValues()
-        if not FOSTERFRAMESHasUnitXP or not FOSTERFRAMESHasUnitXP() or not FOSTERFRAMESHasSuperWOW or not FOSTERFRAMESHasSuperWOW() then
-                f:UnregisterEvent'UPDATE_BATTLEFIELD_SCORE'
-                FOSTERFRAMESInitialize(nil)
-                f:SetScript('OnUpdate', nil)
-                return
-        end
+	if not FOSTERFRAMESHasUnitXP or not FOSTERFRAMESHasUnitXP() or not FOSTERFRAMESHasSuperWOW or not FOSTERFRAMESHasSuperWOW() then
+		f:UnregisterEvent'UPDATE_BATTLEFIELD_SCORE'
+		FOSTERFRAMESInitialize(nil)
+		f:SetScript('OnUpdate', nil)
+		return
+	end
 
-        playerFaction = UnitFactionGroup('player')
-        insideBG = bgs[GetZoneText()] and true or false
-        
-        playerList = {}
-        raidTargets = {}
-        prioMembers = {}
-        nearbyList = {}
-        playerListRefresh = 0
-
-        local maxUnits = bgs[GetZoneText()] and bgs[GetZoneText()] or maxUnitsDisplayed
-        
-        if insideBG then 
-                f:RegisterEvent'UPDATE_BATTLEFIELD_SCORE'
-        else
-                f:UnregisterEvent'UPDATE_BATTLEFIELD_SCORE'
-        end
-        
-        f:SetScript('OnUpdate', fosterFramesCoreOnUpdate)
-        -- enable ui elements
-        FOSTERFRAMESInitialize(maxUnits, insideBG)
-        bindingsInit()
-        WSGUIinit(insideBG)
-end
-
-	insideBG = false
 	playerFaction = UnitFactionGroup('player')
-		
+	insideBG = bgs[GetZoneText()] and true or false
+	
 	playerList = {}
 	raidTargets = {}
 	prioMembers = {}
 	nearbyList = {}
 	playerListRefresh = 0
-		
+
 	local maxUnits = bgs[GetZoneText()] and bgs[GetZoneText()] or maxUnitsDisplayed
-	if maxUnits then
-		--
-		insideBG = bgs[GetZoneText()] and true or false
-		
-		if insideBG then f:RegisterEvent'UPDATE_BATTLEFIELD_SCORE'	end
-		f:SetScript('OnUpdate', fosterFramesCoreOnUpdate)
-		-- enable ui elements
-		FOSTERFRAMESInitialize(maxUnits, insideBG)
-		bindingsInit()
-		WSGUIinit(insideBG)
+	
+	if insideBG then 
+		f:RegisterEvent'UPDATE_BATTLEFIELD_SCORE'
 	else
 		f:UnregisterEvent'UPDATE_BATTLEFIELD_SCORE'
-		-- nil value to disable ui elements
-		FOSTERFRAMESInitialize(nil)
-		f:SetScript('OnUpdate', nil)
 	end
-end
-
-
-
-    if not playerList[name] then
-        -- We don't know their class yet, but we'll try to find out when we target/mouseover
-        -- For now, add them as unknown or wait for verifyUnitInfo
-        -- SuperWOW often allows getting class from name or GUID if nearby
-        playerList[name] = {['name'] = name, ['class'] = 'UNKNOWN', ['nearby'] = true, ['lastSeen'] = GetTime() + playerOutdoorLastseen}
-        refreshUnits = true
-    else
-        playerList[name]['nearby'] = true
-        playerList[name]['lastSeen'] = GetTime() + playerOutdoorLastseen
-    end
-end
-
-local function eventHandler(_, eventName, unit)
-        local evt = eventName or event
-        if evt == 'PLAYER_ENTERING_WORLD' or evt == 'ZONE_CHANGED_NEW_AREA' then
-                initializeValues()
-        elseif evt == 'UPDATE_BATTLEFIELD_SCORE' then
-                local now = GetTime()
-                -- fill player list
-                if now > playerListRefresh then
-                        if fillPlayerList()     then
-                                playerListRefresh = now + playerListInterval
-                        end
-                end
-        elseif evt == 'UNIT_HEALTH' then
-                WSGUIupdateFChealth(unit or arg1)
-
-        end
-end
 	
-	elseif evt == 'UNIT_HEALTH' then
-		WSGUIupdateFChealth(unit or arg1)
-	end
+	f:SetScript('OnUpdate', fosterFramesCoreOnUpdate)
+	FOSTERFRAMESInitialize(maxUnits, insideBG)
+	bindingsInit()
+	WSGUIinit(insideBG)
 end
 
+local function eventHandler()
+	local evt = event
+	if evt == 'PLAYER_ENTERING_WORLD' or evt == 'ZONE_CHANGED_NEW_AREA' then
+		initializeValues()
+	elseif evt == 'UPDATE_BATTLEFIELD_SCORE' then
+		local now = GetTime()
+		if now > playerListRefresh then
+			if fillPlayerList() then
+				playerListRefresh = now + playerListInterval
+			end
+		end
+	elseif evt == 'UNIT_HEALTH' then
+		WSGUIupdateFChealth(arg1)
+	end
+end
 
 f:RegisterEvent'PLAYER_ENTERING_WORLD'
 f:RegisterEvent'ZONE_CHANGED_NEW_AREA'
 f:RegisterEvent'UNIT_HEALTH'
-
-
-
-
-
 f:SetScript('OnEvent', eventHandler)
 
 SLASH_FOSTERFRAMECORE1 = '/ffc'
@@ -551,7 +468,6 @@ SlashCmdList["FOSTERFRAMECORE"] = function(msg)
 			print('[FosterFrames] Dependency status helper is unavailable.')
 		end
 	elseif msg == 'near' then
-		
 		print('nearbyList:')
 		for k, v in pairs(nearbyList) do
 			print(v['name'])
@@ -563,4 +479,3 @@ SlashCmdList["FOSTERFRAMECORE"] = function(msg)
 		end
 	end
 end
-

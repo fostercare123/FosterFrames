@@ -42,31 +42,31 @@ function FOSTERFRAMESPrintDependencyStatus()
 end
 
 if FOSTERFRAMESPLAYERDATA == nil then
-	        FOSTERFRAMESPLAYERDATA =
-        {
-        -- Main
-        ['enableFrames']                        = true,
-        ['scale']                               = 1,
-        ['layout']                              = 'block',
-        ['groupsize']                           = 5,
-        ['displayOnlyNearby']                   = true, -- Default to true as it's important
-        ['frameMovable']                        = true,
-        
-        -- Tactical (DLL)
-        ['targetFrameCastbar']                  = true,
-        ['integratedTargetFrameCastbar']        = true,
-        ['useUnitXP']                           = true,
-        
-        -- Display
-        ['displayNames']                        = true,
-        ['displayManabar']                      = true,
-        ['castTimers']                          = true,
-        
-        -- Positioning
-        ['offX']                                = 0,
-        ['offY']                                = 0,
-        ['settingsOffX']                        = 0,
-        ['settingsOffY']                        = 0,
+	FOSTERFRAMESPLAYERDATA = 
+	{
+	-- options
+	['scale']					= 1,
+	['groupsize']				= 5,
+	['layout']					= 'block',
+	['frameMovable'] 			= true,
+	['enableFrames']			= true,
+	-- features
+	['mouseOver']				= false,
+	['targetFrameCastbar']		= true,
+	['integratedTargetFrameCastbar']		= true,
+	['targetDebuffTimers']		= false,
+	['playerTargetCounter']		= false,
+	-- bgs
+	['efcBGannouncement']		= true,
+	-- optionals
+	['displayNames']			= true,
+	--['displayHealthValues'] = false,
+	['displayManabar']			= false,
+	['displayOnlyNearby']		= false,
+	['castTimers']				= false,		
+	['targetCounter']			= false,
+	['offX']				= 0,
+	['offY']				= 0,
 }
 end
 
@@ -78,7 +78,7 @@ local fosterFramesDisplayShow = false
 
 local settings = CreateFrame('Frame', 'fosterFramesSettings', UIParent)
 settings:ClearAllPoints()
-settings:SetWidth(400) settings:SetHeight(300)
+settings:SetWidth(320) settings:SetHeight(340)
 settings:SetFrameLevel(60)
 settings:SetPoint('CENTER', UIParent, -UIParent:GetWidth()/3, 0)
 settings:SetBackdrop({bgFile   = [[Interface\Tooltips\UI-Tooltip-Background]],
@@ -89,8 +89,8 @@ settings:SetBackdropBorderColor(.2, .2, .2)
 settings:SetMovable(true) settings:SetUserPlaced(true)
 settings:SetClampedToScreen(true)
 settings:RegisterForDrag'LeftButton' settings:EnableMouse(true)
-settings:SetScript('OnDragStart', function() (self or this):StartMoving() end)
-settings:SetScript('OnDragStop', function() this:StopMovingOrSizing() end)
+settings:SetScript('OnDragStart', function() settings:StartMoving() end)
+settings:SetScript('OnDragStop', function() settings:StopMovingOrSizing() end)
 tinsert(UISpecialFrames, 'fosterFramesSettings')
 settings:Hide()
 
@@ -110,7 +110,7 @@ settings.header.t:SetText'FosterFrames Settings'
 -- tabs
 
 settings.numTabs = 3
-local tabNames = {'Main', 'Tactical', 'Display'}
+local tabNames = {'General', 'Features', 'Optionals'}
 local tabElements = {'Left', 'LeftDisabled', 'Middle', 'MiddleDisabled', 'Right', 'RightDisabled'}
 settings.tabs = {}
 for i = 1, settings.numTabs do
@@ -162,9 +162,9 @@ function setupSettings()
 	end
 	settings.header.t:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'], .9)
 
-	        if MAINSETTINGSInit then MAINSETTINGSInit(enemyFactionColor) end
-        if TACTICALSETTINGSInit then TACTICALSETTINGSInit(enemyFactionColor) end
-        if DISPLAYSETTINGSInit then DISPLAYSETTINGSInit(enemyFactionColor) end
+	GENERALSSETTINGSInit(enemyFactionColor)
+	FEATURESSETTINGSInit(enemyFactionColor)
+	OPTIONALSSETTINGSInit(enemyFactionColor)
 
 	-- general tab by default
 	for j = 1, settings.numTabs do
@@ -189,7 +189,7 @@ function setupSettings()
 	end
 	
 	FOSTERFRAMESsettings()
-	if TARGETFRAMECASTBARsettings then TARGETFRAMECASTBARsettings(true) end
+	TARGETFRAMECASTBARsettings(true)
 end
 
 local closeSettings = function()
@@ -198,7 +198,7 @@ local closeSettings = function()
 		_G['fosterFrameDisplay']:Hide() 
 	end 
 
-	if TARGETFRAMECASTBARsettings then TARGETFRAMECASTBARsettings(false) end
+	TARGETFRAMECASTBARsettings(false)
 end
 -- x button
 settings.x:SetScript('OnClick', function() 
@@ -233,7 +233,7 @@ local function eventHandler()
 		FOSTERFRAMESPLAYERDATA['offX'] = xOfs
 		FOSTERFRAMESPLAYERDATA['offY'] = yOfs
 	elseif event == 'ZONE_CHANGED_NEW_AREA' then
-		if IsInsideBG then insideBG = IsInsideBG() end
+		insideBG = IsInsideBG()
 	end
 end
 

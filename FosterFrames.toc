@@ -1,12 +1,11 @@
 ## Interface: 11200
-## Title: |cffffd700FosterFrames|r 
+## Title: |cffffd700FosterFrames|r |cffcccccc[Fostercare]|r
 ## Notes: FosterFrames for Battlegrounds (Turtle WoW 1.18.1)
 ## OptionalDeps: UnitXP_SP3_Addon, NampowerSettings, SuperAPI, SuperAPI_Castlib
 ## SavedVariablesPerCharacter: FOSTERFRAMESPLAYERDATA
 
 # LIBS / HANDLERS
-globals
-esources\globals.lua
+globals\resources\globals.lua
 globals\actionHandler.lua
 globals\wsgHandler.lua
 globals\abHandler.lua
@@ -14,11 +13,10 @@ globals\commHandler.lua
 globals\smoothBar.lua
 
 # CLASS SPECIFIC
-globals\class
-ogue.lua
+globals\class\rogue.lua
 globals\class\paladin.lua
 
-# SETTINGS - Definitions first, then the main file
+# SETTINGS - Definitions first
 globals\settings\general.lua
 globals\settings\features.lua
 globals\settings\optionals.lua
@@ -32,7 +30,7 @@ FosterFramesCore.lua
 UIElements\UIElementsTemplate.lua
 UIElements\customBorder.lua
 UIElements\customCooldown.lua
-UIElements	argetframe.lua
+UIElements\targetframe.lua
 UIElements\scoreBoard.lua
 UIElements\wsgUI.lua
 UIElements\BindingsHandler.lua

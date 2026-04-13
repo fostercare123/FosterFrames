@@ -490,18 +490,29 @@ local function drawUnits(list)
 		-- target count
 		units[i].targetCount.text:SetText(v['targetcount'] and (v['targetcount'] > 0 and v['targetcount'] or '') or '')
 		
-		-- hp & mana
-                local maxHP = v['maxhealth'] and v['maxhealth'] or 100
-                local currHP = v['health'] and v['health'] or (not v['nearby'] and maxHP) or 100
+                -- hp & mana display optimization for UnitXP
+                local maxHP = v['maxhealth'] or 100
+                local currHP = v['health'] or (not v['nearby'] and maxHP) or 100
                 units[i].hpbar:SetMinMaxValues(0, maxHP)
                 units[i].hpbar:SetValue(currHP)
-                units[i].hpText:SetText(currHP > 100 and currHP or "")
+                
+                -- Always show text if we have real values (UnitXP)
+                if FOSTERFRAMESHasUnitXP() then
+                    units[i].hpText:SetText(currHP .. " / " .. maxHP)
+                else
+                    units[i].hpText:SetText(currHP > 100 and currHP or "")
+                end
 
-                local maxMana = v['maxmana'] and v['maxmana'] or 100
-                local currMana = v['mana'] and v['mana'] or (not v['nearby'] and maxMana) or 100
+                local maxMana = v['maxmana'] or 100
+                local currMana = v['mana'] or (not v['nearby'] and maxMana) or 100
                 units[i].manabar:SetMinMaxValues(0, maxMana)
                 units[i].manabar:SetValue(currMana)
-                units[i].manaText:SetText((currMana > 100 and v['class'] ~= 'WARRIOR' and v['class'] ~= 'ROGUE') and currMana or "")
+                
+                if FOSTERFRAMESHasUnitXP() and v['class'] ~= 'WARRIOR' and v['class'] ~= 'ROGUE' then
+                    units[i].manaText:SetText(currMana .. " / " .. maxMana)
+                else
+                    units[i].manaText:SetText((currMana > 100 and v['class'] ~= 'WARRIOR' and v['class'] ~= 'ROGUE') and currMana or "")
+                end
 		
 		--units[i]:Show()
 		if FOSTERFRAMESPLAYERDATA['displayOnlyNearby'] and not v['nearby'] then units[i]:Hide()	else units[i]:Show() end
@@ -544,14 +555,14 @@ local function updateUnits()
 	if rtMenuEndtime < now then
 		fosterFrame.raidTargetMenu:Hide()
 	end
-	local currentTarget = UnitName'target'
+	local currentTargetGUID = UnitExists('target') and UnitGUID('target')
 	
 	local i = 1
 	
 	for k, v in pairs(playerList) do
 		
-		-- target indicator
-		if currentTarget == v['name'] then
+		-- target indicator using GUID for reliability
+		if (currentTargetGUID and v['guid'] == currentTargetGUID) or (not currentTargetGUID and UnitName('target') == v['name']) then
 			units[i].border:SetColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'])
 			
 			units[i].hpbar:SetBackdropColor(enemyFactionColor['r'] - .6, enemyFactionColor['g'] - .6, enemyFactionColor['b'] - .6, .6)
@@ -564,9 +575,8 @@ local function updateUnits()
 		end
 
 		
-		-- castbar
-                local unitID = (UnitExists('target') and v['name'] == UnitName('target')) and 'target' or (UnitExists('mouseover') and v['name'] == UnitName('mouseover')) and 'mouseover' or nil
-                local castInfo = SPELLCASTINGCOREgetCast(v['name'], unitID)
+		-- castbar - use pre-calculated info from core
+                local castInfo = v['castinfo']
                 units[i].castbar:Hide()
                 if castInfo ~= nil then
                         units[i].castbar:SetMinMaxValues(0, castInfo.timeEnd - castInfo.timeStart)
@@ -624,7 +634,7 @@ local function fosterFramesOnUpdate(self, elapsed)
 	nextRefresh = nextRefresh - (elapsed or arg1 or 0)
 	if nextRefresh < 0 then
 		-- update units
-		if FOSTERFRAMECOREGetRaidTarget then raidTargets = FOSTERFRAMECOREGetRaidTarget() end
+		raidTargets = FOSTERFRAMECOREGetRaidTarget()
 		updateUnits()
 	
 		nextRefresh = refreshInterval

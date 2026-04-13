@@ -1,5 +1,12 @@
 	-------------------------------------------------------------------------------
-	-- RAID MARKERS REMOVED
+	local raidTargetFrame = CreateFrame('Frame', nil, TargetFrame)
+	raidTargetFrame:SetFrameLevel(2)
+	raidTargetFrame:SetHeight(36)	raidTargetFrame:SetWidth(36)
+	raidTargetFrame:SetPoint('CENTER', TargetPortrait, 'TOP')
+	
+	raidTargetFrame.icon = raidTargetFrame:CreateTexture(nil, 'OVERLAY')
+	raidTargetFrame.icon:SetTexture([[Interface\TargetingFrame\UI-RaidTargetingIcons]])
+	raidTargetFrame.icon:SetAllPoints()
 	-------------------------------------------------------------------------------
 	local refreshInterval, nextRefresh = 1/60, 0
 	local flagCarriers = {}
@@ -308,8 +315,7 @@
 		end
 	end
 	-------------------------------------------------------------------------------
-	local function --raidTargetOnUpdate()
-		if not FOSTERFRAMECOREGetRaidTarget then return end
+	local function raidTargetOnUpdate()
 		local rt = FOSTERFRAMECOREGetRaidTarget()
 
 		if UnitExists'target' and rt[UnitName'target'] then
@@ -342,7 +348,7 @@
 			end
 			
 			-- raidtarget
-			--raidTargetOnUpdate()
+			raidTargetOnUpdate()
 			
 			nextRefresh = refreshInterval			
 		end
