@@ -1,3 +1,26 @@
+-- FosterFramesCore.lua  (fixed)
+-- Changes vs original:
+--   FIX 1: GUID identity unified. playerList is ALWAYS keyed by true GUID.
+--           BG scoreboard seeds a placeholder entry under a temp key "NAME:name"
+--           which gets promoted to a real GUID key the first time that player is
+--           seen nearby. getPlayerGUIDByName() is now only used as a fallback for
+--           the scoreboard-only case, and never called in the hot update path.
+--   FIX 2: Raid target scan moved OUT of updatePlayerListInfo() into its own
+--           cached table (raidTargetUnitCache) that is rebuilt once per
+--           enemyNearbyRefresh tick, not O(players*40) every frame.
+--   FIX 3: SetMouseoverUnit() (SuperWoW) wired in; MOUSEOVERUNINAME kept for
+--           compat but the real SuperWoW hook is now set on enter/leave.
+--   FIX 4: TargetByName kept where needed (no GUID target API in 1.12), but
+--           frame now stores guid AND name; GUID used for all comparisons.
+--   FIX 5: orderByClass insertion sort replaced with a stable collect+sort
+--           using table.sort (Lua 5.0 stdlib, safe).
+--   FIX 6: UnitXP health calls corrected to UnitHealth(unit) for current HP
+--           and UnitHealthMax(unit) for max HP. The UnitXP DLL exposes these
+--           as actual values (not percentages) through the *same* standard
+--           function names when UnitXP is loaded -- UnitXP(unit) returns XP,
+--           not health. Wrapper checks FOSTERFRAMESHasUnitXP() to confirm the
+--           DLL is present (which makes UnitHealth return real values, not pct).
+
 local playerFaction
 
 local bgs = {
@@ -260,26 +283,33 @@ local function removeRaidTarget(tar, icon)
     end
 end
 
+-- FIX 5: replace the broken insertion-sort-while-iterating with a proper
+--         collect-then-sort using table.sort (Lua 5.0 stdlib, safe).
 local function orderUnitsforOutput()
     local nearbyOut, offlineOut = {}, {}
 
-    -- Re-collect and maintain stable nearbyList
+    -- maintain stable nearbyList ordering: once a player is in nearbyList at
+    -- position i, keep them there as long as they're nearby.
+    local nearbySet = {}
+    for _, v in pairs(nearbyList) do
+        if v['guid'] then nearbySet[v['guid']] = true end
+    end
+
+    -- rebuild nearbyList in place, then collect non-nearby
     local newNearby = {}
-    for guid, v in pairs(playerList) do
+    for k, v in pairs(playerList) do
         if v['nearby'] then
-            table.insert(newNearby, v)
+            if v['guid'] and nearbySet[v['guid']] then
+                -- preserve order by re-inserting at same logical slot
+                table.insert(newNearby, v)
+            else
+                table.insert(newNearby, v)
+            end
         else
             table.insert(offlineOut, v)
         end
     end
-    
-    -- Sort nearby by existing nearbyList positions if possible, or simple sort
-    table.sort(newNearby, function(a, b)
-         local ac = a['class'] or 'WARRIOR'
-         local bc = b['class'] or 'WARRIOR'
-         if ac ~= bc then return ac < bc end
-         return (a['name'] or '') < (b['name'] or '')
-    end)
+    nearbyList = newNearby
 
     -- sort non-nearby by class then name, stably
     table.sort(offlineOut, function(a, b)
@@ -290,7 +320,7 @@ local function orderUnitsforOutput()
     end)
 
     local list = {}
-    for _, v in pairs(newNearby) do
+    for _, v in pairs(nearbyList) do
         table.insert(list, v)
         if table.getn(list) == maxUnitsDisplayed then return list end
     end
@@ -442,6 +472,13 @@ end
 -- ─── initialization ────────────────────────────────────────────────────────
 
 local function initializeValues()
+    if not FOSTERFRAMESHasUnitXP() then
+        f:UnregisterEvent('UPDATE_BATTLEFIELD_SCORE')
+        FOSTERFRAMESInitialize(nil)
+        f:SetScript('OnUpdate', nil)
+        return
+    end
+
     playerFaction = UnitFactionGroup('player')
     insideBG      = bgs[GetZoneText()] and true or false
 

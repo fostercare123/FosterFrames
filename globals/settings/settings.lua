@@ -20,6 +20,12 @@ function FOSTERFRAMESHasGUID()
 	return type(UnitGUID) == 'function'
 end
 
+function FOSTERFRAMESHasUnitXP()
+	-- UnitXP DLL typically exposes UnitXP global or just hooks UnitHealth.
+	-- We check if UnitXP function exists (returns XP points).
+	return type(UnitXP) == 'function'
+end
+
 function FOSTERFRAMESHasCastInfo()
 	return type(UnitCastingInfo) == 'function' and type(UnitChannelInfo) == 'function'
 end

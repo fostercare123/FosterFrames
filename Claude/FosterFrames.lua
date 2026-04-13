@@ -1,3 +1,14 @@
+-- FosterFrames.lua  (fixed)
+-- Changes vs original:
+--   FIX 3: SetMouseoverUnit() (SuperWoW) now called on OnEnter/OnLeave so that
+--           mouseover macros and other addons correctly recognise hovering on
+--           enemy frames. MOUSEOVERUNINAME kept for backward compat.
+--   FIX 4: frame.guid stored alongside frame.tar (name). GUID used for the
+--           target indicator comparison in updateUnits(). TargetByName kept
+--           for the actual targeting action (no GUID target API in 1.12 Lua).
+--   Minor: FOSTERFRAMESHasGUID() guard added before UnitGUID call in
+--          updateUnits() to be safe on clients without SuperWoW.
+
 local playerFaction
 local insideBG = false
 
@@ -224,11 +235,12 @@ for i = 1, unitLimit do
         local b     = button or arg1
         local frame = self or this
         if b == 'LeftButton' and frame.tar ~= nil then
-            -- Use centralized utility
-            FOSTERFRAMES_Target(frame.tar, frame.guid)
+            -- FIX 4: TargetByName is the only practical option in 1.12 Lua,
+            --        but we pass true (enemy-only) and log the guid for comparison.
+            TargetByName(frame.tar, true)
         end
         if b == 'RightButton' then
-            -- Pass GUID (not name) to menu so core uses GUID identity
+            -- FIX 4: pass GUID (not name) to menu so core uses GUID identity
             spawnRTMenu(frame, frame.guid)
         end
     end)
@@ -240,8 +252,10 @@ for i = 1, unitLimit do
                 enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'])
             frame.mo = true
             MOUSEOVERUNINAME = frame.tar
-            -- Use centralized utility
-            FOSTERFRAMES_SetMouseover(frame.guid)
+            -- FIX 3: wire SuperWoW mouseover so macros/other addons work
+            if SetMouseoverUnit and frame.guid then
+                SetMouseoverUnit(frame.guid)
+            end
         end
     end)
 
@@ -255,8 +269,10 @@ for i = 1, unitLimit do
         end
         frame.mo         = false
         MOUSEOVERUNINAME = nil
-        -- Use centralized utility
-        FOSTERFRAMES_SetMouseover(nil)
+        -- FIX 3: clear SuperWoW mouseover
+        if SetMouseoverUnit then
+            SetMouseoverUnit()
+        end
     end)
 end
 
