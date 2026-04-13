@@ -510,18 +510,18 @@ local function drawUnits(list)
 		units[i].hpbar:SetMinMaxValues(0, maxHP)
 		units[i].hpbar:SetValue(currHP)
 		
-		units[i].hpText:SetText(currHP .. " / " .. maxHP)
+		-- units[i].hpText:SetText(currHP .. " / " .. maxHP)
 
 		local maxMana = v['maxmana'] or 100
 		local currMana = v['mana'] or (not v['nearby'] and maxMana) or 100
 		units[i].manabar:SetMinMaxValues(0, maxMana)
 		units[i].manabar:SetValue(currMana)
 		
-		if v['class'] ~= 'WARRIOR' and v['class'] ~= 'ROGUE' then
-			units[i].manaText:SetText(currMana .. " / " .. maxMana)
-		else
-			units[i].manaText:SetText("")
-		end
+		-- if v['class'] ~= 'WARRIOR' and v['class'] ~= 'ROGUE' then
+		-- 	units[i].manaText:SetText(currMana .. " / " .. maxMana)
+		-- else
+		-- 	units[i].manaText:SetText("")
+		-- end
 		
 		if FOSTERFRAMESPLAYERDATA['displayOnlyNearby'] and not v['nearby'] then units[i]:Hide()	else units[i]:Show() end
 
