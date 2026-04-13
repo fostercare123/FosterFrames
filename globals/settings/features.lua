@@ -16,8 +16,8 @@
 																[4] = {['id'] = 'targetDebuffTimers', 	['label'] = 'Debuff Timers On Target'},
 																
 															}
-			local checkBoxFeaturesBGN, checkBoxFeaturesBG  = 1, {	[1] = {['id'] = 'efcBGannouncement', 	['label'] = 'Low Health EFC Announcement'},
-																	
+			local checkBoxFeaturesBGN, checkBoxFeaturesBG  = 2, {	[1] = {['id'] = 'efcBGannouncement', 	['label'] = 'Low Health EFC Announcement'},
+																	[2] = {['id'] = 'efcDistanceTracking', 	['label'] = 'Track EFC Distance'},
 																}
 			
 			-- features

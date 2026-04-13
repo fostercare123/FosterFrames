@@ -12,12 +12,12 @@ local hasSuperWOW = false
 local hasNampower = false
 
 function FOSTERFRAMESHasUnitXP()
-	return hasUnitXP and type(UnitXP) == 'function'
+	return type(UnitXP) == 'function'
 end
 
 function FOSTERFRAMESHasSuperWOW()
-	-- On TurtleWOW/SuperWOW environment, we need to ensure the critical functions exist
-	return hasSuperWOW and type(UnitGUID) == 'function' and type(UnitCastingInfo) == 'function' and type(UnitChannelInfo) == 'function'
+	-- Check for signature SuperWOW functions directly in global environment
+	return type(UnitGUID) == 'function' and type(UnitCastingInfo) == 'function'
 end
 
 function FOSTERFRAMESHasNampower()
@@ -60,6 +60,7 @@ if FOSTERFRAMESPLAYERDATA == nil then
 	['playerTargetCounter']		= false,
 	-- bgs
 	['efcBGannouncement']		= true,
+	['efcDistanceTracking']		= true,
 	-- optionals
 	['displayNames']			= true,
 	--['displayHealthValues'] = false,

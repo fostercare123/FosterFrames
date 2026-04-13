@@ -88,7 +88,16 @@ local 	fosterFrame = CreateFrame('Frame', 'fosterFrameDisplay', UIParent)
 		fosterFrame.efcButton:SetPoint('LEFT', fosterFrame.Title, 'RIGHT', 2, 0)
 		fosterFrame.efcButton:SetScript('OnEnter', function(self)
 			GameTooltip:SetOwner(self or this, 'ANCHOR_TOPRIGHT', -30, -30)
-			GameTooltip:SetText('Toggle EFC Low Health Announcement')
+			if FOSTERFRAMESPLAYERDATA['efcDistanceTracking'] then
+				local name, dist = FOSTERFRAMECOREGetEFCDistance()
+				if name then
+					GameTooltip:SetText('EFC: '..name..' ('..dist..')')
+				else
+					GameTooltip:SetText('EFC: Unknown')
+				end
+			else
+				GameTooltip:SetText('Toggle EFC Low Health Announcement')
+			end
 			GameTooltip:Show()
 		end)
 		fosterFrame.efcButton:SetScript('OnLeave', function()
@@ -97,6 +106,11 @@ local 	fosterFrame = CreateFrame('Frame', 'fosterFrameDisplay', UIParent)
 
 		fosterFrame.efcButton.flagTexture = fosterFrame.efcButton:CreateTexture(nil, 'ARTWORK')
 		fosterFrame.efcButton.flagTexture:SetAllPoints()
+		
+		fosterFrame.efcButton.distText = fosterFrame.efcButton:CreateFontString(nil, 'OVERLAY')
+		fosterFrame.efcButton.distText:SetFont(STANDARD_TEXT_FONT, 10, 'OUTLINE')
+		fosterFrame.efcButton.distText:SetPoint('LEFT', fosterFrame.efcButton, 'RIGHT', 2, 0)
+		fosterFrame.efcButton.distText:SetTextColor(1, 1, 1)
 
 		--fosterFrame.efcButton:Hide()
 		
@@ -627,6 +641,18 @@ local function fosterFramesOnUpdate(self, elapsed)
 		-- update units
 		raidTargets = FOSTERFRAMECOREGetRaidTarget()
 		updateUnits()
+		
+		-- update EFC distance text
+		if FOSTERFRAMESPLAYERDATA['efcDistanceTracking'] and fosterFrame.efcButton:IsShown() then
+			local name, dist = FOSTERFRAMECOREGetEFCDistance()
+			if name and dist ~= 'unknown' then
+				fosterFrame.efcButton.distText:SetText(dist)
+			else
+				fosterFrame.efcButton.distText:SetText('')
+			end
+		else
+			fosterFrame.efcButton.distText:SetText('')
+		end
 	
 		nextRefresh = refreshInterval
 	end

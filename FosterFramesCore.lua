@@ -155,6 +155,41 @@ local function updatePlayerListInfo(now)
 	end
 end
 
+local function calculateEFCDistance(now)
+	if not FOSTERFRAMESPLAYERDATA['efcDistanceTracking'] then return end
+	
+	local enemyFaction = playerFaction == 'Alliance' and 'Horde' or 'Alliance'
+	local efcName = raidTargets[enemyFaction] and raidTargets[enemyFaction]['name']
+	if not efcName then return end
+
+	local efcUnit = nil
+	-- scan units
+	if UnitExists('target') and UnitName('target') == efcName then efcUnit = 'target'
+	elseif UnitExists('mouseover') and UnitName('mouseover') == efcName then efcUnit = 'mouseover'
+	else
+		for i=1, 40 do
+			local rTarget = 'raid'..i..'target'
+			if UnitExists(rTarget) and UnitName(rTarget) == efcName then
+				efcUnit = rTarget
+				break
+			end
+		end
+	end
+
+	if efcUnit then
+		local distance = 'unknown'
+		if CheckInteractDistance(efcUnit, 3) then distance = '< 10yd'
+		elseif CheckInteractDistance(efcUnit, 2) then distance = '< 11yd'
+		elseif CheckInteractDistance(efcUnit, 4) then distance = '< 28yd'
+		end
+		
+		local guid = getPlayerGUIDByName(efcName)
+		if guid and playerList[guid] then
+			playerList[guid]['efcDistance'] = distance
+		end
+	end
+end
+
 local function globalNearbyMaintenance(now)
 	now = now or GetTime()
 	local nextSeen = now + playerOutdoorLastseen
@@ -254,6 +289,18 @@ function FOSTERFRAMECOREgetPlayer(nameOrGuid)
 	return playerList[nameOrGuid] or playerList[getPlayerGUIDByName(nameOrGuid)]
 end
 
+function FOSTERFRAMECOREGetEFCDistance()
+	local enemyFaction = playerFaction == 'Alliance' and 'Horde' or 'Alliance'
+	local efcName = raidTargets[enemyFaction] and raidTargets[enemyFaction]['name']
+	if not efcName then return nil end
+	
+	local guid = getPlayerGUIDByName(efcName)
+	if guid and playerList[guid] then
+		return efcName, playerList[guid]['efcDistance'] or 'unknown'
+	end
+	return efcName, 'unknown'
+end
+
 function FOSTERFRAMECOREUpdateFlagCarriers(fc)
 	for k, v in pairs(playerList) do
 		local f = v['fc']
@@ -340,6 +387,7 @@ local function fosterFramesCoreOnUpdate()
 	end
 
 	updatePlayerListInfo(now)
+	calculateEFCDistance(now)
 
 	if now > globalNearbyCheckNext then
 		globalNearbyMaintenance(now)
