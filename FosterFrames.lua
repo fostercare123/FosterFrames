@@ -707,8 +707,17 @@ function FOSTERFRAMESsettings()
 		SetupFrames(15)
 		defaultVisuals()
 		setccIcon()
+		
+		-- Always show EFC button when settings are open as an example
+		fosterFrame.efcButton:Show()
+		fosterFrame.efcButton.distText:SetText(FOSTERFRAMESPLAYERDATA['efcDistanceTracking'] and '< 28yd' or '')
 	else
 		SetupFrames(maxUnits)
+		if GetZoneText() == 'Warsong Gulch' then
+			fosterFrame.efcButton:Show()
+		else
+			fosterFrame.efcButton:Hide()
+		end
 	end
 	
 	arrangeUnits()
