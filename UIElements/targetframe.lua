@@ -280,7 +280,7 @@
 	-------------------------------------------------------------------------------
 	local checkAddTimer = function(button, debuff, debuffList)
 		for k, v in pairs(debuffList) do
-			if string.upper(v.icon) == string.upper(debuff) then
+			if v.icon and debuff and string.upper(v.icon) == string.upper(debuff) then
 				button.text:SetText(getTimerLeft(v.timeEnd, 0))					
 				if showText then button.text:Show()	end
 				button.cd:SetTimers(v.timeStart, v.timeEnd)

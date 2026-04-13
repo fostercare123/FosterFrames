@@ -243,16 +243,19 @@ function setupSettings()
 end
 
 local closeSettings = function()
-	--settings:Hide() 
-	if not fosterFramesDisplayShow and not insideBG then 
+	-- Only hide the display if it's supposed to be disabled globally
+	if not FOSTERFRAMESPLAYERDATA['enableFrames'] then 
 		_G['fosterFrameDisplay']:Hide() 
+	elseif not insideBG and not fosterFramesDisplayShow then
+		-- If we're not in a BG and the frame wasn't shown before opening settings, hide it
+		_G['fosterFrameDisplay']:Hide()
 	end 
 
 	TARGETFRAMECASTBARsettings(false)
 end
 -- x button
 settings.x:SetScript('OnClick', function() 
-	 --closeSettings()
+	 closeSettings()
 	 settings:Hide()
 end)
 
