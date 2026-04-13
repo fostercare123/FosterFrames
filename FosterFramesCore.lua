@@ -456,22 +456,28 @@ local function eventHandler()
 	elseif evt == 'UPDATE_BATTLEFIELD_SCORE' then
 		local numScores = GetNumBattlefieldScores()
 		for i=1, numScores do
-			local name, killingBlows, honorableKills, deaths, honorGained, faction, rank, race, class, classToken, damageDone, healingDone = GetBattlefieldScore(i)
-			if faction ~= playerFaction then
+			-- Standard Vanilla 1.12.1 return values:
+			-- name, killingBlows, honorableKills, deaths, honorGained, faction, rank, race, class, damageDone, healingDone
+			local name, killingBlows, honorableKills, deaths, honorGained, faction, rank, race, class, damageDone, healingDone = GetBattlefieldScore(i)
+			
+			-- faction: 0 for Horde, 1 for Alliance
+			local enemyFactionID = playerFaction == 'Alliance' and 0 or 1
+			
+			if faction == enemyFactionID and name then
 				-- Check if we already have this player by name (as a fallback for GUID)
 				local guid = getPlayerGUIDByName(name)
 				if not guid then
-					-- If no SuperWOW GUID, create a pseudo-GUID for tracking
+					-- If no SuperWOW GUID, use name as the unique key
 					guid = name
 				end
 				
 				if not playerList[guid] then
 					local u = {}
 					u['name'] = name
-					u['class'] = classToken
+					u['class'] = string.upper(class or 'WARRIOR')
 					u['guid'] = guid
 					u['nearby'] = false
-					u['health'] = 100
+					u['health'] = nil -- nil means we haven't seen them yet
 					u['maxhealth'] = 100
 					playerList[guid] = u
 					refreshUnits = true

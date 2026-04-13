@@ -54,6 +54,7 @@
 
 	GET_DEFAULT_ICON = function(op, value)
 		local dir = iconFolders[op]
+		if not value or not dir then return "" end
 		return dir .. value
 	end
 	
