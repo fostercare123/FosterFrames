@@ -62,7 +62,7 @@
 	       local button = self or this
 	       local text = button == hb and h or a
         local t = text:GetText()
-        FOSTERFRAMES_Target(t, nil)
+        TargetByName(t, true)
 
     end
 	

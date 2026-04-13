@@ -1,38 +1,22 @@
 	-------------------------------------------------------------------------------
 	local function castingChecks(spell)
-		if not FOSTERFRAMESPLAYERDATA or not FOSTERFRAMESPLAYERDATA['mouseOver'] or MOUSEOVERUNINAME == nil then
-			return false
-		end
-
-		if spell and SPELLINFO_SINGLE_TARGET_BUFF_SPELLS and SPELLINFO_SINGLE_TARGET_BUFF_SPELLS[spell] then
-			return false
-		end
-
+		if not FOSTERFRAMESPLAYERDATA['mouseOver'] or MOUSEOVERUNINAME == nil			then	return false	end
+		
+		if SPELLINFO_SINGLE_TARGET_BUFF_SPELLS[spell]	then	return false	end
+		
 		-- target mouseover unit
-		local guid = nil
-		if type(FOSTERFRAMECOREgetPlayer) == 'function' then
-			local p = FOSTERFRAMECOREgetPlayer(MOUSEOVERUNINAME)
-			guid = p and p.guid
-		end
-		FOSTERFRAMES_Target(MOUSEOVERUNINAME, guid)
+		TargetByName(MOUSEOVERUNINAME, true)
 		return true
 	end
 	-------------------------------------------------------------------------------
 	local function reTarget(b, currentTarget)
 		if b then 
-			if currentTarget == nil then
-				ClearTarget()	
+			if currentTarget == nil then	ClearTarget()	
 			else
-				local guid = nil
-				if type(FOSTERFRAMECOREgetPlayer) == 'function' then
-					local p = FOSTERFRAMECOREgetPlayer(currentTarget)
-					guid = p and p.guid
-				end
-				FOSTERFRAMES_Target(currentTarget, guid)
+				TargetByName(currentTarget, true)
 			end
 		end
 	end
-
 	-------------------------------------------------------------------------------
 	local AHTooltip = CreateFrame("GameTooltip","AHTooltip",UIParent,"GameTooltipTemplate")
 	AHTooltip:SetOwner(UIParent,"ANCHOR_NONE")

@@ -20,12 +20,6 @@ function FOSTERFRAMESHasGUID()
 	return type(UnitGUID) == 'function'
 end
 
-function FOSTERFRAMESHasUnitXP()
-	-- UnitXP DLL typically exposes UnitXP global or just hooks UnitHealth.
-	-- We check if UnitXP function exists (returns XP points).
-	return type(UnitXP) == 'function'
-end
-
 function FOSTERFRAMESHasCastInfo()
 	return type(UnitCastingInfo) == 'function' and type(UnitChannelInfo) == 'function'
 end
@@ -34,30 +28,12 @@ function FOSTERFRAMESHasNampower()
 	return hasNampower
 end
 
-function FOSTERFRAMES_Target(name, guid)
-	if not name then return end
-	if FOSTERFRAMESHasGUID() and guid and string.find(tostring(guid), "^0x") then
-		TargetUnit(guid)
-	else
-		TargetByName(name, true)
-	end
-end
-
-function FOSTERFRAMES_SetMouseover(guid)
-	if type(SetMouseoverUnit) == 'function' then
-		if guid and string.find(tostring(guid), "^0x") then
-			SetMouseoverUnit(guid)
-		else
-			SetMouseoverUnit(nil)
-		end
-	end
-end
-
 function FOSTERFRAMESPrintDependencyStatus()
 	local superwowState = hasSuperWOW and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 	local nampowerState = hasNampower and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 
 	print('[FosterFrames] Dependency status: SuperWOW=' .. superwowState .. ', Nampower=' .. nampowerState)
+end
 
 	if hasSuperWOW and SUPERWOW_VERSION then
 		print('[FosterFrames] SuperWOW version: ' .. tostring(SUPERWOW_VERSION))
