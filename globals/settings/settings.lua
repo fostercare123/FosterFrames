@@ -9,6 +9,7 @@ FOSTERFRAMESVERSION = 3.0
 
 local hasSuperWOW = false
 local hasNampower = false
+local hasUnitXP = false
 
 function FOSTERFRAMESHasSuperWOW()
 	-- The addon can load if any SuperWOW-like environment is found,
@@ -28,11 +29,16 @@ function FOSTERFRAMESHasNampower()
 	return hasNampower
 end
 
+function FOSTERFRAMESHasUnitXP()
+	return hasUnitXP
+end
+
 function FOSTERFRAMESPrintDependencyStatus()
 	local superwowState = hasSuperWOW and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 	local nampowerState = hasNampower and '|cff00ff00yes|r' or '|cffff1a1ano|r'
+	local unitxpState = hasUnitXP and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 
-	print('[FosterFrames] Dependency status: SuperWOW=' .. superwowState .. ', Nampower=' .. nampowerState)
+	print('[FosterFrames] Dependency status: SuperWOW=' .. superwowState .. ', Nampower=' .. nampowerState .. ', UnitXP=' .. unitxpState)
 end
 
 	if hasSuperWOW and SUPERWOW_VERSION then
@@ -67,7 +73,8 @@ if FOSTERFRAMESPLAYERDATA == nil then
 	['efcDistanceTracking']		= true,
 	-- optionals
 	['displayNames']			= true,
-	--['displayHealthValues'] = false,
+	['displayHealthValues'] 	= false,
+	['displayManaValues'] 		= false,
 	['displayManabar']			= false,
 	['displayOnlyNearby']		= false,
 	['castTimers']				= false,		
@@ -250,7 +257,8 @@ local function eventHandler()
 	if event == 'PLAYER_LOGIN' then
 		playerFaction = UnitFactionGroup'player'
 		hasSuperWOW = FOSTERFRAMESHasSuperWOW()
-		hasNampower = FOSTERFRAMESHasNampower()
+		hasNampower = IsAddOnLoaded("Nampower") or IsAddOnLoaded("NampowerSettings")
+		hasUnitXP = IsAddOnLoaded("UnitXP_SP3_Addon")
 		local tc = playerFaction == 'Alliance' and 'FF1A1A' or '00ADF0'
 		print('|cff' ..tc.. '[FosterFrames] Use |cffffffff/ffs|cff' ..tc.. ' to open Settings.')
 		if hasSuperWOW then

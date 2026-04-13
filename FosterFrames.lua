@@ -256,12 +256,17 @@ end
 local function optionals()
 	for i=1, unitLimit do
 		if not FOSTERFRAMESPLAYERDATA['displayNames'] 		then units[i].name:Hide() 	else units[i].name:Show() end
+		if not FOSTERFRAMESPLAYERDATA['displayHealthValues'] then units[i].hpText:Hide() else units[i].hpText:Show() end
+		if not FOSTERFRAMESPLAYERDATA['displayManaValues']   then units[i].manaText:Hide() else units[i].manaText:Show() end
+		
 		if not FOSTERFRAMESPLAYERDATA['displayManabar'] 	then 
 			units[i].hpbar:SetHeight(unitHeight)
 			units[i].manabar:Hide()
+			units[i].manaText:Hide()
 		else 
 			units[i].hpbar:SetHeight(unitHeight - manaBarHeight)
 			units[i].manabar:Show() 
+			if FOSTERFRAMESPLAYERDATA['displayManaValues'] then units[i].manaText:Show() end
 		end
 		if not FOSTERFRAMESPLAYERDATA['castTimers'] 		then units[i].castbar.timer:Hide() else units[i].castbar.timer:Show() end
 		if not FOSTERFRAMESPLAYERDATA['targetCounter'] 		then units[i].targetCount.text:Hide() else units[i].targetCount.text:Show() end
@@ -432,18 +437,22 @@ local function drawUnits(list)
 		units[i].hpbar:SetMinMaxValues(0, maxHP)
 		units[i].hpbar:SetValue(currHP)
 		
-		-- units[i].hpText:SetText(currHP .. " / " .. maxHP)
+		if FOSTERFRAMESPLAYERDATA['displayHealthValues'] then
+			units[i].hpText:SetText(currHP .. " / " .. maxHP)
+		end
 
 		local maxMana = v['maxmana'] or 100
 		local currMana = v['mana'] or (not v['nearby'] and maxMana) or 100
 		units[i].manabar:SetMinMaxValues(0, maxMana)
 		units[i].manabar:SetValue(currMana)
 		
-		-- if v['class'] ~= 'WARRIOR' and v['class'] ~= 'ROGUE' then
-		-- 	units[i].manaText:SetText(currMana .. " / " .. maxMana)
-		-- else
-		-- 	units[i].manaText:SetText("")
-		-- end
+		if FOSTERFRAMESPLAYERDATA['displayManaValues'] then
+			if v['class'] ~= 'WARRIOR' and v['class'] ~= 'ROGUE' then
+				units[i].manaText:SetText(currMana .. " / " .. maxMana)
+			else
+				units[i].manaText:SetText("")
+			end
+		end
 		
 		if FOSTERFRAMESPLAYERDATA['displayOnlyNearby'] and not v['nearby'] then units[i]:Hide()	else units[i]:Show() end
 

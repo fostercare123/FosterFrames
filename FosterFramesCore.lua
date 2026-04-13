@@ -31,12 +31,26 @@ local playerTargetCounter = 0
 
 -- confirm hostile nearbyPlayers
 local function applyNearbyPlayer(v, now, nextCheck)
-	if playerList[v['name']] == nil then
-		playerList[v['name']] = v
-		refreshUnits = true
+	local id = v['guid'] or v['name']
+	
+	if playerList[id] == nil then
+		-- if we only have name, check if we already have this player by GUID
+		if not v['guid'] then
+			for guid, p in pairs(playerList) do
+				if p.name == v.name then
+					id = guid
+					break
+				end
+			end
+		end
+		
+		if playerList[id] == nil then
+			playerList[id] = v
+			refreshUnits = true
+		end
 	end
 
-	local p = playerList[v['name']]
+	local p = playerList[id]
 	if p then
 		refreshUnits = true
 		p['health'] = v['health']
@@ -45,7 +59,13 @@ local function applyNearbyPlayer(v, now, nextCheck)
 		if v['maxmana'] then p['maxmana'] = v['maxmana'] end
 		if v['sex'] then p['sex'] = v['sex'] end
 		if v['powerType'] then p['powerType'] = v['powerType'] end
-		if v['guid'] then p['guid'] = v['guid'] end
+		
+		-- Update GUID if we just found it
+		if v['guid'] and not p['guid'] then
+			playerList[v['guid']] = p
+			playerList[v['name']] = nil
+			p['guid'] = v['guid']
+		end
 
 		if now > enemyNearbyRefresh then
 			p['targetcount'] = p['targetcount'] and p['targetcount'] + 1 or 1
@@ -77,7 +97,7 @@ local function verifyUnitInfo(unit, now)
 		applyNearbyPlayer(u, now, now + nextPlayerCheck)
 		
 		-- update fc health text
-		local p = playerList[u['name']]
+		local p = FOSTERFRAMECOREgetPlayer(u['guid'] or u['name'])
 		if p and p['fc'] then WSGUIupdateFChealth(unit) end
 		
 		return true
@@ -413,6 +433,7 @@ local function fosterFramesCoreOnUpdate()
 	if now > enemyNearbyRefresh then
 		resetTargetCount()
 		cacheRaidTargets()
+		getRaidMembersTarget(now)
 		checkPrioMembers(now)
 		enemyNearbyRefresh = now + enemyNearbyInterval
 	end

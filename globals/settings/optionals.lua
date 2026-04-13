@@ -9,12 +9,13 @@
 			container:EnableMouse(true)
 			container:Hide()
 			
-			local checkBoxOptionalsN, checkBoxOptionals  = 5, { [1] = {['id'] = 'displayNames', 		['label'] = 'Display Names'}, 
-																--[2] = {['id'] = 'displayHealthValues', 	['label'] = 'Display Health %'}, 
-																[2] = {['id'] = 'displayManabar', 		['label'] = 'Display Mana Bar'},
-																[3] = {['id'] = 'castTimers', 			['label'] = 'Display Cast Timers'},
-																[4] = {['id'] = 'displayOnlyNearby', 	['label'] = 'Display Nearby Units Only'},
-																[5] = {['id'] = 'targetCounter', 		['label'] = 'Display Target Counter'},
+			local checkBoxOptionalsN, checkBoxOptionals  = 7, { [1] = {['id'] = 'displayNames', 		['label'] = 'Display Names'}, 
+																[2] = {['id'] = 'displayHealthValues', 	['label'] = 'Display Health Values'},
+																[3] = {['id'] = 'displayManaValues', 	['label'] = 'Display Mana Values'},
+																[4] = {['id'] = 'displayManabar', 		['label'] = 'Display Mana Bar'},
+																[5] = {['id'] = 'castTimers', 			['label'] = 'Display Cast Timers'},
+																[6] = {['id'] = 'displayOnlyNearby', 	['label'] = 'Display Nearby Units Only'},
+																[7] = {['id'] = 'targetCounter', 		['label'] = 'Display Target Counter'},
 																
 															}
 			
