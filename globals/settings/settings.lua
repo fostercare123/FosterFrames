@@ -16,8 +16,19 @@ function FOSTERFRAMESHasUnitXP()
 end
 
 function FOSTERFRAMESHasSuperWOW()
-	-- Check for signature SuperWOW functions directly in global environment
-	return type(UnitGUID) == 'function' and type(UnitCastingInfo) == 'function'
+	-- Broad detection for SuperWOW environment
+	local isSuperWOW = (type(UnitGUID) == 'function' or type(SetAutoloot) == 'function' or SUPERWOW_VERSION ~= nil or SUPERWOW_STRING ~= nil)
+	return isSuperWOW
+end
+
+function FOSTERFRAMESDebugDependencies()
+	print('|cffffd700[FosterFrames] Debugging Dependencies:|r')
+	print('UnitXP: ' .. (type(UnitXP) == 'function' and '|cff00ff00Found|r' or '|cffff1a1aMissing|r'))
+	print('UnitGUID: ' .. (type(UnitGUID) == 'function' and '|cff00ff00Found|r' or '|cffff1a1aMissing|r'))
+	print('UnitCastingInfo: ' .. (type(UnitCastingInfo) == 'function' and '|cff00ff00Found|r' or '|cffff1a1aMissing|r'))
+	print('UnitChannelInfo: ' .. (type(UnitChannelInfo) == 'function' and '|cff00ff00Found|r' or '|cffff1a1aMissing|r'))
+	print('SetAutoloot: ' .. (type(SetAutoloot) == 'function' and '|cff00ff00Found|r' or '|cffff1a1aMissing|r'))
+	print('SUPERWOW_VERSION: ' .. (SUPERWOW_VERSION and '|cff00ff00'..tostring(SUPERWOW_VERSION)..'|r' or '|cffff1a1aMissing|r'))
 end
 
 function FOSTERFRAMESHasNampower()
