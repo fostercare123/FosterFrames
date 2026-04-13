@@ -18,10 +18,10 @@ globals\class\paladin.lua
 globals\class\shaman.lua
 
 # SETTINGS - Definitions first
+globals\settings\settings.lua
 globals\settings\general.lua
 globals\settings\features.lua
 globals\settings\optionals.lua
-globals\settings\settings.lua
 
 # CORE LOGIC
 globals\spellCastingCore.lua

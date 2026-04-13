@@ -158,9 +158,11 @@ settings.unlock:SetScript('OnClick', function()
 	if FOSTERFRAMESPLAYERDATA['frameMovable'] then
 		FOSTERFRAMESPLAYERDATA['frameMovable'] = false
 		this:SetText('Unlock')
+		if _G['fosterFrameDisplay'].bg then _G['fosterFrameDisplay'].bg:Hide() end
 	else
 		FOSTERFRAMESPLAYERDATA['frameMovable'] = true
 		this:SetText('Lock')
+		if _G['fosterFrameDisplay'].bg then _G['fosterFrameDisplay'].bg:Show() end
 	end
 	FOSTERFRAMESsettings()
 end)

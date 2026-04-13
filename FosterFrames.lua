@@ -43,12 +43,15 @@ local 	fosterFrame = CreateFrame('Frame', 'fosterFrameDisplay', UIParent)
 		end)
 		fosterFrame:SetScript('OnDragStop', function(self)
 			local frame = self or this
-			if FOSTERFRAMESPLAYERDATA['frameMovable'] or (_G['fosterFramesSettings'] and _G['fosterFramesSettings']:IsShown()) then
-				frame:StopMovingOrSizing()
-			end
+			frame:StopMovingOrSizing()
 		end)
 		fosterFrame:RegisterForDrag('LeftButton')
+		fosterFrame:EnableMouse(true)
 	
+		fosterFrame.bg = fosterFrame:CreateTexture(nil, 'BACKGROUND')
+		fosterFrame.bg:SetAllPoints()
+		fosterFrame.bg:SetTexture(0, 0, 0, 0.5)
+		fosterFrame.bg:Hide()
 		
 		fosterFrame.Title = fosterFrame:CreateFontString(nil, 'OVERLAY')
 		fosterFrame.Title:SetFont(STANDARD_TEXT_FONT, 12, 'OUTLINE')		
