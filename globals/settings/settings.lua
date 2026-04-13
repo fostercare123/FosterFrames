@@ -146,9 +146,36 @@ for i = 1, settings.numTabs do
 				end
 			end
 		end
-		-- Highlight active button?
 	end)
 end
+
+-- Unlock/Lock Button
+settings.unlock = CreateFrame('Button', 'fosterFramesSettingsUnlockButton', settings.sidebar, 'UIPanelButtonTemplate')
+settings.unlock:SetWidth(90) settings.unlock:SetHeight(24)
+settings.unlock:SetPoint('BOTTOM', settings.sidebar, 'BOTTOM', 0, 40)
+settings.unlock:SetText(FOSTERFRAMESPLAYERDATA['frameMovable'] and 'Lock' or 'Unlock')
+settings.unlock:SetScript('OnClick', function()
+	if FOSTERFRAMESPLAYERDATA['frameMovable'] then
+		FOSTERFRAMESPLAYERDATA['frameMovable'] = false
+		this:SetText('Unlock')
+	else
+		FOSTERFRAMESPLAYERDATA['frameMovable'] = true
+		this:SetText('Lock')
+	end
+	FOSTERFRAMESsettings()
+end)
+
+-- Reset Button
+settings.reset = CreateFrame('Button', 'fosterFramesSettingsResetButton', settings.sidebar, 'UIPanelButtonTemplate')
+settings.reset:SetWidth(90) settings.reset:SetHeight(24)
+settings.reset:SetPoint('BOTTOM', settings.sidebar, 'BOTTOM', 0, 10)
+settings.reset:SetText('Reset Pos')
+settings.reset:SetScript('OnClick', function()
+	_G['fosterFrameDisplay']:ClearAllPoints()
+	_G['fosterFrameDisplay']:SetPoint('CENTER', UIParent, 0, 0)
+	FOSTERFRAMESPLAYERDATA['offX'] = 0
+	FOSTERFRAMESPLAYERDATA['offY'] = 0
+end)
 
 -------------------------------------------
 
@@ -186,13 +213,13 @@ function setupSettings()
 	if _G['fosterFramesSettingsgeneralContainer'] then _G['fosterFramesSettingsgeneralContainer']:Show() end
 	
 	settings:Show()
+	settings.unlock:SetText(FOSTERFRAMESPLAYERDATA['frameMovable'] and 'Lock' or 'Unlock')
 	
 	if FOSTERFRAMESPLAYERDATA['enableFrames'] then
 		if _G['fosterFrameDisplay']:IsShown() then
 			fosterFramesDisplayShow = true
 		else
 			fosterFramesDisplayShow = false
-			
 			_G['fosterFrameDisplay']:Show()
 		end		
 	end
