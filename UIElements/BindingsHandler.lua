@@ -17,7 +17,7 @@
 	
 	function getKTbind()
 		if enabled then
-			TargetByName(FOSTERFRAMECOREGetRaidTargetbyIcon('skull'), true)
+			FOSTERFRAMES_Target(FOSTERFRAMECOREGetRaidTargetbyIcon('skull'), nil)
 		end
 	end
 		

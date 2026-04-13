@@ -241,11 +241,7 @@ for i = 1, unitLimit,1 do
 			local b = button or arg1
 			local frame = self or this
 			if b == 'LeftButton' and frame.tar ~= nil  then
-				if FOSTERFRAMESHasGUID() and frame.guid then
-					TargetUnit(frame.guid)
-				else
-					TargetByName(frame.tar, true)
-				end
+				FOSTERFRAMES_Target(frame.tar, frame.guid)
 			end
 			if b == 'RightButton' then
 				spawnRTMenu(frame, frame.tar)
@@ -258,9 +254,7 @@ for i = 1, unitLimit,1 do
 			frame.name:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'])
 			frame.mo = true
 			MOUSEOVERUNINAME = frame.tar
-			if FOSTERFRAMESHasGUID() and frame.guid and type(SetMouseoverUnit) == 'function' then
-				SetMouseoverUnit(frame.guid)
-			end
+			FOSTERFRAMES_SetMouseover(frame.guid)
 		end
 	end)
 
@@ -274,9 +268,7 @@ for i = 1, unitLimit,1 do
 		end
 		frame.mo = false
 		MOUSEOVERUNINAME = nil
-		if type(SetMouseoverUnit) == 'function' then
-			SetMouseoverUnit(nil)
-		end
+		FOSTERFRAMES_SetMouseover(nil)
 	end)
 end
 

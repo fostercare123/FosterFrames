@@ -119,9 +119,9 @@ local function cacheRaidTargets()
 	for i=1, numRaidMembers do
 		local rTarget = groupType .. i .. 'target'
 		if UnitExists(rTarget) then
-			local name = UnitName(rTarget)
-			if name then
-				newCache[name] = rTarget
+			local guid = FOSTERFRAMESHasGUID() and UnitGUID(rTarget)
+			if guid then
+				newCache[guid] = rTarget
 			end
 		end
 	end
@@ -149,9 +149,9 @@ local function updatePlayerListInfo(now)
 		-- Determine unitID if target or mouseover using GUID for reliability
 		local unitID = (UnitExists('target') and FOSTERFRAMESHasGUID() and v['guid'] == UnitGUID('target')) and 'target' or (UnitExists('mouseover') and FOSTERFRAMESHasGUID() and v['guid'] == UnitGUID('mouseover')) and 'mouseover' or nil
 		
-		-- Use cache for raid targets (O(1) lookup)
-		if not unitID then
-			unitID = cachedRaidTargets[v['name']]
+		-- Use cache for raid targets (O(1) lookup by GUID)
+		if not unitID and v['guid'] then
+			unitID = cachedRaidTargets[v['guid']]
 		end
 
 		v['castinfo'] = SPELLCASTINGCOREgetCast(v['name'], unitID)
@@ -249,27 +249,19 @@ local function verifynearbylist(p)
 	return 0
 end
 
-local function orderByClass(l, e)
-	for j, v in pairs(l) do
-		local eClass = e['class'] or 'WARRIOR'
-		local vClass = v['class'] or 'WARRIOR'
-		local eName = e['name'] or 'Unknown'
-		local vName = v['name'] or 'Unknown'
-		
-		if eClass < vClass or (eClass == vClass and eName < vName) then
-			table.insert(l, j, e)
-			return l
-		end
-	end
-	table.insert(l, e)
-	return l
-end
-
 local function orderUnitsforOutput()
 	local list = {}
 	
+	-- Add officially tracked players
 	for k, v in pairs(playerList) do
 		table.insert(list, v)
+	end
+	
+	-- Add scoreboard players not yet officially seen (BG mode)
+	if insideBG then
+		for name, v in pairs(pendingBGPlayers) do
+			table.insert(list, v)
+		end
 	end
 	
 	table.sort(list, function(a, b)
@@ -313,7 +305,7 @@ end
 
 --- GLOBAL ACCESS ---
 function FOSTERFRAMECOREgetPlayer(nameOrGuid)
-	return playerList[nameOrGuid] or playerList[getPlayerGUIDByName(nameOrGuid)]
+	return playerList[nameOrGuid] or playerList[getPlayerGUIDByName(nameOrGuid)] or pendingBGPlayers[nameOrGuid]
 end
 
 function FOSTERFRAMECOREGetEFCDistance()
@@ -498,18 +490,26 @@ local function eventHandler()
 			local enemyFactionID = playerFaction == 'Alliance' and 0 or 1
 			
 			if faction == enemyFactionID and name then
-				local guid = name -- Use name as unique identifier for scoreboard players
-				
-				if not playerList[guid] then
-					local u = {}
-					u['name'] = name
-					u['class'] = string.upper(classToken or class or 'WARRIOR')
-					u['guid'] = guid
-					u['nearby'] = false
-					u['health'] = nil
-					u['maxhealth'] = 100
-					playerList[guid] = u
-					refreshUnits = true
+				if not playerList[name] and not pendingBGPlayers[name] then
+					-- Check if this player is already officially tracked by GUID
+					local alreadyTracked = false
+					for guid, p in pairs(playerList) do
+						if p.name == name then
+							alreadyTracked = true
+							break
+						end
+					end
+
+					if not alreadyTracked then
+						local u = {}
+						u['name'] = name
+						u['class'] = string.upper(classToken or class or 'WARRIOR')
+						u['nearby'] = false
+						u['health'] = nil
+						u['maxhealth'] = 100
+						pendingBGPlayers[name] = u
+						refreshUnits = true
+					end
 				end
 			end
 		end

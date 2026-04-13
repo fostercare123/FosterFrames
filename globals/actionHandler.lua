@@ -5,7 +5,8 @@
 		if SPELLINFO_SINGLE_TARGET_BUFF_SPELLS[spell]	then	return false	end
 		
 		-- target mouseover unit
-		TargetByName(MOUSEOVERUNINAME, true)
+		local p = FOSTERFRAMECOREgetPlayer(MOUSEOVERUNINAME)
+		FOSTERFRAMES_Target(MOUSEOVERUNINAME, p and p.guid)
 		return true
 	end
 	-------------------------------------------------------------------------------
@@ -13,7 +14,8 @@
 		if b then 
 			if currentTarget == nil then	ClearTarget()	
 			else
-				TargetByName(currentTarget, true)
+				local p = FOSTERFRAMECOREgetPlayer(currentTarget)
+				FOSTERFRAMES_Target(currentTarget, p and p.guid)
 			end
 		end
 	end
