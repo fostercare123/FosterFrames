@@ -423,6 +423,13 @@ local function initializeValues()
 	playerFaction = UnitFactionGroup('player')
 	insideBG = bgs[GetZoneText()] and true or false
 	
+	if insideBG then
+		f:RegisterEvent'UPDATE_BATTLEFIELD_SCORE'
+		RequestBattlefieldScoreData()
+	else
+		f:UnregisterEvent'UPDATE_BATTLEFIELD_SCORE'
+	end
+	
 	playerList = {}
 	raidTargets = {}
 	prioMembers = {}
@@ -441,6 +448,31 @@ local function eventHandler()
 	local evt = event
 	if evt == 'PLAYER_ENTERING_WORLD' or evt == 'ZONE_CHANGED_NEW_AREA' then
 		initializeValues()
+	elseif evt == 'UPDATE_BATTLEFIELD_SCORE' then
+		local numScores = GetNumBattlefieldScores()
+		for i=1, numScores do
+			local name, killingBlows, honorableKills, deaths, honorGained, faction, rank, race, class, classToken, damageDone, healingDone = GetBattlefieldScore(i)
+			if faction ~= playerFaction then
+				-- Check if we already have this player by name (as a fallback for GUID)
+				local guid = getPlayerGUIDByName(name)
+				if not guid then
+					-- If no SuperWOW GUID, create a pseudo-GUID for tracking
+					guid = name
+				end
+				
+				if not playerList[guid] then
+					local u = {}
+					u['name'] = name
+					u['class'] = classToken
+					u['guid'] = guid
+					u['nearby'] = false
+					u['health'] = 100
+					u['maxhealth'] = 100
+					playerList[guid] = u
+					refreshUnits = true
+				end
+			end
+		end
 	elseif evt == 'UNIT_HEALTH' then
 		WSGUIupdateFChealth(arg1)
 	end
