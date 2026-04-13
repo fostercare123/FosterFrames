@@ -703,7 +703,7 @@ end
 
 function FOSTERFRAMESsettings()
 	optionals()
-	if not enabled or not insideBG then
+	if not enabled or (not insideBG and (_G['fosterFramesSettings'] and _G['fosterFramesSettings']:IsShown())) then
 		SetupFrames(15)
 		defaultVisuals()
 		setccIcon()
@@ -713,7 +713,7 @@ function FOSTERFRAMESsettings()
 		fosterFrame.efcButton.distText:SetText(FOSTERFRAMESPLAYERDATA['efcDistanceTracking'] and '< 28yd' or '')
 	else
 		SetupFrames(maxUnits)
-		if GetZoneText() == 'Warsong Gulch' then
+		if insideBG and GetZoneText() == 'Warsong Gulch' then
 			fosterFrame.efcButton:Show()
 		else
 			fosterFrame.efcButton:Hide()

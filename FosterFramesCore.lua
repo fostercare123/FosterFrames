@@ -227,7 +227,12 @@ end
 
 local function orderByClass(l, e)
 	for j, v in pairs(l) do
-		if e['class'] < v['class'] or (e['class'] == v['class'] and e['name'] < v['name']) then
+		local eClass = e['class'] or 'WARRIOR'
+		local vClass = v['class'] or 'WARRIOR'
+		local eName = e['name'] or 'Unknown'
+		local vName = v['name'] or 'Unknown'
+		
+		if eClass < vClass or (eClass == vClass and eName < vName) then
 			table.insert(l, j, e)
 			return l
 		end
