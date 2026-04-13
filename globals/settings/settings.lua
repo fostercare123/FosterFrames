@@ -42,31 +42,31 @@ function FOSTERFRAMESPrintDependencyStatus()
 end
 
 if FOSTERFRAMESPLAYERDATA == nil then
-	FOSTERFRAMESPLAYERDATA = 
-	{
-	-- options
-	['scale']					= 1,
-	['groupsize']				= 5,
-	['layout']					= 'block',
-	['frameMovable'] 			= true,
-	['enableFrames']			= true,
-	-- features
-	['mouseOver']				= false,
-	['targetFrameCastbar']		= true,
-	['integratedTargetFrameCastbar']		= true,
-	['targetDebuffTimers']		= false,
-	['playerTargetCounter']		= false,
-	-- bgs
-	['efcBGannouncement']		= true,
-	-- optionals
-	['displayNames']			= true,
-	--['displayHealthValues'] = false,
-	['displayManabar']			= false,
-	['displayOnlyNearby']		= false,
-	['castTimers']				= false,		
-	['targetCounter']			= false,
-	['offX']				= 0,
-	['offY']				= 0,
+	        FOSTERFRAMESPLAYERDATA =
+        {
+        -- Main
+        ['enableFrames']                        = true,
+        ['scale']                               = 1,
+        ['layout']                              = 'block',
+        ['groupsize']                           = 5,
+        ['displayOnlyNearby']                   = true, -- Default to true as it's important
+        ['frameMovable']                        = true,
+        
+        -- Tactical (DLL)
+        ['targetFrameCastbar']                  = true,
+        ['integratedTargetFrameCastbar']        = true,
+        ['useUnitXP']                           = true,
+        
+        -- Display
+        ['displayNames']                        = true,
+        ['displayManabar']                      = true,
+        ['castTimers']                          = true,
+        
+        -- Positioning
+        ['offX']                                = 0,
+        ['offY']                                = 0,
+        ['settingsOffX']                        = 0,
+        ['settingsOffY']                        = 0,
 }
 end
 
@@ -78,7 +78,7 @@ local fosterFramesDisplayShow = false
 
 local settings = CreateFrame('Frame', 'fosterFramesSettings', UIParent)
 settings:ClearAllPoints()
-settings:SetWidth(320) settings:SetHeight(340)
+settings:SetWidth(400) settings:SetHeight(300)
 settings:SetFrameLevel(60)
 settings:SetPoint('CENTER', UIParent, -UIParent:GetWidth()/3, 0)
 settings:SetBackdrop({bgFile   = [[Interface\Tooltips\UI-Tooltip-Background]],
@@ -110,7 +110,7 @@ settings.header.t:SetText'FosterFrames Settings'
 -- tabs
 
 settings.numTabs = 3
-local tabNames = {'General', 'Features', 'Optionals'}
+local tabNames = {'Main', 'Tactical', 'Display'}
 local tabElements = {'Left', 'LeftDisabled', 'Middle', 'MiddleDisabled', 'Right', 'RightDisabled'}
 settings.tabs = {}
 for i = 1, settings.numTabs do

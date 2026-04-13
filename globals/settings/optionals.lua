@@ -8,7 +8,10 @@
 	container:EnableMouseWheel(true)
 	container:Hide()
 	-------------------------------------------------------------------------------
-	local checkBoxOptionalsN, checkBoxOptionals  = 5, { [1] = {['id'] = 'displayNames', 		['label'] = 'Display Names'}, 
+		local checkBoxOptionalsN, checkBoxOptionals  = 3, { [1] = {['id'] = 'displayNames', 		['label'] = 'Show Player Names'}, 
+														[2] = {['id'] = 'displayManabar', 		['label'] = 'Show Mana/Resource Bars'},
+														[3] = {['id'] = 'castTimers', 			['label'] = 'Show Cast Timers'},
+													}, 
 														--[2] = {['id'] = 'displayHealthValues', 	['label'] = 'Display Health %'}, 
 														[2] = {['id'] = 'displayManabar', 		['label'] = 'Display Mana Bar'},
 														[3] = {['id'] = 'castTimers', 			['label'] = 'Display Cast Timers'},
@@ -37,7 +40,7 @@
 		end)
 	end
 	-------------------------------------------------------------------------------
-	OPTIONALSSETTINGSInit = function(color)
+	DISPLAYSETTINGSInit = function(color)
 		for i = 1, checkBoxOptionalsN do
 			_G[container.optinalsList[i]:GetName()..'Text']:SetTextColor(color['r'], color['g'], color['b'], .9)
 			container.optinalsList[i]:SetChecked(FOSTERFRAMESPLAYERDATA[checkBoxOptionals[i]['id']])

@@ -8,7 +8,10 @@
 	container:EnableMouseWheel(true)
 	container:Hide()
 	-------------------------------------------------------------------------------
-	local checkBoxGeneralN, checkBoxGeneral  = 1, { 	[1] = {['id'] = 'enableFrames', 		['label'] = 'Show FosterFrames'},
+		local checkBoxGeneralN, checkBoxGeneral  = 3, { 	[1] = {['id'] = 'enableFrames', 		['label'] = 'Enable FosterFrames'},
+													[2] = {['id'] = 'displayOnlyNearby', 	['label'] = 'Display Nearby Units Only'},
+													[3] = {['id'] = 'frameMovable', 		['label'] = 'Unlock Frames (Draggable)'},
+													},
 													}
 	-------------------------------------------------------------------------------
 	-- general checkbox
@@ -74,7 +77,7 @@
 	end)
 	
 	-------------------------------------------------------------------------------
-	GENERALSSETTINGSInit = function(color)
+	MAINSETTINGSInit = function(color)
 		_G[container.scaleSlider:GetName()..'Low']:SetTextColor(color['r'], color['g'], color['b'], .9)
 		_G[container.scaleSlider:GetName()..'High']:SetTextColor(color['r'], color['g'], color['b'], .9)
 		_G[container.layoutSlider:GetName()..'Low']:SetTextColor(color['r'], color['g'], color['b'], .9)
