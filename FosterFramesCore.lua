@@ -456,28 +456,23 @@ local function eventHandler()
 	elseif evt == 'UPDATE_BATTLEFIELD_SCORE' then
 		local numScores = GetNumBattlefieldScores()
 		for i=1, numScores do
-			-- Standard Vanilla 1.12.1 return values:
-			-- name, killingBlows, honorableKills, deaths, honorGained, faction, rank, race, class, damageDone, healingDone
-			local name, killingBlows, honorableKills, deaths, honorGained, faction, rank, race, class, damageDone, healingDone = GetBattlefieldScore(i)
+			-- Correct TurtleWoW/Vanilla 1.12.1 return values:
+			-- 1:name, 2:killingBlows, 3:honorableKills, 4:deaths, 5:honorGained, 6:faction, 7:race, 8:class, 9:classToken, 10:damageDone, 11:healingDone
+			local name, kb, hk, deaths, honor, faction, race, class, classToken = GetBattlefieldScore(i)
 			
 			-- faction: 0 for Horde, 1 for Alliance
 			local enemyFactionID = playerFaction == 'Alliance' and 0 or 1
 			
 			if faction == enemyFactionID and name then
-				-- Check if we already have this player by name (as a fallback for GUID)
-				local guid = getPlayerGUIDByName(name)
-				if not guid then
-					-- If no SuperWOW GUID, use name as the unique key
-					guid = name
-				end
+				local guid = name -- Use name as unique identifier for scoreboard players
 				
 				if not playerList[guid] then
 					local u = {}
 					u['name'] = name
-					u['class'] = string.upper(class or 'WARRIOR')
+					u['class'] = string.upper(classToken or class or 'WARRIOR')
 					u['guid'] = guid
 					u['nearby'] = false
-					u['health'] = nil -- nil means we haven't seen them yet
+					u['health'] = nil
 					u['maxhealth'] = 100
 					playerList[guid] = u
 					refreshUnits = true
