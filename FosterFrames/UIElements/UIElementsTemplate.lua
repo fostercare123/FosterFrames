@@ -1,7 +1,7 @@
 	-------------------------------------------------------------------------------
-	local TEXTURE 	= [[Interface\AddOns\enemyFrames\globals\resources\barTexture]]
+	local TEXTURE 	= [[Interface\AddOns\fosterFrames\globals\resources\barTexture]]
 	local BACKDROP 	= {bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],}
-	local ISTEXTURE = [[Interface\AddOns\enemyFrames\globals\resources\arrow2]]
+	local ISTEXTURE = [[Interface\AddOns\fosterFrames\globals\resources\arrow2]]
 	-------------------------------------------------------------------------------
 	local unitWidth, unitHeight, castBarHeight, ccIconWidth, manaBarHeight = 64, 22, 8, 28, 6
 	UIElementsGetDimensions = function()
@@ -86,9 +86,19 @@
 		--------------
 
 		this.name = this:CreateFontString(nil, 'OVERLAY')
-		this.name:SetFont(STANDARD_TEXT_FONT, 11, 'OUTLINE')
-		this.name:SetTextColor(.8, .8, .8, .8)
-		this.name:SetPoint('CENTER', this.hpbar)	
+                this.name:SetFont(STANDARD_TEXT_FONT, 11, 'OUTLINE')
+                this.name:SetTextColor(.8, .8, .8, .8)
+                this.name:SetPoint('CENTER', this.hpbar)
+
+                this.hpText = this.hpbar:CreateFontString(nil, 'OVERLAY')
+                this.hpText:SetFont(STANDARD_TEXT_FONT, 8, 'OUTLINE')
+                this.hpText:SetTextColor(1, 1, 1, .8)
+                this.hpText:SetPoint('LEFT', this.hpbar, 2, 0)
+                
+                this.manaText = this.manabar:CreateFontString(nil, 'OVERLAY')
+                this.manaText:SetFont(STANDARD_TEXT_FONT, 8, 'OUTLINE')
+                this.manaText:SetTextColor(1, 1, 1, .8)
+                this.manaText:SetPoint('LEFT', this.manabar, 2, 0)	
 		--this.name:SetPoint('RIGHT', this.hpbar, -2, 0)
 		
 		--this.hpText = this:CreateFontString(nil, 'OVERLAY')
@@ -153,51 +163,6 @@
 		this.cc.cd = CreateCooldown(this.cc, .58, true)
 		this.cc.cd:SetAlpha(1)
 	
-		return this
-	end
-	-------------------------------------------------------------------------------
-	local ISWidth, ISHeight, arrowWidth, arrowHeight = 26, 20, 66, 14
-	CreateIncomingSpellsFrame = function(parentFrame)
-		local this = CreateFrame('Frame', nil, parentFrame)
-		this:SetWidth(ISWidth)
-		this:SetHeight(ISHeight)
-		
-		this.icon = this:CreateTexture(nil, 'OVERLAY')
-		this.icon:SetAllPoints()	
-		this.icon:SetTexCoord(.1, .9, .25, .75)
-		
-		this.border = CreateBorder(nil, this, 16)
-		
-		this.arrow = CreateFrame('statusbar', nil, this)
-		this.arrow:SetStatusBarTexture(ISTEXTURE)
-		this.arrow:SetFrameLevel(1)
-		this.arrow:SetWidth(arrowWidth)
-		this.arrow:SetHeight(arrowHeight)
-		this.arrow:SetPoint('TOP', this, 'BOTTOM', -1, 0)
-
-		this.arrow.bg = this.arrow:CreateTexture(nil, 'BACKGROUND')
-		this.arrow.bg:SetTexture(ISTEXTURE)
-		this.arrow.bg:SetAllPoints()
-		
-		this.caster = this:CreateFontString(nil, 'OVERLAY')
-		this.caster:SetFont(STANDARD_TEXT_FONT, 16, 'OUTLINE')
-		this.caster:SetPoint('RIGHT', this.arrow, 'TOPLEFT', 4, 4)
-		
-		this.you = this:CreateFontString(nil, 'OVERLAY')
-		this.you:SetFont(STANDARD_TEXT_FONT, 16, 'OUTLINE')
-		this.you:SetPoint('LEFT', this.arrow, 'TOPRIGHT', -2, 4)
-		this.you:SetText("You")
-		
-		this.button = CreateFrame('Button', nil, this)
-		this.button:SetPoint('TOPLEFT', this.caster, 'TOPLEFT')
-		this.button:SetPoint('BOTTOMRIGHT', this.you, 'BOTTOMRIGHT')
-		
-		this.button:SetScript('OnClick', function()
-			if this.target then
-				TargetByName(this.target, true)
-			end
-		end)
-		
 		return this
 	end
 	-------------------------------------------------------------------------------

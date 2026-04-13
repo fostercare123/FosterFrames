@@ -5,15 +5,46 @@ print = function(m) DEFAULT_CHAT_FRAME:AddMessage(m) end
 
 tlength = function(t)	local i = 0 for k, j in ipairs(t) do i = i + 1 end return i end
 
-ENEMYFRAMESVERSION = 1.35
-ENEMYFRAMESNEWVERSION = ENEMYFRAMESVERSION
-ENEMYFRAMESVERSIONFOUND = false
+FOSTERFRAMESVERSION = 3.0
 
+local hasUnitXP = false
+local hasSuperWOW = false
+local hasNampower = false
+function FOSTERFRAMESHasUnitXP()
+	return hasUnitXP
+end
 
-ENEMYFRAMESPLAYERDATA = 
-{
+function FOSTERFRAMESHasSuperWOW()
+	return hasSuperWOW
+end
+
+function FOSTERFRAMESHasNampower()
+	return hasNampower
+end
+
+function FOSTERFRAMESPrintDependencyStatus()
+	local unitxpState = hasUnitXP and '|cff00ff00yes|r' or '|cffff1a1ano|r'
+	local superwowState = hasSuperWOW and '|cff00ff00yes|r' or '|cffff1a1ano|r'
+	local nampowerState = hasNampower and '|cff00ff00yes|r' or '|cffff1a1ano|r'
+
+	print('[FosterFrames] Dependency status: UnitXP=' .. unitxpState .. ', SuperWOW=' .. superwowState .. ', Nampower=' .. nampowerState)
+
+	if hasSuperWOW and SUPERWOW_VERSION then
+		print('[FosterFrames] SuperWOW version: ' .. tostring(SUPERWOW_VERSION))
+	end
+
+	if hasNampower and GetNampowerVersion then
+		local major, minor, patch = GetNampowerVersion()
+		if major then
+			print('[FosterFrames] Nampower version: ' .. tostring(major) .. '.' .. tostring(minor or 0) .. '.' .. tostring(patch or 0))
+		end
+	end
+end
+
+if FOSTERFRAMESPLAYERDATA == nil then
+	FOSTERFRAMESPLAYERDATA = 
+	{
 	-- options
-	['defaultIcon'] 			= 'rank',
 	['scale']					= 1,
 	['groupsize']				= 5,
 	['layout']					= 'block',
@@ -21,17 +52,12 @@ ENEMYFRAMESPLAYERDATA =
 	['enableFrames']			= true,
 	-- features
 	['mouseOver']				= false,
-	['enableOutdoors']			= true,
 	['targetFrameCastbar']		= true,
 	['integratedTargetFrameCastbar']		= true,
-	['playerPortraitDebuff']	= false,
-	['targetPortraitDebuff']	= false,
 	['targetDebuffTimers']		= false,
 	['playerTargetCounter']		= false,
 	-- bgs
-	['incomingSpells']			= false,
-	['pvpmapblips']				= false,	
-	['efcBGannouncement']		= false,
+	['efcBGannouncement']		= true,
 	-- optionals
 	['displayNames']			= true,
 	--['displayHealthValues'] = false,
@@ -39,25 +65,18 @@ ENEMYFRAMESPLAYERDATA =
 	['displayOnlyNearby']		= false,
 	['castTimers']				= false,		
 	['targetCounter']			= false,
-	-- nameplates
-	['nameplatesClassColor'] 	= true,
-	['nameplatesdebuffs'] 		= true,
-	['nameplatesCastbar']		= true,
-	['plateDebuffSize']			= 1,
-	['nameplatesRaidMarks']		= true,
-	
-	
 	['offX']				= 0,
 	['offY']				= 0,
 }
+end
 
 
 local playerFaction, insideBG = false
 ------------ UI ELEMENTS ------------------
 local enemyFactionColor
-local enemyFramesDisplayShow = false
+local fosterFramesDisplayShow = false
 
-local settings = CreateFrame('Frame', 'enemyFramesSettings', UIParent)
+local settings = CreateFrame('Frame', 'fosterFramesSettings', UIParent)
 settings:ClearAllPoints()
 settings:SetWidth(320) settings:SetHeight(340)
 settings:SetFrameLevel(60)
@@ -72,10 +91,10 @@ settings:SetClampedToScreen(true)
 settings:RegisterForDrag'LeftButton' settings:EnableMouse(true)
 settings:SetScript('OnDragStart', function() settings:StartMoving() end)
 settings:SetScript('OnDragStop', function() settings:StopMovingOrSizing() end)
-tinsert(UISpecialFrames, 'enemyFramesSettings')
+tinsert(UISpecialFrames, 'fosterFramesSettings')
 settings:Hide()
 
-settings.x = CreateFrame('Button', 'enemyFramesSettingsCloseButton', settings, 'UIPanelCloseButton')
+settings.x = CreateFrame('Button', 'fosterFramesSettingsCloseButton', settings, 'UIPanelCloseButton')
 settings.x:SetPoint('TOPRIGHT',  -6, -6)
 
 settings.header = settings:CreateTexture(nil, 'ARTWORK')
@@ -86,21 +105,12 @@ settings.header:SetVertexColor(.2, .2, .2)
 
 settings.header.t = settings:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
 settings.header.t:SetPoint('TOP', settings.header, 0, -14)
-settings.header.t:SetText'enemyFrames Settings'
-
--- container scrollframe
-
-settings.containerScrollframe = CreateFrame('ScrollFrame', 'enemyFramesSettingsScrollframe', settings, 'UIPanelScrollFrameTemplate')
-settings.containerScrollframe:SetFrameLevel(3)
-settings.containerScrollframe:SetPoint('TOPLEFT', settings, -7, -36)
-settings.containerScrollframe:SetPoint('BOTTOMRIGHT', settings, -37, 18)
-settings.containerScrollframe:Raise()
-settings.containerScrollframe:SetToplevel()
+settings.header.t:SetText'FosterFrames Settings'
 
 -- tabs
 
-settings.numTabs = 4
-local tabNames = {'general', 'features', 'optionals', 'nameplates'}
+settings.numTabs = 3
+local tabNames = {'General', 'Features', 'Optionals'}
 local tabElements = {'Left', 'LeftDisabled', 'Middle', 'MiddleDisabled', 'Right', 'RightDisabled'}
 settings.tabs = {}
 for i = 1, settings.numTabs do
@@ -117,17 +127,16 @@ for i = 1, settings.numTabs do
 	end
 	
 	settings.tabs[i]:SetScript('OnClick', function()	
+		local activeContainerName = string.lower(tabNames[this.id])
 		for j = 1, settings.numTabs do	
 			if j ~= this.id then
-				_G['enemyFramesSettings'..tabNames[j]..'Container']:Hide()
+				local containerName = string.lower(tabNames[j])
+				_G['fosterFramesSettings'..containerName..'Container']:Hide()
 			end
 		end
-		settings.containerScrollframe.content = _G['enemyFramesSettings'..tabNames[this.id]..'Container']
-		settings.containerScrollframe:SetScrollChild(_G['enemyFramesSettings'..tabNames[this.id]..'Container'])
-		_G['enemyFramesSettings'..tabNames[this.id]..'Container']:Show()
+		_G['fosterFramesSettings'..activeContainerName..'Container']:Show()
 		
 		PanelTemplates_SetTab(settings, this.id)
-		--_G[settings:GetName()..'Tab'..this.id..'Text']:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'])
 	end)
 end
 
@@ -135,6 +144,16 @@ end
 
 
 function setupSettings()
+	if not FOSTERFRAMESHasUnitXP() then
+		print('|cffff1a1a[FosterFrames] UnitXP SP3 is required. FosterFrames will stay disabled until UnitXP is active.')
+		return
+	end
+
+	if not FOSTERFRAMESHasSuperWOW() then
+		print('|cffff1a1a[FosterFrames] SuperWOW is required. FosterFrames will stay disabled until SuperWOW is active.')
+		return
+	end
+
 	playerFaction = UnitFactionGroup'player'
 	if playerFaction == 'Alliance' then 
 		enemyFactionColor = RGB_FACTION_COLORS['Horde']
@@ -146,47 +165,40 @@ function setupSettings()
 	GENERALSSETTINGSInit(enemyFactionColor)
 	FEATURESSETTINGSInit(enemyFactionColor)
 	OPTIONALSSETTINGSInit(enemyFactionColor)
-	NAMEPLATESSETTINGSInit(enemyFactionColor)
-	
+
 	-- general tab by default
 	for j = 1, settings.numTabs do
-		_G['enemyFramesSettings'..tabNames[j]..'Container']:Hide()
-		
-		--local disableFont = _G[settings.tabs[j]:GetName()]:CreateFontString(nil, 'ARTWORK', 'GameFontDisable')
-		--disableFont:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'])
-		--_G[settings.tabs[j]:GetName()]:SetDisabledFontObject(disableFont)
+		local containerName = string.lower(tabNames[j])
+		_G['fosterFramesSettings'..containerName..'Container']:Hide()
 	end
 			
-	settings.containerScrollframe.content = _G['enemyFramesSettingsgeneralContainer']
-	settings.containerScrollframe:SetScrollChild(_G['enemyFramesSettingsgeneralContainer'])
-	_G['enemyFramesSettingsgeneralContainer']:Show()
+	_G['fosterFramesSettingsgeneralContainer']:Show()
 	PanelTemplates_SetTab(settings, 1)
 	
 	settings:Show()
 	
-	if ENEMYFRAMESPLAYERDATA['enableFrames'] then
-		if _G['enemyFrameDisplay']:IsShown() then
-			enemyFramesDisplayShow = true
+	if FOSTERFRAMESPLAYERDATA['enableFrames'] then
+		if _G['fosterFrameDisplay']:IsShown() then
+			fosterFramesDisplayShow = true
 		else
-			enemyFramesDisplayShow = false
+			fosterFramesDisplayShow = false
 			
-			_G['enemyFrameDisplay']:Show()
+			_G['fosterFrameDisplay']:Show()
 		end		
-		--tinsert(UISpecialFrames, 'enemyFrameDisplay')
+		--tinsert(UISpecialFrames, 'fosterFrameDisplay')
 	end
 	
-	ENEMYFRAMESsettings()
-	INCOMINGSPELLSsettings(ENEMYFRAMESPLAYERDATA['incomingSpells'])
+	FOSTERFRAMESsettings()
 	TARGETFRAMECASTBARsettings(true)
 end
 
 local closeSettings = function()
 	--settings:Hide() 
-	if not enemyFramesDisplayShow and not insideBG then 
-		_G['enemyFrameDisplay']:Hide() 
+	if not fosterFramesDisplayShow and not insideBG then 
+		_G['fosterFrameDisplay']:Hide() 
 	end 
 
-	INCOMINGSPELLSsettings(false) TARGETFRAMECASTBARsettings(false)
+	TARGETFRAMECASTBARsettings(false)
 end
 -- x button
 settings.x:SetScript('OnClick', function() 
@@ -197,14 +209,29 @@ end)
 local function eventHandler()
 	if event == 'PLAYER_LOGIN' then
 		playerFaction = UnitFactionGroup'player'
+		hasUnitXP = type(UnitXP) == 'function'
+		hasSuperWOW = type(SUPERWOW_VERSION) ~= 'nil' or type(SUPERWOW_STRING) ~= 'nil' or type(SetAutoloot) == 'function'
+		hasNampower = type(GetNampowerVersion) == 'function'
 		local tc = playerFaction == 'Alliance' and 'FF1A1A' or '00ADF0'
-		print('|cff' ..tc.. '[enemyFrames] v'.. ENEMYFRAMESVERSION .. ' loaded. |cffffffff/efs|cff' ..tc.. ' for menu settings.')
-		_G['enemyFrameDisplay']:SetScale(ENEMYFRAMESPLAYERDATA['scale'])
-		_G['enemyFrameDisplay']:SetPoint('CENTER', UIParent, ENEMYFRAMESPLAYERDATA['offX'], ENEMYFRAMESPLAYERDATA['offY'])
+		print('|cff' ..tc.. '[FosterFrames] Use |cffffffff/ffs|cff' ..tc.. ' to open Settings.')
+		if hasUnitXP and hasSuperWOW then
+			print('|cff' ..tc.. '[FosterFrames] Loaded (UnitXP + SuperWOW mode).')
+			FOSTERFRAMESPrintDependencyStatus()
+		else
+			if not hasUnitXP then
+				print('|cffff1a1a[FosterFrames] UnitXP SP3 was not detected. Addon disabled.')
+			end
+			if not hasSuperWOW then
+				print('|cffff1a1a[FosterFrames] SuperWOW was not detected. Addon disabled.')
+			end
+			print('|cffff1a1a[FosterFrames] Runtime extensions: SuperWOW=' .. (hasSuperWOW and 'yes' or 'no') .. ', Nampower=' .. (hasNampower and 'yes' or 'no') .. '.')
+		end
+		_G['fosterFrameDisplay']:SetScale(FOSTERFRAMESPLAYERDATA['scale'])
+		_G['fosterFrameDisplay']:SetPoint('CENTER', UIParent, FOSTERFRAMESPLAYERDATA['offX'], FOSTERFRAMESPLAYERDATA['offY'])
 	elseif event == 'PLAYER_LOGOUT' then
-		local point, relativeTo, relativePoint, xOfs, yOfs = _G['enemyFrameDisplay']:GetPoint()
-		ENEMYFRAMESPLAYERDATA['offX'] = xOfs
-		ENEMYFRAMESPLAYERDATA['offY'] = yOfs
+		local point, relativeTo, relativePoint, xOfs, yOfs = _G['fosterFrameDisplay']:GetPoint()
+		FOSTERFRAMESPLAYERDATA['offX'] = xOfs
+		FOSTERFRAMESPLAYERDATA['offY'] = yOfs
 	elseif event == 'ZONE_CHANGED_NEW_AREA' then
 		insideBG = IsInsideBG()
 	end
@@ -219,8 +246,10 @@ f:SetScript('OnEvent', eventHandler)
 settings:SetScript('OnHide', closeSettings)
 
 
-SLASH_ENEMYFRAMESSETTINGS1 = '/efs'
-SlashCmdList["ENEMYFRAMESSETTINGS"] = function(msg)
+SLASH_FOSTERFRAMESSETTINGS1 = '/ffs'
+SLASH_FOSTERFRAMESSETTINGS2 = '/fosterframes'
+SLASH_FOSTERFRAMESSETTINGS3 = '/ffsettings'
+SlashCmdList["FOSTERFRAMESSETTINGS"] = function(msg)
 	if settings:IsShown() then
 		closeSettings()
 	else

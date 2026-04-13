@@ -8,7 +8,7 @@
     h:SetFontObject(GameFontNormalSmall)
     h:SetTextColor(RGB_FACTION_COLORS['Alliance']['r'], RGB_FACTION_COLORS['Alliance']['g'], RGB_FACTION_COLORS['Alliance']['b'])
     h:SetJustifyH'LEFT'
-	h:SetText('horde')
+	h:SetText('Horde')
 	
 	local hb = CreateFrame('Button', nil, WorldStateAlwaysUpFrame)
     hb:SetFrameLevel(2)
@@ -27,7 +27,7 @@
     a:SetFontObject(GameFontNormalSmall)
 	a:SetTextColor(RGB_FACTION_COLORS['Horde']['r'], RGB_FACTION_COLORS['Horde']['g'], RGB_FACTION_COLORS['Horde']['b'])
     a:SetJustifyH'LEFT'
-	a:SetText('alliance')
+	a:SetText('Alliance')
 	
 	local ab = CreateFrame('Button', nil, WorldStateAlwaysUpFrame)
     ab:SetFrameLevel(2)
@@ -41,23 +41,26 @@
     ah:SetJustifyH'RIGHT'
     ah:SetPoint('LEFT', a, 'RIGHT', 5, 0)
 	-------------------------------------------------------------------------------
-	local OnEnter = function()
-		local label = this == hb and h or a
+	local OnEnter = function(self)
+		local button = self or this
+		local label = button == hb and h or a
 		label:SetTextColor(.9, .9, .4)
 		if label:GetText() ~= '' then
-			GameTooltip:SetOwner(this, 'ANCHOR_TOPRIGHT', -40, 10)
+			GameTooltip:SetOwner(button, 'ANCHOR_TOPRIGHT', -40, 10)
 			GameTooltip:SetText('Click to target '..label:GetText())
 			GameTooltip:Show()
 		end
 	end
-	local OnLeave = function()
-		local label = this == hb and h or a
+	local OnLeave = function(self)
+		local button = self or this
+		local label = button == hb and h or a
 		local f = label == a and 'Horde' or 'Alliance'
 		label:SetTextColor(RGB_FACTION_COLORS[f]['r'], RGB_FACTION_COLORS[f]['g'], RGB_FACTION_COLORS[f]['b'])
 		GameTooltip:Hide()
 	end
-	local target = function()
-        local text = this == hb and h or a
+	local target = function(self)
+	       local button = self or this
+	       local text = button == hb and h or a
         local t = text:GetText()
         TargetByName(t, true)
     end
@@ -136,7 +139,7 @@
 			end
 		end
 		
-		if ENEMYFRAMESPLAYERDATA['efcBGannouncement'] then
+		if FOSTERFRAMESPLAYERDATA['efcBGannouncement'] then
 			efcLowHealth()
 		end
 	end

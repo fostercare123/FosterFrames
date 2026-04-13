@@ -17,7 +17,7 @@
 	
 	function getKTbind()
 		if enabled then
-			TargetByName(ENEMYFRAMECOREGetRaidTargetbyIcon('skull'), true)
+			TargetByName(FOSTERFRAMECOREGetRaidTargetbyIcon('skull'), true)
 		end
 	end
 		
@@ -25,7 +25,7 @@
 		if enabled then
 			local tar = MOUSEOVERUNINAME and MOUSEOVERUNINAME or  UnitExists'target' and UnitName'target' or nil
 			if tar then
-				ENEMYFRAMECORESendRaidTarget(icon, tar)
+				FOSTERFRAMECORESendRaidTarget(icon, tar)
 			end
 		end
 	end

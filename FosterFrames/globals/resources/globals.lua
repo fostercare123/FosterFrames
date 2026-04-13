@@ -49,16 +49,12 @@
 	
 	local iconFolders = 
 	{
-		['class'] 		= [[Interface\AddOns\enemyFrames\globals\resources\ClassIcons\ClassIcon_]],
-		['rank']  		= [[Interface\PvPRankBadges\PvPRank]],
-		['portrait'] 	= [[Interface\characterframe\TEMPORARYPORTRAIT-]],
+		['class'] 		= [[Interface\AddOns\fosterFrames\globals\resources\ClassIcons\ClassIcon_]],
 	}
 
 	GET_DEFAULT_ICON = function(op, value)
 		local dir = iconFolders[op]
-		-- rank file hack
-		local a = op == 'rank' and value < 10 and '0' or ''
-		return dir .. a .. value
+		return dir .. value
 	end
 	
 	RAID_TARGET_TCOORDS = 

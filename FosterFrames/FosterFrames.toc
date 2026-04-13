@@ -1,37 +1,32 @@
 ## Interface: 11200
-## Title: |cff00ff00BG EnemyFrames|r |cff808080[Kirsten]|r
-## Notes: Enemy Frames for Battlegrounds
-## SavedVariablesPerCharacter: ENEMYFRAMESPLAYERDATA
+## Title: |cffffd700FosterFrames|r |cffcccccc[Fostercare]|r
+## Notes: FosterFrames for Battlegrounds (Turtle WoW 1.18.1)
+## OptionalDeps: UnitXP_SP3_Addon, NampowerSettings, SuperAPI, SuperAPI_Castlib
+## SavedVariablesPerCharacter: FOSTERFRAMESPLAYERDATA
 
 globals\actionHandler.lua
 globals\spellCastingCore.lua
 globals\resources\globals.lua
-globals\resources\spells.lua
-globals\resources\buffs.lua
 globals\wsgHandler.lua
+globals\abHandler.lua
 globals\commHandler.lua
 globals\smoothBar.lua
 globals\settings\settings.lua
 globals\settings\general.lua
 globals\settings\features.lua
-globals\settings\nameplates.lua
 globals\settings\optionals.lua
 globals\class\rogue.lua
 globals\class\paladin.lua
 
 UIElements\BindingsHandler.lua
-UIElements\nameplatesHandler.lua
 UIElements\customBorder.lua
 UIElements\customCooldown.lua
 UIElements\targetframe.lua
-UIElements\playerFrame.lua
 UIElements\UIElementsTemplate.lua
-UIElements\incomingSpells.lua
-UIElements\pvpmap.lua
 UIElements\scoreBoard.lua
 UIElements\wsgUI.lua
 
-enemyFrames.lua
-enemyFramesCore.lua
+FosterFrames.lua
+FosterFramesCore.lua
 
 

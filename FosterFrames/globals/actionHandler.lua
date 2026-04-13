@@ -1,6 +1,6 @@
 	-------------------------------------------------------------------------------
 	local function castingChecks(spell)
-		if not ENEMYFRAMESPLAYERDATA['mouseOver'] or MOUSEOVERUNINAME == nil			then	return false	end
+		if not FOSTERFRAMESPLAYERDATA['mouseOver'] or MOUSEOVERUNINAME == nil			then	return false	end
 		
 		if SPELLINFO_SINGLE_TARGET_BUFF_SPELLS[spell]	then	return false	end
 		

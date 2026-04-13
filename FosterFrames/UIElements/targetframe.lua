@@ -12,10 +12,10 @@
 	local flagCarriers = {}
 	local showText = true
 	-------------------------------------------------------------------------------
-	local TEXTURE = [[Interface\AddOns\enemyFrames\globals\resources\barTexture.tga]]
+	local TEXTURE = [[Interface\AddOns\fosterFrames\globals\resources\barTexture.tga]]
     local BACKDROP = {bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],}
 	
-	TargetFrame.EFcast = CreateFrame('StatusBar', 'enemyFramesTargetFrameCastbar', TargetFrame)
+	TargetFrame.EFcast = CreateFrame('StatusBar', 'fosterFramesTargetFrameCastbar', TargetFrame)
     TargetFrame.EFcast:SetStatusBarTexture(TEXTURE)
     TargetFrame.EFcast:SetStatusBarColor(1, .4, 0)
     TargetFrame.EFcast:SetBackdrop(BACKDROP)
@@ -72,7 +72,7 @@
 	TargetFrame.EFcast.icon.border = CreateBorder(nil, ic, 12.8)
 	TargetFrame.EFcast.icon.border:SetPadding(1)
 	
-	TargetFrame.IntegratedCastBar = CreateFrame('StatusBar', 'enemyFramesTargetFrameCastbar', TargetFrame)
+	TargetFrame.IntegratedCastBar = CreateFrame('StatusBar', 'fosterFramesTargetFrameCastbar', TargetFrame)
     TargetFrame.IntegratedCastBar:SetStatusBarTexture(TEXTURE)
     TargetFrame.IntegratedCastBar:SetStatusBarColor(1, .4, 0)
     TargetFrame.IntegratedCastBar:SetBackdrop(BACKDROP)
@@ -119,12 +119,12 @@
 	-------------------------------------------------------------------------------
 	local showCast = function()
 		if castbarmoveable then
-			if ENEMYFRAMESPLAYERDATA['targetFrameCastbar'] then
+			if FOSTERFRAMESPLAYERDATA['targetFrameCastbar'] then
 				TargetFrame.EFcast:Show()
 			else
 				TargetFrame.EFcast:Hide()
 			end
-			if ENEMYFRAMESPLAYERDATA['integratedTargetFrameCastbar'] then
+			if FOSTERFRAMESPLAYERDATA['integratedTargetFrameCastbar'] then
 				TargetFrame.IntegratedCastBar:Show()
 				--TargetFrameNameBackground:SetDrawLayer'BACKGROUND'
 				TargetFrameNameBackground:SetAlpha(.3)
@@ -143,7 +143,7 @@
 			TargetName:Show()
 		end
 		if UnitExists'target' then
-			local v = SPELLCASTINGCOREgetCast(UnitName'target')
+			local v = SPELLCASTINGCOREgetCast(UnitName('target'), 'target')
 			if v ~= nil then
 				if GetTime() < v.timeEnd then
 					TargetFrame.EFcast:SetMinMaxValues(0, v.timeEnd - v.timeStart)
@@ -177,10 +177,10 @@
 					TargetFrame.IntegratedCastBar.spark:SetPoint('CENTER', TargetFrame.IntegratedCastBar, 'LEFT', sparkPosition * TargetFrameNameBackground:GetWidth(), -1)
 					TargetFrame.EFcast.spark:SetPoint('CENTER', TargetFrame.EFcast, 'LEFT', sparkPosition * TargetFrame.EFcast:GetWidth(), 0)
 					--
-					if ENEMYFRAMESPLAYERDATA['targetFrameCastbar'] then
+					if FOSTERFRAMESPLAYERDATA['targetFrameCastbar'] then
 						TargetFrame.EFcast:Show()
 					end
-					if ENEMYFRAMESPLAYERDATA['integratedTargetFrameCastbar'] then
+					if FOSTERFRAMESPLAYERDATA['integratedTargetFrameCastbar'] then
 						TargetFrame.IntegratedCastBar:Show()
 						--TargetFrameNameBackground:SetDrawLayer'BACKGROUND'
 						TargetFrameNameBackground:SetAlpha(.3)
@@ -205,7 +205,7 @@
 	portraitDebuff.bgText:SetPoint('TOPLEFT', TargetPortrait, 'TOPLEFT', 3, -4.5)
 	portraitDebuff.bgText:SetPoint('BOTTOMRIGHT', TargetPortrait, 'BOTTOMRIGHT', -4, 3)
 	portraitDebuff.bgText:SetVertexColor(.3, .3, .3)
-	portraitDebuff.bgText:SetTexture([[Interface\AddOns\enemyFrames\globals\resources\portraitBg.tga]])
+	portraitDebuff.bgText:SetTexture([[Interface\AddOns\fosterFrames\globals\resources\portraitBg.tga]])
 	-- debuff texture
 	portraitDebuff.debuffText = TargetFrame:CreateTexture()
 	portraitDebuff.debuffText:SetPoint('TOPLEFT', TargetPortrait, 'TOPLEFT', 7.5, -8)
@@ -226,31 +226,11 @@
 	portraitDebuff.cd = CreateCooldown(portraitDebuff, 1.054, true)
 	portraitDebuff.cd:SetAlpha(1)
 	-------------------------------------------------------------------------------
-	local a, maxa, b, c = .002, .058, 0, 1
 	local showPortraitDebuff = function()
 		if UnitExists'target' then
 			local xtFaction = UnitFactionGroup'target' == 'Alliance' and 'Horde' or 'Alliance'
-			local prioBuff = SPELLCASTINGCOREgetPrioBuff(UnitName'target', 1)[1]
 
-			if prioBuff ~= nil then
-				local d = 1
-				if b > maxa then c = -1 end
-				if b < 0 then c = 1 end
-				b = b + a * c 
-				d = -b 
-				
-				--portraitDebuff.debuffText:SetTexCoord(.12+b, .88+d, .12+d, .88+b)
-			
-				portraitDebuff.debuffText:SetTexture(prioBuff.icon)
-				portraitDebuff.duration:SetText(getTimerLeft(prioBuff.timeEnd))
-				portraitDebuff.bgText:Show()
-				portraitDebuff.cd:SetTimers(prioBuff.timeStart, prioBuff.timeEnd)
-				portraitDebuff.cd:Show()
-				
-				local br, bg, bb = prioBuff.border[1], prioBuff.border[2], prioBuff.border[3]
-				portraitDebuff.bgText:SetVertexColor(br, bg, bb)
-				
-			elseif UnitName'target' == flagCarriers[xtFaction] then
+			if UnitName'target' == flagCarriers[xtFaction] then
 				portraitDebuff.debuffText:SetTexture(SPELLINFO_WSG_FLAGS[xtFaction]['icon'])
 				portraitDebuff.bgText:Show()
 				portraitDebuff.duration:SetText('')
@@ -328,7 +308,7 @@
 				button.text:Hide()
 				button.cd:Hide()
 				
-				if ENEMYFRAMESPLAYERDATA['targetDebuffTimers'] then
+				if FOSTERFRAMESPLAYERDATA['targetDebuffTimers'] then
 					checkAddTimer(button, debuff, debuffList)
 				end
 			end
@@ -336,7 +316,7 @@
 	end
 	-------------------------------------------------------------------------------
 	local function raidTargetOnUpdate()
-		local rt = ENEMYFRAMECOREGetRaidTarget()
+		local rt = FOSTERFRAMECOREGetRaidTarget()
 
 		if UnitExists'target' and rt[UnitName'target'] then
 			local tCoords = RAID_TARGET_TCOORDS[rt[UnitName'target']['icon']]
@@ -351,7 +331,7 @@
 	dummyFrame:SetScript('OnUpdate', function()
 		nextRefresh = nextRefresh - arg1
 		if nextRefresh < 0 then
-			if ENEMYFRAMESPLAYERDATA['targetFrameCastbar'] or ENEMYFRAMESPLAYERDATA['integratedTargetFrameCastbar'] then
+			if FOSTERFRAMESPLAYERDATA['targetFrameCastbar'] or FOSTERFRAMESPLAYERDATA['integratedTargetFrameCastbar'] then
 				showCast()				
 			else
 				TargetFrame.EFcast:Hide()
@@ -360,18 +340,11 @@
 				TargetFrameNameBackground:SetAlpha(1)
 				TargetName:Show()				
 			end
-			if ENEMYFRAMESPLAYERDATA['targetPortraitDebuff'] then
-				showPortraitDebuff()				
-			else
-				portraitDebuff.cd:Hide()				
-				portraitDebuff.debuffText:SetTexture()
-				portraitDebuff.duration:SetText('')
-				portraitDebuff.bgText:Hide()
-			end
+			showPortraitDebuff()
 			
 			-- debuff timers
 			if UnitExists('target') then
-				displayTimers(SPELLCASTINGCOREgetBuffs(UnitName'target'))
+				displayTimers(SPELLCASTINGCOREgetBuffs(UnitName('target'), 'target'))
 			end
 			
 			-- raidtarget

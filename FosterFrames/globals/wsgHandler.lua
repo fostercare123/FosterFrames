@@ -6,7 +6,6 @@
 	end
 	-------------------------------------------------------------------------------
 	local eventHandler = function()
-
 		if event ~= 'RAID_ROSTER_UPDATE' then
 			-- Flag for Alliance flag for horde. thanks blizzard
 			local pick 	= 'The (.+) (.+) was picked up by (.+)!'	local bpick  = string.find(arg1, pick)
@@ -31,7 +30,7 @@
 			end
 			
 			if bpick or bdrop or bscore then
-				ENEMYFRAMECOREUpdateFlagCarriers(flagCarriers)
+				FOSTERFRAMECOREUpdateFlagCarriers(flagCarriers)
 			end
 		else
 			fcTemp['Alliance'] = flagCarriers['Alliance'] 	and flagCarriers['Alliance'] 	or ' '

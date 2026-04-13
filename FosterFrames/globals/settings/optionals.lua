@@ -1,18 +1,18 @@
 	-------------------------------------------------------------------------------
-	local settings = _G['enemyFramesSettings']
+	local settings = _G['fosterFramesSettings']
 	
-	local container = CreateFrame('Frame', 'enemyFramesSettingsoptionalsContainer', settings)
+	local container = CreateFrame('Frame', 'fosterFramesSettingsoptionalsContainer', settings)
 	container:SetWidth(settings:GetWidth()) container:SetHeight(settings:GetHeight())
 	container:SetPoint('CENTER', settings)
 	container:EnableMouse(true)
 	container:EnableMouseWheel(true)
 	container:Hide()
 	-------------------------------------------------------------------------------
-	local checkBoxOptionalsN, checkBoxOptionals  = 5, { [1] = {['id'] = 'displayNames', 		['label'] = 'Display names'}, 
+	local checkBoxOptionalsN, checkBoxOptionals  = 5, { [1] = {['id'] = 'displayNames', 		['label'] = 'Display Names'}, 
 														--[2] = {['id'] = 'displayHealthValues', 	['label'] = 'Display Health %'}, 
-														[2] = {['id'] = 'displayManabar', 		['label'] = 'Display mana bar'},
-														[3] = {['id'] = 'castTimers', 			['label'] = 'Display cast timers'},
-														[4] = {['id'] = 'displayOnlyNearby', 	['label'] = 'Display nearby units only'},
+														[2] = {['id'] = 'displayManabar', 		['label'] = 'Display Mana Bar'},
+														[3] = {['id'] = 'castTimers', 			['label'] = 'Display Cast Timers'},
+														[4] = {['id'] = 'displayOnlyNearby', 	['label'] = 'Display Nearby Units Only'},
 														[5] = {['id'] = 'targetCounter', 		['label'] = 'Display Target Counter'},
 														
 													}
@@ -20,11 +20,11 @@
 	-- optionals
 	container.optionals = container:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
 	container.optionals:SetPoint('LEFT', container, 'TOPLEFT', 45, -30)
-	container.optionals:SetText'optional'
+	container.optionals:SetText'Optionals'
 
 	container.optinalsList = {}
 	for i = 1, checkBoxOptionalsN, 1 do
-		container.optinalsList[i] = CreateFrame('CheckButton', 'enemyFramesOptionalsCheckButton'..i, container, 'UICheckButtonTemplate')
+		container.optinalsList[i] = CreateFrame('CheckButton', 'fosterFramesOptionalsCheckButton'..i, container, 'UICheckButtonTemplate')
 		container.optinalsList[i]:SetHeight(20) 	container.optinalsList[i]:SetWidth(20)
 		container.optinalsList[i]:SetPoint('LEFT', i == 1 and container.optionals or container.optinalsList[i-1], 'LEFT', 0, i == 1 and -40 or -30)
 		_G[container.optinalsList[i]:GetName()..'Text']:SetText(checkBoxOptionals[i]['label'])
@@ -32,15 +32,15 @@
 
 		container.optinalsList[i].id = checkBoxOptionals[i]['id']
 		container.optinalsList[i]:SetScript('OnClick', function()
-			ENEMYFRAMESPLAYERDATA[this.id]	= this:GetChecked()
-			ENEMYFRAMESsettings()
+			FOSTERFRAMESPLAYERDATA[this.id]	= this:GetChecked()
+			FOSTERFRAMESsettings()
 		end)
 	end
 	-------------------------------------------------------------------------------
 	OPTIONALSSETTINGSInit = function(color)
 		for i = 1, checkBoxOptionalsN do
 			_G[container.optinalsList[i]:GetName()..'Text']:SetTextColor(color['r'], color['g'], color['b'], .9)
-			container.optinalsList[i]:SetChecked(ENEMYFRAMESPLAYERDATA[checkBoxOptionals[i]['id']])
+			container.optinalsList[i]:SetChecked(FOSTERFRAMESPLAYERDATA[checkBoxOptionals[i]['id']])
 		end
 	end
 	-------------------------------------------------------------------------------
