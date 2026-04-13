@@ -89,8 +89,8 @@ settings:SetBackdropBorderColor(.2, .2, .2)
 settings:SetMovable(true) settings:SetUserPlaced(true)
 settings:SetClampedToScreen(true)
 settings:RegisterForDrag'LeftButton' settings:EnableMouse(true)
-settings:SetScript('OnDragStart', function() settings:StartMoving() end)
-settings:SetScript('OnDragStop', function() settings:StopMovingOrSizing() end)
+settings:SetScript('OnDragStart', function() if arg1 == 'LeftButton' then this:StartMoving() end end)
+settings:SetScript('OnDragStop', function() this:StopMovingOrSizing() end)
 tinsert(UISpecialFrames, 'fosterFramesSettings')
 settings:Hide()
 
@@ -233,7 +233,7 @@ local function eventHandler()
 		FOSTERFRAMESPLAYERDATA['offX'] = xOfs
 		FOSTERFRAMESPLAYERDATA['offY'] = yOfs
 	elseif event == 'ZONE_CHANGED_NEW_AREA' then
-		insideBG = IsInsideBG()
+		if IsInsideBG then insideBG = IsInsideBG() end
 	end
 end
 
