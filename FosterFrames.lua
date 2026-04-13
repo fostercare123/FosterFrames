@@ -624,7 +624,7 @@ local function fosterFramesOnUpdate(self, elapsed)
 	nextRefresh = nextRefresh - (elapsed or arg1 or 0)
 	if nextRefresh < 0 then
 		-- update units
-		raidTargets = FOSTERFRAMECOREGetRaidTarget()
+		if FOSTERFRAMECOREGetRaidTarget then raidTargets = FOSTERFRAMECOREGetRaidTarget() end
 		updateUnits()
 	
 		nextRefresh = refreshInterval

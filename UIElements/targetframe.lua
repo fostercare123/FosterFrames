@@ -316,6 +316,7 @@
 	end
 	-------------------------------------------------------------------------------
 	local function raidTargetOnUpdate()
+		if not FOSTERFRAMECOREGetRaidTarget then return end
 		local rt = FOSTERFRAMECOREGetRaidTarget()
 
 		if UnitExists'target' and rt[UnitName'target'] then
