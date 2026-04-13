@@ -76,4 +76,12 @@
 		['Horde'] 		= {['icon'] = [[Interface\Icons\inv_bannerpvp_01]]},
 	}
 
+	SPELLINFO_SINGLE_TARGET_BUFF_SPELLS = {
+		['Power Infusion'] = true,
+		['Innervate'] = true,
+		['Blessing of Protection'] = true,
+		['Blessing of Freedom'] = true,
+		['Blessing of Sacrifice'] = true,
+	}
+
 	--
