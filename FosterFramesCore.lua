@@ -62,7 +62,7 @@ end
 local function verifyUnitInfo(unit, now)
 	now = now or GetTime()
 	if UnitExists(unit) and UnitIsPlayer(unit) and UnitFactionGroup(unit) ~= playerFaction then
-		local guid = UnitGUID(unit)
+		local guid = FOSTERFRAMESHasSuperWOW() and UnitGUID(unit)
 		if not guid then return false end -- Strict GUID tracking
 
 		local u = {}
@@ -72,9 +72,9 @@ local function verifyUnitInfo(unit, now)
 		local _, c = UnitClass(unit)
 		u['class'] = c
 
-		-- Use UnitXP for actual health values strictly
-		u['health'] = UnitXP(unit)
-		u['maxhealth'] = UnitXP(unit, true)
+		-- Use UnitXP for actual health values strictly if available
+		u['health'] = FOSTERFRAMESHasUnitXP() and UnitXP(unit) or UnitHealth(unit)
+		u['maxhealth'] = FOSTERFRAMESHasUnitXP() and UnitXP(unit, true) or UnitHealthMax(unit)
 		
 		u['mana'] = UnitMana(unit)
 		u['maxmana'] = UnitManaMax(unit)
@@ -117,7 +117,7 @@ local function updatePlayerListInfo(now)
 
 	for k, v in pairs(playerList) do
 		-- Determine unitID if target or mouseover using GUID for reliability
-		local unitID = (UnitExists('target') and v['guid'] == UnitGUID('target')) and 'target' or (UnitExists('mouseover') and v['guid'] == UnitGUID('mouseover')) and 'mouseover' or nil
+		local unitID = (UnitExists('target') and FOSTERFRAMESHasSuperWOW() and v['guid'] == UnitGUID('target')) and 'target' or (UnitExists('mouseover') and FOSTERFRAMESHasSuperWOW() and v['guid'] == UnitGUID('mouseover')) and 'mouseover' or nil
 		
 		-- Also check raid targets
 		if not unitID then

@@ -123,7 +123,11 @@
 		return math.floor(num * mult + 0.5) / mult
 	end
 	local getPerc = function(unit)
-		return round(((UnitXP(unit) * 100) / UnitXP(unit, true)), 1)
+		if FOSTERFRAMESHasUnitXP() then
+			return round(((UnitXP(unit) * 100) / UnitXP(unit, true)), 1)
+		else
+			return round(((UnitHealth(unit) * 100) / UnitHealthMax(unit)), 1)
+		end
 	end
 	-------------------------------------------------------------------------------
 	WSGUIupdateFChealth = function(unit)

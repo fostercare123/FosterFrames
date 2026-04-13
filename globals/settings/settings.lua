@@ -10,12 +10,14 @@ FOSTERFRAMESVERSION = 3.0
 local hasUnitXP = false
 local hasSuperWOW = false
 local hasNampower = false
+
 function FOSTERFRAMESHasUnitXP()
-	return hasUnitXP
+	return hasUnitXP and type(UnitXP) == 'function'
 end
 
 function FOSTERFRAMESHasSuperWOW()
-	return hasSuperWOW
+	-- On TurtleWOW/SuperWOW environment, we need to ensure the critical functions exist
+	return hasSuperWOW and type(UnitGUID) == 'function' and type(UnitCastingInfo) == 'function' and type(UnitChannelInfo) == 'function'
 end
 
 function FOSTERFRAMESHasNampower()

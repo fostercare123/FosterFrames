@@ -546,7 +546,7 @@ local function updateUnits()
 	if rtMenuEndtime < now then
 		fosterFrame.raidTargetMenu:Hide()
 	end
-	local currentTargetGUID = UnitExists('target') and UnitGUID('target')
+	local currentTargetGUID = UnitExists('target') and FOSTERFRAMESHasSuperWOW() and UnitGUID('target')
 	
 	local i = 1
 	

@@ -46,19 +46,33 @@ SPELLCASTINGCOREgetBuffs = function(name, unit)
         -- Use improved SuperWOW UnitBuff/UnitDebuff if available
         -- Note: FosterFrames UI might need updates to handle this list
         for i=1, 40 do
-            local name, rank, icon, count, debuffType, duration, expirationTime = UnitBuff(unit, i)
+            local name, rank, icon, count, debuffType, duration, expirationTime
+            if FOSTERFRAMESHasSuperWOW() then
+                name, rank, icon, count, debuffType, duration, expirationTime = UnitBuff(unit, i)
+            else
+                -- Standard Vanilla return: name, rank, icon, count
+                name, rank, icon, count = UnitBuff(unit, i)
+            end
+            
             if not name then break end
             table.insert(list, {
                 ['spell'] = name,
                 ['icon'] = icon,
                 ['stacks'] = count,
-                ['timeEnd'] = expirationTime,
-                ['duration'] = duration,
+                ['timeEnd'] = expirationTime, -- will be nil on standard
+                ['duration'] = duration, -- will be nil on standard
                 ['type'] = 'buff'
             })
         end
         for i=1, 40 do
-            local name, rank, icon, count, debuffType, duration, expirationTime = UnitDebuff(unit, i)
+            local name, rank, icon, count, debuffType, duration, expirationTime
+            if FOSTERFRAMESHasSuperWOW() then
+                name, rank, icon, count, debuffType, duration, expirationTime = UnitDebuff(unit, i)
+            else
+                -- Standard Vanilla return: name, rank, icon, count, debuffType
+                name, rank, icon, count, debuffType = UnitDebuff(unit, i)
+            end
+
             if not name then break end
             table.insert(list, {
                 ['spell'] = name,
