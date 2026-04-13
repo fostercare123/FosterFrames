@@ -488,8 +488,7 @@ end
 end
 
 
-local function discoverPlayer(name)
-    if not name or name == UnitName('player') then return end
+
     if not playerList[name] then
         -- We don't know their class yet, but we'll try to find out when we target/mouseover
         -- For now, add them as unknown or wait for verifyUnitInfo
@@ -516,16 +515,7 @@ local function eventHandler(_, eventName, unit)
                 end
         elseif evt == 'UNIT_HEALTH' then
                 WSGUIupdateFChealth(unit or arg1)
-        elseif string.find(evt, 'CHAT_MSG_SPELL_HOSTILEPLAYER') or string.find(evt, 'CHAT_MSG_COMBAT_HOSTILEPLAYER') then
-                -- Standard 1.12.1 combat log discovery
-                -- Extract name from "Source casts Spell" or "Source hits Target"
-                -- This is a bit complex for all localizations, but we can try to find the first word
-                if arg1 then
-                    local name = string.gsub(arg1, "^([^%s'%'s]+).*", "%1")
-                    if name and name ~= "You" and name ~= "your" then
-                        discoverPlayer(name)
-                    end
-                end
+
         end
 end
 	
@@ -538,9 +528,9 @@ end
 f:RegisterEvent'PLAYER_ENTERING_WORLD'
 f:RegisterEvent'ZONE_CHANGED_NEW_AREA'
 f:RegisterEvent'UNIT_HEALTH'
-f:RegisterEvent'CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE'
-f:RegisterEvent'CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF'
-f:RegisterEvent'CHAT_MSG_COMBAT_HOSTILEPLAYER_HITS'
+
+
+
 
 
 f:SetScript('OnEvent', eventHandler)
