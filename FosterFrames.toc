@@ -15,6 +15,7 @@ globals\smoothBar.lua
 # CLASS SPECIFIC
 globals\class\rogue.lua
 globals\class\paladin.lua
+globals\class\shaman.lua
 
 # SETTINGS - Definitions first
 globals\settings\general.lua
