@@ -78,9 +78,9 @@ local fosterFramesDisplayShow = false
 
 local settings = CreateFrame('Frame', 'fosterFramesSettings', UIParent)
 settings:ClearAllPoints()
-settings:SetWidth(320) settings:SetHeight(340)
+settings:SetWidth(450) settings:SetHeight(340)
 settings:SetFrameLevel(60)
-settings:SetPoint('CENTER', UIParent, -UIParent:GetWidth()/3, 0)
+settings:SetPoint('CENTER', UIParent, 0, 0)
 settings:SetBackdrop({bgFile   = [[Interface\Tooltips\UI-Tooltip-Background]],
 				  edgeFile = [[Interface\DialogFrame\UI-DialogBox-Border]],
 				  insets   = {left = 11, right = 12, top = 12, bottom = 11}})
@@ -93,6 +93,21 @@ settings:SetScript('OnDragStart', function() settings:StartMoving() end)
 settings:SetScript('OnDragStop', function() settings:StopMovingOrSizing() end)
 tinsert(UISpecialFrames, 'fosterFramesSettings')
 settings:Hide()
+
+-- Sidebar
+settings.sidebar = CreateFrame('Frame', nil, settings)
+settings.sidebar:SetWidth(100)
+settings.sidebar:SetPoint('TOPLEFT', settings, 'TOPLEFT', 11, -40)
+settings.sidebar:SetPoint('BOTTOMLEFT', settings, 'BOTTOMLEFT', 11, 11)
+settings.sidebar:SetBackdrop({bgFile = [[Interface\Tooltips\UI-Tooltip-Background]]})
+settings.sidebar:SetBackdropColor(.1, .1, .1, .5)
+
+-- Content Area
+settings.content = CreateFrame('Frame', 'fosterFramesSettingsContent', settings)
+settings.content:SetPoint('TOPLEFT', settings.sidebar, 'TOPRIGHT', 5, 0)
+settings.content:SetPoint('BOTTOMRIGHT', settings, 'BOTTOMRIGHT', -12, 11)
+settings.content:SetBackdrop({bgFile = [[Interface\Tooltips\UI-Tooltip-Background]]})
+settings.content:SetBackdropColor(.05, .05, .05, .5)
 
 settings.x = CreateFrame('Button', 'fosterFramesSettingsCloseButton', settings, 'UIPanelCloseButton')
 settings.x:SetPoint('TOPRIGHT',  -6, -6)
@@ -107,36 +122,31 @@ settings.header.t = settings:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
 settings.header.t:SetPoint('TOP', settings.header, 0, -14)
 settings.header.t:SetText'FosterFrames Settings'
 
--- tabs
-
+-- Sidebar Buttons
 settings.numTabs = 3
 local tabNames = {'General', 'Features', 'Optionals'}
-local tabElements = {'Left', 'LeftDisabled', 'Middle', 'MiddleDisabled', 'Right', 'RightDisabled'}
 settings.tabs = {}
 for i = 1, settings.numTabs do
-	settings.tabs[i] = CreateFrame('Button', settings:GetName()..'Tab'..i, settings, 'WorldStateScoreFrameTabButtonTemplate')
+	settings.tabs[i] = CreateFrame('Button', 'fosterFramesSettingsSideButton'..i, settings.sidebar, 'UIPanelButtonTemplate')
+	settings.tabs[i]:SetWidth(90) settings.tabs[i]:SetHeight(24)
 	settings.tabs[i]:SetText(tabNames[i])
-	if i == 1 then
-		settings.tabs[i]:SetPoint('TOPLEFT', settings, 'BOTTOMLEFT',0, 3)
-	else
-		settings.tabs[i]:SetPoint('LEFT', settings.tabs[i-1], 'RIGHT', -12, 0)
-	end
-	settings.tabs[i].id = i
-	for j  = 1, tlength(tabElements) do
-		_G[settings.tabs[i]:GetName()..tabElements[j]]:SetVertexColor(.2, .2, .2)
-	end
+	settings.tabs[i]:SetPoint('TOP', settings.sidebar, 'TOP', 0, -10 - (i-1)*30)
 	
+	settings.tabs[i].id = i
 	settings.tabs[i]:SetScript('OnClick', function()	
 		local activeContainerName = string.lower(tabNames[this.id])
 		for j = 1, settings.numTabs do	
-			if j ~= this.id then
-				local containerName = string.lower(tabNames[j])
-				_G['fosterFramesSettings'..containerName..'Container']:Hide()
+			local containerName = string.lower(tabNames[j])
+			local container = _G['fosterFramesSettings'..containerName..'Container']
+			if container then
+				if j == this.id then
+					container:Show()
+				else
+					container:Hide()
+				end
 			end
 		end
-		_G['fosterFramesSettings'..activeContainerName..'Container']:Show()
-		
-		PanelTemplates_SetTab(settings, this.id)
+		-- Highlight active button?
 	end)
 end
 
@@ -169,11 +179,11 @@ function setupSettings()
 	-- general tab by default
 	for j = 1, settings.numTabs do
 		local containerName = string.lower(tabNames[j])
-		_G['fosterFramesSettings'..containerName..'Container']:Hide()
+		local container = _G['fosterFramesSettings'..containerName..'Container']
+		if container then container:Hide() end
 	end
 			
-	_G['fosterFramesSettingsgeneralContainer']:Show()
-	PanelTemplates_SetTab(settings, 1)
+	if _G['fosterFramesSettingsgeneralContainer'] then _G['fosterFramesSettingsgeneralContainer']:Show() end
 	
 	settings:Show()
 	
@@ -185,7 +195,6 @@ function setupSettings()
 			
 			_G['fosterFrameDisplay']:Show()
 		end		
-		--tinsert(UISpecialFrames, 'fosterFrameDisplay')
 	end
 	
 	FOSTERFRAMESsettings()

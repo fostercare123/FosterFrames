@@ -27,60 +27,17 @@ local f = CreateFrame('Frame', 'fosterFramesCore', UIParent)
 --
 local playerTargetCounter = 0
 
-local function fillPlayerList()
-	local factionID
-	local gotData = false
-	local l = {}
-	
-	if UnitFactionGroup('player') == 'Alliance' then factionID = 0 else factionID = 1 end
-	-- get opposing faction players from scoreboard
-	for i=1, GetNumBattlefieldScores() do
-		local name, killingBlows, honorableKills, deaths, honorGained, faction, rank, race, class = GetBattlefieldScore(i)
-		if faction == factionID then
-			-- In scoreboard we only have names, use name as key if GUID not known
-			l[name] = {['name'] = name, ['class'] = string.upper(class)}
-			l[name]['powerType']  =  l[name]['class'] == 'ROGUE' and 'energy' or l[name]['class'] == 'WARRIOR' and 'rage' or 'mana'
-			gotData = true
-		end
-	end	
-	
-	-- add new players or update existing
-	for name, v in pairs(l) do
-		if playerList[name] == nil then	
-			playerList[name] = v 		
-			refreshUnits = true 
-		end
-	end
-	-- remove absent players
-	for name, v in pairs(playerList) do
-		if l[name] == nil then	
-			playerList[name] = nil
-			-- check if a nearby player left
-			for r, t in pairs(nearbyList) do
-				if t['name'] == name then
-					nearbyList[r] = nil
-				end
-			end				
-			refreshUnits = true 
-		end
-	end
-
-	return gotData
-end
-
 -- confirm hostile nearbyPlayers
 local function applyNearbyPlayer(v, now, nextCheck)
-	local identifier = v.guid or v.name
-	local p = playerList[identifier] or playerList[v.name]
+	local guid = v.guid
+	if not guid then return end -- Strict GUID tracking
+
+	local p = playerList[guid]
 	
 	if not p then
-		if not insideBG then
-			playerList[identifier] = v
-			p = playerList[identifier]
-			refreshUnits = true
-		else
-			return -- Don't add if in BG but not in scoreboard?
-		end
+		playerList[guid] = v
+		p = playerList[guid]
+		refreshUnits = true
 	end
 
 	if p then
@@ -105,23 +62,19 @@ end
 local function verifyUnitInfo(unit, now)
 	now = now or GetTime()
 	if UnitExists(unit) and UnitIsPlayer(unit) and UnitFactionGroup(unit) ~= playerFaction then
+		local guid = UnitGUID(unit)
+		if not guid then return false end -- Strict GUID tracking
+
 		local u = {}
 		u['name'] = UnitName(unit)
-		u['guid'] = UnitGUID(unit)
+		u['guid'] = guid
 		
-		if not insideBG then
-			local _, c = UnitClass(unit)
-			u['class'] = c
-		end
+		local _, c = UnitClass(unit)
+		u['class'] = c
 
-		-- Use UnitXP for actual health values if available
-		if FOSTERFRAMESHasUnitXP() and type(UnitXP) == 'function' then
-			u['health'] = UnitXP(unit) or UnitHealth(unit)
-			u['maxhealth'] = UnitXP(unit, true) or UnitHealthMax(unit) -- Assuming UnitXP(u, true) returns max
-		else
-			u['health'] = UnitHealth(unit)
-			u['maxhealth'] = UnitHealthMax(unit)
-		end
+		-- Use UnitXP for actual health values strictly
+		u['health'] = UnitXP(unit)
+		u['maxhealth'] = UnitXP(unit, true)
 		
 		u['mana'] = UnitMana(unit)
 		u['maxmana'] = UnitManaMax(unit)
@@ -131,7 +84,7 @@ local function verifyUnitInfo(unit, now)
 		applyNearbyPlayer(u, now, now + nextPlayerCheck)
 		
 		-- update fc health text
-		local p = playerList[u.guid or u.name]
+		local p = playerList[guid]
 		if p and p['fc'] then WSGUIupdateFChealth(unit) end
 		
 		return true
@@ -289,9 +242,16 @@ local function resetTargetCount()
 	end
 end
 
+local function getPlayerGUIDByName(name)
+	for guid, p in pairs(playerList) do
+		if p.name == name then return guid end
+	end
+	return nil
+end
+
 --- GLOBAL ACCESS ---
-function FOSTERFRAMECOREgetPlayer(name)
-	return playerList[name]
+function FOSTERFRAMECOREgetPlayer(nameOrGuid)
+	return playerList[nameOrGuid] or playerList[getPlayerGUIDByName(nameOrGuid)]
 end
 
 function FOSTERFRAMECOREUpdateFlagCarriers(fc)
@@ -323,20 +283,25 @@ function FOSTERFRAMECORESetPlayersData(list)
 	end
 end
 
-function FOSTERFRAMECORESendRaidTarget(icon, name)
-	if name == nil or (raidTargets[name] and raidTargets[name]['icon'] == icon) then
+function FOSTERFRAMECORESendRaidTarget(icon, guid)
+	local p = playerList[guid]
+	local name = p and p.name or 0
+	if name == nil or (raidTargets[guid] and raidTargets[guid]['icon'] == icon) then
 		name = 0
 	end
 	sendMSG('RT', name, icon, insideBG)
-	FOSTERFRAMECORESetRaidTarget(nil, name, icon)
+	FOSTERFRAMECORESetRaidTarget(nil, guid, icon)
 end
 
 function FOSTERFRAMECORESetRaidTarget(sender, tar, icon)
-	removeRaidTarget(tar, icon)
-	if playerList[tar] then
-		raidTargets[tar] = {['name'] = tar, ['icon'] = icon}
+	-- tar could be name (from addon msg) or GUID (from UI)
+	local guid = playerList[tar] and tar or getPlayerGUIDByName(tar)
+	
+	if guid then
+		removeRaidTarget(guid, icon)
+		raidTargets[guid] = {['name'] = playerList[guid].name, ['icon'] = icon}
 		if sender ~= nil and sender ~= UnitName'player' then
-			FOSTERFRAMESAnnounceRT(raidTargets, playerList[tar])
+			FOSTERFRAMESAnnounceRT(raidTargets, playerList[guid])
 		end
 	end
 end
@@ -363,7 +328,6 @@ end
 
 local function fosterFramesCoreOnUpdate()
 	local now = GetTime()
-	if insideBG then RequestBattlefieldScoreData() end
 
 	verifyUnitInfo('target', now)
 	verifyUnitInfo('mouseover', now)
@@ -419,12 +383,6 @@ local function initializeValues()
 
 	local maxUnits = bgs[GetZoneText()] and bgs[GetZoneText()] or maxUnitsDisplayed
 	
-	if insideBG then 
-		f:RegisterEvent'UPDATE_BATTLEFIELD_SCORE'
-	else
-		f:UnregisterEvent'UPDATE_BATTLEFIELD_SCORE'
-	end
-	
 	f:SetScript('OnUpdate', fosterFramesCoreOnUpdate)
 	FOSTERFRAMESInitialize(maxUnits, insideBG)
 	bindingsInit()
@@ -435,13 +393,6 @@ local function eventHandler()
 	local evt = event
 	if evt == 'PLAYER_ENTERING_WORLD' or evt == 'ZONE_CHANGED_NEW_AREA' then
 		initializeValues()
-	elseif evt == 'UPDATE_BATTLEFIELD_SCORE' then
-		local now = GetTime()
-		if now > playerListRefresh then
-			if fillPlayerList() then
-				playerListRefresh = now + playerListInterval
-			end
-		end
 	elseif evt == 'UNIT_HEALTH' then
 		WSGUIupdateFChealth(arg1)
 	end
@@ -456,11 +407,7 @@ SLASH_FOSTERFRAMECORE1 = '/ffc'
 SLASH_FOSTERFRAMECORE2 = '/fostercore'
 SlashCmdList["FOSTERFRAMECORE"] = function(msg)
 	if msg == 'bg' then
-		print('bg info:')
-		for i=1, GetNumBattlefieldScores() do
-			local name = GetBattlefieldScore(i)
-			print(name)
-		end	
+		print('Scoreboard tracking is disabled (Strict GUID mode).')
 	elseif msg == 'deps' then
 		if FOSTERFRAMESPrintDependencyStatus then
 			FOSTERFRAMESPrintDependencyStatus()
@@ -475,7 +422,7 @@ SlashCmdList["FOSTERFRAMECORE"] = function(msg)
 	else
 		print('playerlist:')
 		for k, v in pairs(playerList) do
-			print(v['name'])
+			print(v['name'] .. ' (' .. k .. ')')
 		end
 	end
 end

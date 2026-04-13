@@ -1,11 +1,10 @@
 	-------------------------------------------------------------------------------
-	local settings = _G['fosterFramesSettings']
+	-------------------------------------------------------------------------------
+	local content = _G['fosterFramesSettingsContent']
 	
-	local container = CreateFrame('Frame', 'fosterFramesSettingsfeaturesContainer', settings)
-	container:SetWidth(settings:GetWidth()) container:SetHeight(settings:GetHeight())
-	container:SetPoint('CENTER', settings)
+	local container = CreateFrame('Frame', 'fosterFramesSettingsfeaturesContainer', content)
+	container:SetAllPoints(content)
 	container:EnableMouse(true)
-	container:EnableMouseWheel(true)
 	container:Hide()
 	-------------------------------------------------------------------------------
 	local checkBoxFeaturesN, checkBoxFeatures  = 4, {
@@ -21,16 +20,16 @@
 	-------------------------------------------------------------------------------
 	-- features
 	container.features = container:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
-	container.features:SetPoint('LEFT', container, 'TOPLEFT', 45, -30)
+	container.features:SetPoint('TOPLEFT', container, 'TOPLEFT', 20, -20)
 	container.features:SetText'Features'
 
 	container.featuresList = {}
 	for i = 1, checkBoxFeaturesN, 1 do
 		container.featuresList[i] = CreateFrame('CheckButton', 'fosterFramesFeaturesCheckButton'..i, container, 'UICheckButtonTemplate')
-		container.featuresList[i]:SetHeight(20) 	container.featuresList[i]:SetWidth(20)
-		container.featuresList[i]:SetPoint('LEFT', i == 1 and container.features or container.featuresList[i-1], 'LEFT', 0, i == 1 and -40 or -30)
+		container.featuresList[i]:SetHeight(24) 	container.featuresList[i]:SetWidth(24)
+		container.featuresList[i]:SetPoint('TOPLEFT', i == 1 and container.features or container.featuresList[i-1], 'BOTTOMLEFT', 0, i == 1 and -10 or -10)
 		_G[container.featuresList[i]:GetName()..'Text']:SetText(checkBoxFeatures[i]['label'])
-		_G[container.featuresList[i]:GetName()..'Text']:SetPoint('LEFT', container.featuresList[i], 'RIGHT', 4, 0)
+		_G[container.featuresList[i]:GetName()..'Text']:SetPoint('LEFT', container.featuresList[i], 'RIGHT', 6, 0)
 		container.featuresList[i].id = checkBoxFeatures[i]['id']
 		container.featuresList[i]:SetScript('OnClick', function()
 			FOSTERFRAMESPLAYERDATA[this.id]	= this:GetChecked()
@@ -39,16 +38,16 @@
 	end
 	-------------------------------------------------------------------------------
 	container.bgLabel = container:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
-	container.bgLabel:SetPoint('LEFT', container.featuresList[checkBoxFeaturesN], 'LEFT', 0, -30)
+	container.bgLabel:SetPoint('TOPLEFT', container.featuresList[checkBoxFeaturesN], 'BOTTOMLEFT', 0, -20)
 	container.bgLabel:SetText'Battlegrounds'
 	
 	container.bgList = {}
 	for i = 1, checkBoxFeaturesBGN, 1 do
 		container.bgList[i] = CreateFrame('CheckButton', 'fosterFramesFeaturesBGCheckButton'..i, container, 'UICheckButtonTemplate')
-		container.bgList[i]:SetHeight(20) 	container.bgList[i]:SetWidth(20)
-		container.bgList[i]:SetPoint('LEFT', i == 1 and container.bgLabel or container.bgList[i-1], 'LEFT', 0, i == 1 and -40 or -30)
+		container.bgList[i]:SetHeight(24) 	container.bgList[i]:SetWidth(24)
+		container.bgList[i]:SetPoint('TOPLEFT', i == 1 and container.bgLabel or container.bgList[i-1], 'BOTTOMLEFT', 0, i == 1 and -10 or -10)
 		_G[container.bgList[i]:GetName()..'Text']:SetText(checkBoxFeaturesBG[i]['label'])
-		_G[container.bgList[i]:GetName()..'Text']:SetPoint('LEFT', container.bgList[i], 'RIGHT', 4, 0)
+		_G[container.bgList[i]:GetName()..'Text']:SetPoint('LEFT', container.bgList[i], 'RIGHT', 6, 0)
 		container.bgList[i].id = checkBoxFeaturesBG[i]['id']
 		container.bgList[i]:SetScript('OnClick', function()
 			FOSTERFRAMESPLAYERDATA[this.id]	= this:GetChecked()

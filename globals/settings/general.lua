@@ -1,11 +1,10 @@
 	-------------------------------------------------------------------------------
-	local settings = _G['fosterFramesSettings']
+	-------------------------------------------------------------------------------
+	local content = _G['fosterFramesSettingsContent']
 	
-	local container = CreateFrame('Frame', 'fosterFramesSettingsgeneralContainer', settings)
-	container:SetWidth(settings:GetWidth()) container:SetHeight(settings:GetHeight())
-	container:SetPoint('CENTER', settings)
+	local container = CreateFrame('Frame', 'fosterFramesSettingsgeneralContainer', content)
+	container:SetAllPoints(content)
 	container:EnableMouse(true)
-	container:EnableMouseWheel(true)
 	container:Hide()
 	-------------------------------------------------------------------------------
 	local checkBoxGeneralN, checkBoxGeneral  = 1, { 	[1] = {['id'] = 'enableFrames', 		['label'] = 'Show FosterFrames'},
@@ -15,14 +14,14 @@
 	container.generalList = {}
 	for i = 1, checkBoxGeneralN, 1 do
 		container.generalList[i] = CreateFrame('CheckButton', 'fosterFramesGeneralCheckButton'..i, container, 'UICheckButtonTemplate')
-		container.generalList[i]:SetHeight(20) 	container.generalList[i]:SetWidth(20)
+		container.generalList[i]:SetHeight(24) 	container.generalList[i]:SetWidth(24)
 		if i == 1 then
-			container.generalList[i]:SetPoint('LEFT', container, 'TOPLEFT', 45, -30)
+			container.generalList[i]:SetPoint('TOPLEFT', container, 'TOPLEFT', 20, -20)
 		else
-			container.generalList[i]:SetPoint('LEFT', container.generalList[i-1], 'LEFT', 0, -30)
+			container.generalList[i]:SetPoint('TOPLEFT', container.generalList[i-1], 'BOTTOMLEFT', 0, -10)
 		end
 		_G[container.generalList[i]:GetName()..'Text']:SetText(checkBoxGeneral[i]['label'])
-		_G[container.generalList[i]:GetName()..'Text']:SetPoint('LEFT', container.generalList[i], 'RIGHT', 4, 0)
+		_G[container.generalList[i]:GetName()..'Text']:SetPoint('LEFT', container.generalList[i], 'RIGHT', 6, 0)
 		container.generalList[i].id = checkBoxGeneral[i]['id']
 		container.generalList[i]:SetScript('OnClick', function()
 			FOSTERFRAMESPLAYERDATA[this.id] = this:GetChecked()
@@ -32,17 +31,16 @@
 	
 	-- scale
 	container.scale = container:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
-	container.scale:SetPoint('LEFT', container.generalList[checkBoxGeneralN], 'LEFT', 0, -30)
+	container.scale:SetPoint('TOPLEFT', container.generalList[checkBoxGeneralN], 'BOTTOMLEFT', 0, -20)
 	container.scale:SetText'Scale'
 
 	container.scaleSlider = CreateFrame('Slider', 'fosterFramesScaleSlider', container, 'OptionsSliderTemplate')
-	container.scaleSlider:SetWidth(215) 	container.scaleSlider:SetHeight(14)
-	container.scaleSlider:SetPoint('LEFT', container.scale, 'LEFT', 0, -30)
+	container.scaleSlider:SetWidth(215) 	container.scaleSlider:SetHeight(16)
+	container.scaleSlider:SetPoint('TOPLEFT', container.scale, 'BOTTOMLEFT', 10, -10)
 	container.scaleSlider:SetMinMaxValues(0.8, 1.5)
 	container.scaleSlider:SetValueStep(.05)
 	_G[container.scaleSlider:GetName()..'Low']:SetText'0.8'
 	_G[container.scaleSlider:GetName()..'High']:SetText'1.5'
-
 
 	container.scaleSlider:SetScript('OnValueChanged', function() 
 		FOSTERFRAMESPLAYERDATA['scale'] = this:GetValue() 
@@ -50,19 +48,17 @@
 	end)
 
 	-- layout
-
 	container.layout = container:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
-	container.layout:SetPoint('LEFT', container.scaleSlider, 'LEFT', 0, -50)
+	container.layout:SetPoint('TOPLEFT', container.scaleSlider, 'BOTTOMLEFT', -10, -40)
 	container.layout:SetText'Layout'
 
 	container.layoutSlider = CreateFrame('Slider', 'fosterFramesLayoutSlider', container, 'OptionsSliderTemplate')
-	container.layoutSlider:SetWidth(215) 	container.layoutSlider:SetHeight(14)
-	container.layoutSlider:SetPoint('LEFT', container.layout, 'LEFT', 0, -30)
+	container.layoutSlider:SetWidth(215) 	container.layoutSlider:SetHeight(16)
+	container.layoutSlider:SetPoint('TOPLEFT', container.layout, 'BOTTOMLEFT', 10, -10)
 	container.layoutSlider:SetMinMaxValues(0, 4)
 	container.layoutSlider:SetValueStep(1)
 	_G[container.layoutSlider:GetName()..'Low']:SetText'Horizontal'
 	_G[container.layoutSlider:GetName()..'High']:SetText'Vertical'
-
 
 	container.layoutSlider:SetScript('OnValueChanged', function() 
 		local v = this:GetValue()

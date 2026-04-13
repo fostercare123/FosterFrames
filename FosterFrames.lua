@@ -447,14 +447,14 @@ local function drawUnits(list)
 	for k,v in pairs(playerList) do
 		-- set for redrawn
 		
-		local colour = RAID_CLASS_COLORS[v['class']]
-		local powerColor = RGB_POWER_COLORS[v['powerType']]
+		local class = v['class'] or 'WARRIOR'
+		local powerType = v['powerType'] or 'mana'
+		local colour = RAID_CLASS_COLORS[class] or RAID_CLASS_COLORS['WARRIOR']
+		local powerColor = RGB_POWER_COLORS[powerType] or RGB_POWER_COLORS['mana']
 		
-		-- hightlight nearby unit
+		-- highlight nearby unit
 		if v['nearby'] then		
-			if colour then
-				units[i].hpbar:SetStatusBarColor(colour.r, colour.g, colour.b)
-			end
+			units[i].hpbar:SetStatusBarColor(colour.r, colour.g, colour.b)
 			units[i].hoverEnabled = true
 			if not units[i].mo then
 				units[i].name:SetTextColor(colour.r, colour.g, colour.b)	
@@ -470,19 +470,16 @@ local function drawUnits(list)
 				units[i].name:SetTextColor(colour.r / 2, colour.g / 2, colour.b / 2, .7)
 			end		
 			
-			--units[i].targetCount.text:SetTextColor(.898 / 2, .898 / 2, .199 / 2)
-
 			if v['fc'] then
 				units[i].cc.icon:SetVertexColor(1, 1, 1, 1)
 			else
-				units[i].cc.icon:SetVertexColor(.4, .4, .4, .7)--v['fc'] and 1, 1, 1, 1 or .4, .4, .4, .6)
+				units[i].cc.icon:SetVertexColor(.4, .4, .4, .7)
 			end
 			units[i].cc.cd:Hide()
 			
 		end
 				
-		--units[i].name:SetText(v['name'])
-		units[i].name:SetText(string.sub(v['name'], 1, 7))
+		units[i].name:SetText(string.sub(v['name'] or 'Unknown', 1, 7))
 		
 		-- button function to target unit
 		units[i].tar = v['name']
@@ -490,34 +487,27 @@ local function drawUnits(list)
 		-- target count
 		units[i].targetCount.text:SetText(v['targetcount'] and (v['targetcount'] > 0 and v['targetcount'] or '') or '')
 		
-                -- hp & mana display optimization for UnitXP
-                local maxHP = v['maxhealth'] or 100
-                local currHP = v['health'] or (not v['nearby'] and maxHP) or 100
-                units[i].hpbar:SetMinMaxValues(0, maxHP)
-                units[i].hpbar:SetValue(currHP)
-                
-                -- Always show text if we have real values (UnitXP)
-                if FOSTERFRAMESHasUnitXP() then
-                    units[i].hpText:SetText(currHP .. " / " .. maxHP)
-                else
-                    units[i].hpText:SetText(currHP > 100 and currHP or "")
-                end
-
-                local maxMana = v['maxmana'] or 100
-                local currMana = v['mana'] or (not v['nearby'] and maxMana) or 100
-                units[i].manabar:SetMinMaxValues(0, maxMana)
-                units[i].manabar:SetValue(currMana)
-                
-                if FOSTERFRAMESHasUnitXP() and v['class'] ~= 'WARRIOR' and v['class'] ~= 'ROGUE' then
-                    units[i].manaText:SetText(currMana .. " / " .. maxMana)
-                else
-                    units[i].manaText:SetText((currMana > 100 and v['class'] ~= 'WARRIOR' and v['class'] ~= 'ROGUE') and currMana or "")
-                end
+		-- hp & mana display using UnitXP
+		local maxHP = v['maxhealth'] or 100
+		local currHP = v['health'] or (not v['nearby'] and maxHP) or 100
+		units[i].hpbar:SetMinMaxValues(0, maxHP)
+		units[i].hpbar:SetValue(currHP)
 		
-		--units[i]:Show()
+		units[i].hpText:SetText(currHP .. " / " .. maxHP)
+
+		local maxMana = v['maxmana'] or 100
+		local currMana = v['mana'] or (not v['nearby'] and maxMana) or 100
+		units[i].manabar:SetMinMaxValues(0, maxMana)
+		units[i].manabar:SetValue(currMana)
+		
+		if v['class'] ~= 'WARRIOR' and v['class'] ~= 'ROGUE' then
+			units[i].manaText:SetText(currMana .. " / " .. maxMana)
+		else
+			units[i].manaText:SetText("")
+		end
+		
 		if FOSTERFRAMESPLAYERDATA['displayOnlyNearby'] and not v['nearby'] then units[i]:Hide()	else units[i]:Show() end
 
-		
 		nearU = v['nearby'] and nearU + 1 or nearU
 		i = i + 1
 	end
@@ -539,8 +529,6 @@ local function drawUnits(list)
 		end
 		
 		fosterFrame.bottom:SetPoint('TOPLEFT', units[unitPointBottom].castbar.icon, 'BOTTOMLEFT', 1, -6)
-		
-		--/Script print(math.floor(4/5))
 	end
 end
 
@@ -562,7 +550,7 @@ local function updateUnits()
 	for k, v in pairs(playerList) do
 		
 		-- target indicator using GUID for reliability
-		if (currentTargetGUID and v['guid'] == currentTargetGUID) or (not currentTargetGUID and UnitName('target') == v['name']) then
+		if currentTargetGUID and v['guid'] == currentTargetGUID then
 			units[i].border:SetColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'])
 			
 			units[i].hpbar:SetBackdropColor(enemyFactionColor['r'] - .6, enemyFactionColor['g'] - .6, enemyFactionColor['b'] - .6, .6)
