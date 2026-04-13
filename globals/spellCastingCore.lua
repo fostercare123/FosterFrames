@@ -19,13 +19,13 @@ SPELLCASTINGCOREgetCast = function(caster, unit)
     if caster == nil then return nil end
     
     -- In SuperWOW environment, we prioritize direct unit info
-    if unit and UnitExists(unit) and FOSTERFRAMESHasSuperWOW() then
+    if unit and UnitExists(unit) and FOSTERFRAMESHasSuperWOW() and type(UnitCastingInfo) == 'function' then
         local spell, rank, displayName, icon, startTime, endTime, isStealth, castID, interrupt = UnitCastingInfo(unit)
         if spell then
             return convertSuperWOWCast(caster, spell, icon, startTime, endTime, false, interrupt)
         end
         
-        spell, rank, displayName, icon, startTime, endTime, isStealth, interrupt = UnitChannelInfo(unit)
+        if type(UnitChannelInfo) == 'function' then spell, rank, displayName, icon, startTime, endTime, isStealth, interrupt = UnitChannelInfo(unit) end
         if spell then
             return convertSuperWOWCast(caster, spell, icon, startTime, endTime, true, interrupt)
         end
@@ -42,10 +42,11 @@ end
 
 SPELLCASTINGCOREgetBuffs = function(name, unit)
     local list = {}
-    if unit and UnitExists(unit) and FOSTERFRAMESHasSuperWOW() then
+    if unit and UnitExists(unit) and FOSTERFRAMESHasSuperWOW() and type(UnitCastingInfo) == 'function' then
         -- Use improved SuperWOW UnitBuff/UnitDebuff if available
         -- Note: FosterFrames UI might need updates to handle this list
         for i=1, 40 do
+            if type(UnitBuff) ~= 'function' then break end
             local name, rank, icon, count, debuffType, duration, expirationTime = UnitBuff(unit, i)
             if not name then break end
             table.insert(list, {
@@ -58,6 +59,7 @@ SPELLCASTINGCOREgetBuffs = function(name, unit)
             })
         end
         for i=1, 40 do
+            if type(UnitDebuff) ~= 'function' then break end
             local name, rank, icon, count, debuffType, duration, expirationTime = UnitDebuff(unit, i)
             if not name then break end
             table.insert(list, {
