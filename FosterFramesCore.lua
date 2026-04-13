@@ -20,6 +20,8 @@ local playerList = {}
 local raidTargets = {}
 local prioMembers = {}
 local nearbyList = {}
+local pendingBGPlayers = {}
+local cachedRaidTargets = {}
 local maxUnitsDisplayed = 15
 local playerTargetCounterList = {}
 -- DUMMY FRAME
@@ -32,14 +34,21 @@ local function applyNearbyPlayer(v, now, nextCheck)
 	local guid = v.guid
 	if not guid then return end -- Strict GUID tracking
 
-	local p = playerList[guid]
-	
-	if not p then
+	-- Robust Merge: If this is a newly discovered player, check if we have scoreboard data for them
+	if not playerList[guid] then
+		local name = v.name
+		if name and pendingBGPlayers[name] then
+			-- Merge scoreboard data (class, etc) into the new GUID entry
+			for key, val in pairs(pendingBGPlayers[name]) do
+				if not v[key] then v[key] = val end
+			end
+			pendingBGPlayers[name] = nil -- Player is now officially tracked by GUID
+		end
 		playerList[guid] = v
-		p = playerList[guid]
 		refreshUnits = true
 	end
 
+	local p = playerList[guid]
 	if p then
 		refreshUnits = true
 		p['health'] = v['health']
@@ -72,9 +81,9 @@ local function verifyUnitInfo(unit, now)
 		local _, c = UnitClass(unit)
 		u['class'] = c
 
-		-- Use UnitXP for actual health values strictly if available
-		u['health'] = FOSTERFRAMESHasUnitXP() and UnitXP(unit) or UnitHealth(unit)
-		u['maxhealth'] = FOSTERFRAMESHasUnitXP() and UnitXP(unit, true) or UnitHealthMax(unit)
+		-- Use standard UnitHealth
+		u['health'] = UnitHealth(unit)
+		u['maxhealth'] = UnitHealthMax(unit)
 		
 		u['mana'] = UnitMana(unit)
 		u['maxmana'] = UnitManaMax(unit)
@@ -98,6 +107,27 @@ local function checkPrioMembers(now)
 	end
 end
 
+local function cacheRaidTargets()
+	local numRaidMembers = UnitInRaid('player') and GetNumRaidMembers() or GetNumPartyMembers() 
+	if numRaidMembers == 0 then 
+		cachedRaidTargets = {}
+		return 
+	end
+	
+	local groupType = UnitInRaid('player') and 'raid' or 'party'
+	local newCache = {}
+	for i=1, numRaidMembers do
+		local rTarget = groupType .. i .. 'target'
+		if UnitExists(rTarget) then
+			local name = UnitName(rTarget)
+			if name then
+				newCache[name] = rTarget
+			end
+		end
+	end
+	cachedRaidTargets = newCache
+end
+
 local function getRaidMembersTarget(now)
 	local numRaidMembers = UnitInRaid('player') and GetNumRaidMembers() or GetNumPartyMembers() 
 	if numRaidMembers == 0 then return end
@@ -119,15 +149,9 @@ local function updatePlayerListInfo(now)
 		-- Determine unitID if target or mouseover using GUID for reliability
 		local unitID = (UnitExists('target') and FOSTERFRAMESHasGUID() and v['guid'] == UnitGUID('target')) and 'target' or (UnitExists('mouseover') and FOSTERFRAMESHasGUID() and v['guid'] == UnitGUID('mouseover')) and 'mouseover' or nil
 		
-		-- Also check raid targets
+		-- Use cache for raid targets (O(1) lookup)
 		if not unitID then
-			for i=1, 40 do
-				local rTarget = 'raid'..i..'target'
-				if UnitExists(rTarget) and UnitName(rTarget) == v['name'] then
-					unitID = rTarget
-					break
-				end
-			end
+			unitID = cachedRaidTargets[v['name']]
 		end
 
 		v['castinfo'] = SPELLCASTINGCOREgetCast(v['name'], unitID)
@@ -242,38 +266,36 @@ local function orderByClass(l, e)
 end
 
 local function orderUnitsforOutput()
-	local list, listb = {}, {}
-	local i = 1
+	local list = {}
 	
 	for k, v in pairs(playerList) do
-		if v['nearby'] then
-			i = verifynearbylist(v)
-			if i ~= 0 then
-				nearbyList[i] = v
-			else
-				table.insert(nearbyList, v)
-			end
-		else
-			i = verifynearbylist(v)
-			if i ~= 0 then table.remove(nearbyList, i) end
-			listb = orderByClass(listb, v)
+		table.insert(list, v)
+	end
+	
+	table.sort(list, function(a, b)
+		-- Sort by nearby first
+		if a.nearby ~= b.nearby then
+			return a.nearby
 		end
+		
+		-- Then sort by class
+		local aClass = a.class or 'WARRIOR'
+		local bClass = b.class or 'WARRIOR'
+		if aClass ~= bClass then
+			return aClass < bClass
+		end
+		
+		-- Then sort by name
+		return (a.name or '') < (b.name or '')
+	end)
+	
+	-- Trim to max units
+	local result = {}
+	for i=1, math.min(table.getn(list), maxUnitsDisplayed) do
+		table.insert(result, list[i])
 	end
 	
-	i = 0
-	-- maintain same order
-	for k, v in pairs(nearbyList) do
-		table.insert(list, v)
-		i = i + 1
-		if i == maxUnitsDisplayed then return list end
-	end
-	for k, v in pairs(listb) do
-		table.insert(list, v)
-		i = i + 1
-		if i == maxUnitsDisplayed then return list end
-	end
-	
-	return list
+	return result
 end
 
 local function resetTargetCount()
@@ -298,6 +320,25 @@ function FOSTERFRAMECOREGetEFCDistance()
 	local enemyFaction = playerFaction == 'Alliance' and 'Horde' or 'Alliance'
 	local efcName = raidTargets[enemyFaction] and raidTargets[enemyFaction]['name']
 	if not efcName then return nil end
+	
+	-- Use cache for O(1) distance check
+	local efcUnit = cachedRaidTargets[efcName]
+	if not efcUnit and UnitExists('target') and UnitName('target') == efcName then efcUnit = 'target' end
+	if not efcUnit and UnitExists('mouseover') and UnitName('mouseover') == efcName then efcUnit = 'mouseover' end
+
+	if efcUnit then
+		local distance = 'unknown'
+		if CheckInteractDistance(efcUnit, 3) then distance = '< 10yd'
+		elseif CheckInteractDistance(efcUnit, 2) then distance = '< 11yd'
+		elseif CheckInteractDistance(efcUnit, 4) then distance = '< 28yd'
+		end
+		
+		local guid = getPlayerGUIDByName(efcName)
+		if guid and playerList[guid] then
+			playerList[guid]['efcDistance'] = distance
+		end
+		return efcName, distance
+	end
 	
 	local guid = getPlayerGUIDByName(efcName)
 	if guid and playerList[guid] then
@@ -383,16 +424,16 @@ local function fosterFramesCoreOnUpdate()
 
 	verifyUnitInfo('target', now)
 	verifyUnitInfo('mouseover', now)
-	getRaidMembersTarget(now)
 
 	if now > enemyNearbyRefresh then
 		resetTargetCount()
+		cacheRaidTargets()
 		checkPrioMembers(now)
 		enemyNearbyRefresh = now + enemyNearbyInterval
 	end
 
 	updatePlayerListInfo(now)
-	calculateEFCDistance(now)
+	-- calculateEFCDistance is now handled by its global getter or simplified check
 
 	if now > globalNearbyCheckNext then
 		globalNearbyMaintenance(now)
@@ -418,13 +459,6 @@ local function fosterFramesCoreOnUpdate()
 end
 
 local function initializeValues()
-	if not FOSTERFRAMESHasUnitXP() then
-		f:UnregisterEvent'UPDATE_BATTLEFIELD_SCORE'
-		FOSTERFRAMESInitialize(nil)
-		f:SetScript('OnUpdate', nil)
-		return
-	end
-
 	playerFaction = UnitFactionGroup('player')
 	insideBG = bgs[GetZoneText()] and true or false
 	

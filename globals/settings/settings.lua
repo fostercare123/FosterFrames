@@ -7,13 +7,8 @@ tlength = function(t)	local i = 0 for k, j in ipairs(t) do i = i + 1 end return 
 
 FOSTERFRAMESVERSION = 3.0
 
-local hasUnitXP = false
 local hasSuperWOW = false
 local hasNampower = false
-
-function FOSTERFRAMESHasUnitXP()
-	return type(UnitXP) == 'function'
-end
 
 function FOSTERFRAMESHasSuperWOW()
 	-- The addon can load if any SuperWOW-like environment is found,
@@ -34,11 +29,11 @@ function FOSTERFRAMESHasNampower()
 end
 
 function FOSTERFRAMESPrintDependencyStatus()
-	local unitxpState = hasUnitXP and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 	local superwowState = hasSuperWOW and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 	local nampowerState = hasNampower and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 
-	print('[FosterFrames] Dependency status: UnitXP=' .. unitxpState .. ', SuperWOW=' .. superwowState .. ', Nampower=' .. nampowerState)
+	print('[FosterFrames] Dependency status: SuperWOW=' .. superwowState .. ', Nampower=' .. nampowerState)
+end
 
 	if hasSuperWOW and SUPERWOW_VERSION then
 		print('[FosterFrames] SuperWOW version: ' .. tostring(SUPERWOW_VERSION))
@@ -195,11 +190,6 @@ end)
 
 
 function setupSettings()
-	if not FOSTERFRAMESHasUnitXP() then
-		print('|cffff1a1a[FosterFrames] UnitXP SP3 is required. FosterFrames will stay disabled until UnitXP is active.')
-		return
-	end
-
 	if not FOSTERFRAMESHasSuperWOW() then
 		print('|cffff1a1a[FosterFrames] SuperWOW is required. FosterFrames will stay disabled until SuperWOW is active.')
 		return
@@ -259,22 +249,15 @@ end)
 local function eventHandler()
 	if event == 'PLAYER_LOGIN' then
 		playerFaction = UnitFactionGroup'player'
-		hasUnitXP = type(UnitXP) == 'function'
-		hasSuperWOW = type(SUPERWOW_VERSION) ~= 'nil' or type(SUPERWOW_STRING) ~= 'nil' or type(SetAutoloot) == 'function'
-		hasNampower = type(GetNampowerVersion) == 'function'
+		hasSuperWOW = FOSTERFRAMESHasSuperWOW()
+		hasNampower = FOSTERFRAMESHasNampower()
 		local tc = playerFaction == 'Alliance' and 'FF1A1A' or '00ADF0'
 		print('|cff' ..tc.. '[FosterFrames] Use |cffffffff/ffs|cff' ..tc.. ' to open Settings.')
-		if hasUnitXP and hasSuperWOW then
-			print('|cff' ..tc.. '[FosterFrames] Loaded (UnitXP + SuperWOW mode).')
+		if hasSuperWOW then
+			print('|cff' ..tc.. '[FosterFrames] Loaded (SuperWOW mode).')
 			FOSTERFRAMESPrintDependencyStatus()
 		else
-			if not hasUnitXP then
-				print('|cffff1a1a[FosterFrames] UnitXP SP3 was not detected. Addon disabled.')
-			end
-			if not hasSuperWOW then
-				print('|cffff1a1a[FosterFrames] SuperWOW was not detected. Addon disabled.')
-			end
-			print('|cffff1a1a[FosterFrames] Runtime extensions: SuperWOW=' .. (hasSuperWOW and 'yes' or 'no') .. ', Nampower=' .. (hasNampower and 'yes' or 'no') .. '.')
+			print('|cffff1a1a[FosterFrames] SuperWOW was not detected. Addon disabled.')
 		end
 		_G['fosterFrameDisplay']:SetScale(FOSTERFRAMESPLAYERDATA['scale'])
 		_G['fosterFrameDisplay']:SetPoint('CENTER', UIParent, FOSTERFRAMESPLAYERDATA['offX'], FOSTERFRAMESPLAYERDATA['offY'])

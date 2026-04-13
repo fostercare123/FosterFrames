@@ -241,7 +241,11 @@ for i = 1, unitLimit,1 do
 			local b = button or arg1
 			local frame = self or this
 			if b == 'LeftButton' and frame.tar ~= nil  then
-				TargetByName(frame.tar, true)
+				if FOSTERFRAMESHasGUID() and frame.guid then
+					TargetUnit(frame.guid)
+				else
+					TargetByName(frame.tar, true)
+				end
 			end
 			if b == 'RightButton' then
 				spawnRTMenu(frame, frame.tar)
@@ -254,6 +258,9 @@ for i = 1, unitLimit,1 do
 			frame.name:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'])
 			frame.mo = true
 			MOUSEOVERUNINAME = frame.tar
+			if FOSTERFRAMESHasGUID() and frame.guid and type(SetMouseoverUnit) == 'function' then
+				SetMouseoverUnit(frame.guid)
+			end
 		end
 	end)
 
@@ -267,6 +274,9 @@ for i = 1, unitLimit,1 do
 		end
 		frame.mo = false
 		MOUSEOVERUNINAME = nil
+		if type(SetMouseoverUnit) == 'function' then
+			SetMouseoverUnit(nil)
+		end
 	end)
 end
 
@@ -500,6 +510,7 @@ local function drawUnits(list)
 		
 		-- button function to target unit
 		units[i].tar = v['name']
+		units[i].guid = v['guid']
 		
 		-- target count
 		units[i].targetCount.text:SetText(v['targetcount'] and (v['targetcount'] > 0 and v['targetcount'] or '') or '')
