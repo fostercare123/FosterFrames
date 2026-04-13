@@ -1,5 +1,5 @@
 ## Interface: 11200
-## Title: |cffffd700FosterFrames|r |cffcccccc[Fostercare]|r
+## Title: |cffffd700FosterFrames|r
 ## Notes: FosterFrames for Battlegrounds (Turtle WoW 1.18.1)
 ## OptionalDeps: UnitXP_SP3_Addon, NampowerSettings, SuperAPI, SuperAPI_Castlib
 ## SavedVariablesPerCharacter: FOSTERFRAMESPLAYERDATA
