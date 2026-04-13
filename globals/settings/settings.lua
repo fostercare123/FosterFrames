@@ -58,7 +58,6 @@ function FOSTERFRAMESPrintDependencyStatus()
 	local nampowerState = hasNampower and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 
 	print('[FosterFrames] Dependency status: SuperWOW=' .. superwowState .. ', Nampower=' .. nampowerState)
-end
 
 	if hasSuperWOW and SUPERWOW_VERSION then
 		print('[FosterFrames] SuperWOW version: ' .. tostring(SUPERWOW_VERSION))
