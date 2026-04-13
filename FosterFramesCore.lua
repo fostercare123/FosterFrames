@@ -386,7 +386,7 @@ end
 local function fosterFramesCoreOnUpdate()
         local now = GetTime()
         -- get battleground members on UPDATE_BATTLEFIELD_SCORE
-        if insideBG then RequestBattlefieldScoreData() end
+        if insideBG and type(RequestBattlefieldScoreData) == 'function' then RequestBattlefieldScoreData() end
 
         -- use target & mouseover to further populate list
         verifyUnitInfo('target', now)

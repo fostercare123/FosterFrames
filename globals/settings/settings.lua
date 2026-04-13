@@ -89,7 +89,7 @@ settings:SetBackdropBorderColor(.2, .2, .2)
 settings:SetMovable(true) settings:SetUserPlaced(true)
 settings:SetClampedToScreen(true)
 settings:RegisterForDrag'LeftButton' settings:EnableMouse(true)
-settings:SetScript('OnDragStart', function() if arg1 == 'LeftButton' then this:StartMoving() end end)
+settings:SetScript('OnDragStart', function() (self or this):StartMoving() end)
 settings:SetScript('OnDragStop', function() this:StopMovingOrSizing() end)
 tinsert(UISpecialFrames, 'fosterFramesSettings')
 settings:Hide()
@@ -189,7 +189,7 @@ function setupSettings()
 	end
 	
 	FOSTERFRAMESsettings()
-	TARGETFRAMECASTBARsettings(true)
+	if TARGETFRAMECASTBARsettings then TARGETFRAMECASTBARsettings(true) end
 end
 
 local closeSettings = function()
@@ -198,7 +198,7 @@ local closeSettings = function()
 		_G['fosterFrameDisplay']:Hide() 
 	end 
 
-	TARGETFRAMECASTBARsettings(false)
+	if TARGETFRAMECASTBARsettings then TARGETFRAMECASTBARsettings(false) end
 end
 -- x button
 settings.x:SetScript('OnClick', function() 
