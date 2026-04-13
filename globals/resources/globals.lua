@@ -10,6 +10,18 @@
         ['WARLOCK'] = '9482c9',
         ['WARRIOR'] = 'c79c6e',
     }
+
+	RAID_CLASS_COLORS = {
+		['DRUID']   = { r = 1.00, g = 0.49, b = 0.04 },
+		['HUNTER']  = { r = 0.67, g = 0.83, b = 0.45 },
+		['MAGE']    = { r = 0.41, g = 0.80, b = 0.94 },
+		['PALADIN'] = { r = 0.96, g = 0.55, b = 0.73 },
+		['PRIEST']  = { r = 1.00, g = 1.00, b = 1.00 },
+		['ROGUE']   = { r = 1.00, g = 0.96, b = 0.41 },
+		['SHAMAN']  = { r = 0.96, g = 0.55, b = 0.73 },
+		['WARLOCK'] = { r = 0.58, g = 0.51, b = 0.79 },
+		['WARRIOR'] = { r = 0.78, g = 0.61, b = 0.43 },
+	}
 	
 	RGB_SPELL_SCHOOL_COLORS = 
 	{

@@ -1,9 +1,7 @@
 
-_G = getfenv(0)
-
 print = function(m) DEFAULT_CHAT_FRAME:AddMessage(m) end
 
-tlength = function(t)	local i = 0 for k, j in ipairs(t) do i = i + 1 end return i end
+tlength = function(t)	local i = 0 for k, j in pairs(t) do i = i + 1 end return i end
 
 FOSTERFRAMESVERSION = 3.0
 
@@ -12,8 +10,6 @@ local hasNampower = false
 local hasUnitXP = false
 
 function FOSTERFRAMESHasSuperWOW()
-	-- The addon can load if any SuperWOW-like environment is found,
-	-- but specific functions will be checked at call-site to prevent crashes.
 	return (type(UnitGUID) == 'function' or type(SetAutoloot) == 'function' or SUPERWOW_VERSION ~= nil)
 end
 
@@ -39,18 +35,6 @@ function FOSTERFRAMESPrintDependencyStatus()
 	local unitxpState = hasUnitXP and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 
 	print('[FosterFrames] Dependency status: SuperWOW=' .. superwowState .. ', Nampower=' .. nampowerState .. ', UnitXP=' .. unitxpState)
-end
-
-	if hasSuperWOW and SUPERWOW_VERSION then
-		print('[FosterFrames] SuperWOW version: ' .. tostring(SUPERWOW_VERSION))
-	end
-
-	if hasNampower and GetNampowerVersion then
-		local major, minor, patch = GetNampowerVersion()
-		if major then
-			print('[FosterFrames] Nampower version: ' .. tostring(major) .. '.' .. tostring(minor or 0) .. '.' .. tostring(patch or 0))
-		end
-	end
 end
 
 if FOSTERFRAMESPLAYERDATA == nil then
@@ -148,10 +132,9 @@ for i = 1, settings.numTabs do
 	
 	settings.tabs[i].id = i
 	settings.tabs[i]:SetScript('OnClick', function()	
-		local activeContainerName = string.lower(tabNames[this.id])
 		for j = 1, settings.numTabs do	
 			local containerName = string.lower(tabNames[j])
-			local container = _G['fosterFramesSettings'..containerName..'Container']
+			local container = getglobal('fosterFramesSettings'..containerName..'Container')
 			if container then
 				if j == this.id then
 					container:Show()
@@ -172,11 +155,11 @@ settings.unlock:SetScript('OnClick', function()
 	if FOSTERFRAMESPLAYERDATA['frameMovable'] then
 		FOSTERFRAMESPLAYERDATA['frameMovable'] = false
 		this:SetText('Unlock')
-		if _G['fosterFrameDisplay'].bg then _G['fosterFrameDisplay'].bg:Hide() end
+		if getglobal('fosterFrameDisplay').bg then getglobal('fosterFrameDisplay').bg:Hide() end
 	else
 		FOSTERFRAMESPLAYERDATA['frameMovable'] = true
 		this:SetText('Lock')
-		if _G['fosterFrameDisplay'].bg then _G['fosterFrameDisplay'].bg:Show() end
+		if getglobal('fosterFrameDisplay').bg then getglobal('fosterFrameDisplay').bg:Show() end
 	end
 	FOSTERFRAMESsettings()
 end)
@@ -187,8 +170,8 @@ settings.reset:SetWidth(90) settings.reset:SetHeight(24)
 settings.reset:SetPoint('BOTTOM', settings.sidebar, 'BOTTOM', 0, 10)
 settings.reset:SetText('Reset Pos')
 settings.reset:SetScript('OnClick', function()
-	_G['fosterFrameDisplay']:ClearAllPoints()
-	_G['fosterFrameDisplay']:SetPoint('CENTER', UIParent, 0, 0)
+	getglobal('fosterFrameDisplay'):ClearAllPoints()
+	getglobal('fosterFrameDisplay'):SetPoint('CENTER', UIParent, 0, 0)
 	FOSTERFRAMESPLAYERDATA['offX'] = 0
 	FOSTERFRAMESPLAYERDATA['offY'] = 0
 end)
@@ -217,21 +200,21 @@ function setupSettings()
 	-- general tab by default
 	for j = 1, settings.numTabs do
 		local containerName = string.lower(tabNames[j])
-		local container = _G['fosterFramesSettings'..containerName..'Container']
+		local container = getglobal('fosterFramesSettings'..containerName..'Container')
 		if container then container:Hide() end
 	end
 			
-	if _G['fosterFramesSettingsgeneralContainer'] then _G['fosterFramesSettingsgeneralContainer']:Show() end
+	if getglobal('fosterFramesSettingsgeneralContainer') then getglobal('fosterFramesSettingsgeneralContainer'):Show() end
 	
 	settings:Show()
 	settings.unlock:SetText(FOSTERFRAMESPLAYERDATA['frameMovable'] and 'Lock' or 'Unlock')
 	
 	if FOSTERFRAMESPLAYERDATA['enableFrames'] then
-		if _G['fosterFrameDisplay']:IsShown() then
+		if getglobal('fosterFrameDisplay'):IsShown() then
 			fosterFramesDisplayShow = true
 		else
 			fosterFramesDisplayShow = false
-			_G['fosterFrameDisplay']:Show()
+			getglobal('fosterFrameDisplay'):Show()
 		end		
 	end
 	
@@ -239,10 +222,10 @@ function setupSettings()
 	TARGETFRAMECASTBARsettings(true)
 end
 
-local closeSettings = function()
+function closeSettings()
 	-- Only hide the display if the user explicitly disabled the addon frames
 	if FOSTERFRAMESPLAYERDATA and not FOSTERFRAMESPLAYERDATA['enableFrames'] then 
-		_G['fosterFrameDisplay']:Hide() 
+		getglobal('fosterFrameDisplay'):Hide() 
 	end
 
 	TARGETFRAMECASTBARsettings(false)
@@ -267,10 +250,10 @@ local function eventHandler()
 		else
 			print('|cffff1a1a[FosterFrames] SuperWOW was not detected. Addon disabled.')
 		end
-		_G['fosterFrameDisplay']:SetScale(FOSTERFRAMESPLAYERDATA['scale'])
-		_G['fosterFrameDisplay']:SetPoint('CENTER', UIParent, FOSTERFRAMESPLAYERDATA['offX'], FOSTERFRAMESPLAYERDATA['offY'])
+		getglobal('fosterFrameDisplay'):SetScale(FOSTERFRAMESPLAYERDATA['scale'])
+		getglobal('fosterFrameDisplay'):SetPoint('CENTER', UIParent, FOSTERFRAMESPLAYERDATA['offX'], FOSTERFRAMESPLAYERDATA['offY'])
 	elseif event == 'PLAYER_LOGOUT' then
-		local point, relativeTo, relativePoint, xOfs, yOfs = _G['fosterFrameDisplay']:GetPoint()
+		local point, relativeTo, relativePoint, xOfs, yOfs = getglobal('fosterFrameDisplay'):GetPoint()
 		FOSTERFRAMESPLAYERDATA['offX'] = xOfs
 		FOSTERFRAMESPLAYERDATA['offY'] = yOfs
 	elseif event == 'ZONE_CHANGED_NEW_AREA' then
@@ -293,6 +276,7 @@ SLASH_FOSTERFRAMESSETTINGS3 = '/ffsettings'
 SlashCmdList["FOSTERFRAMESSETTINGS"] = function(msg)
 	if settings:IsShown() then
 		closeSettings()
+		settings:Hide()
 	else
 		setupSettings()
 	end
