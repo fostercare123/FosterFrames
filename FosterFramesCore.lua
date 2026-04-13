@@ -62,7 +62,7 @@ end
 local function verifyUnitInfo(unit, now)
 	now = now or GetTime()
 	if UnitExists(unit) and UnitIsPlayer(unit) and UnitFactionGroup(unit) ~= playerFaction then
-		local guid = FOSTERFRAMESHasSuperWOW() and UnitGUID(unit)
+		local guid = FOSTERFRAMESHasGUID() and UnitGUID(unit)
 		if not guid then return false end -- Strict GUID tracking
 
 		local u = {}
@@ -117,7 +117,7 @@ local function updatePlayerListInfo(now)
 
 	for k, v in pairs(playerList) do
 		-- Determine unitID if target or mouseover using GUID for reliability
-		local unitID = (UnitExists('target') and FOSTERFRAMESHasSuperWOW() and v['guid'] == UnitGUID('target')) and 'target' or (UnitExists('mouseover') and FOSTERFRAMESHasSuperWOW() and v['guid'] == UnitGUID('mouseover')) and 'mouseover' or nil
+		local unitID = (UnitExists('target') and FOSTERFRAMESHasGUID() and v['guid'] == UnitGUID('target')) and 'target' or (UnitExists('mouseover') and FOSTERFRAMESHasGUID() and v['guid'] == UnitGUID('mouseover')) and 'mouseover' or nil
 		
 		-- Also check raid targets
 		if not unitID then
@@ -413,7 +413,7 @@ local function fosterFramesCoreOnUpdate()
 end
 
 local function initializeValues()
-	if not FOSTERFRAMESHasUnitXP or not FOSTERFRAMESHasUnitXP() or not FOSTERFRAMESHasSuperWOW or not FOSTERFRAMESHasSuperWOW() then
+	if not FOSTERFRAMESHasUnitXP() then
 		f:UnregisterEvent'UPDATE_BATTLEFIELD_SCORE'
 		FOSTERFRAMESInitialize(nil)
 		f:SetScript('OnUpdate', nil)

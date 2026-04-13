@@ -145,7 +145,7 @@
 		if UnitExists'target' then
 			local v = SPELLCASTINGCOREgetCast(UnitName('target'), 'target')
 			if v ~= nil then
-				local guid = FOSTERFRAMESHasSuperWOW() and UnitGUID('target')
+				local guid = FOSTERFRAMESHasGUID() and UnitGUID('target')
 				if GetTime() < v.timeEnd then
 					TargetFrame.EFcast:SetMinMaxValues(0, v.timeEnd - v.timeStart)
 					TargetFrame.IntegratedCastBar:SetMinMaxValues(0, v.timeEnd - v.timeStart)
@@ -318,7 +318,7 @@
 	-------------------------------------------------------------------------------
 	local function raidTargetOnUpdate()
 		local rt = FOSTERFRAMECOREGetRaidTarget()
-		local guid = UnitExists'target' and FOSTERFRAMESHasSuperWOW() and UnitGUID'target'
+		local guid = UnitExists'target' and FOSTERFRAMESHasGUID() and UnitGUID'target'
 		if guid and rt[guid] then
 			local tCoords = RAID_TARGET_TCOORDS[rt[guid]['icon']]
 			raidTargetFrame.icon:SetTexCoord(tCoords[1], tCoords[2], tCoords[3], tCoords[4])

@@ -19,17 +19,14 @@ SPELLCASTINGCOREgetCast = function(caster, unit)
     if caster == nil then return nil end
     
     -- In SuperWOW environment, we prioritize direct unit info
-    if unit and UnitExists(unit) and FOSTERFRAMESHasSuperWOW() then
+    if unit and UnitExists(unit) and FOSTERFRAMESHasCastInfo() then
         local spell, rank, displayName, icon, startTime, endTime, isStealth, castID, interrupt = UnitCastingInfo(unit)
-        if spell then
-            return convertSuperWOWCast(caster, spell, icon, startTime, endTime, false, interrupt)
-        end
-        
+        if spell then return convertSuperWOWCast(caster, spell, icon, startTime, endTime, false, interrupt) end
+
         spell, rank, displayName, icon, startTime, endTime, isStealth, interrupt = UnitChannelInfo(unit)
-        if spell then
-            return convertSuperWOWCast(caster, spell, icon, startTime, endTime, true, interrupt)
-        end
+        if spell then return convertSuperWOWCast(caster, spell, icon, startTime, endTime, true, interrupt) end
     end
+
 
     -- If no direct unit ID is provided or SuperWOW info missing, 
     -- we no longer fallback to inaccurate combat log parsing in this version.
