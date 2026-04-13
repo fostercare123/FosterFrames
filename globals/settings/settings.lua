@@ -243,12 +243,18 @@ function setupSettings()
 end
 
 local closeSettings = function()
+	-- Update insideBG state right before checking
+	insideBG = type(IsInsideBG) == 'function' and IsInsideBG()
+
 	-- Only hide the display if it's supposed to be disabled globally
 	if not FOSTERFRAMESPLAYERDATA['enableFrames'] then 
 		_G['fosterFrameDisplay']:Hide() 
 	elseif not insideBG and not fosterFramesDisplayShow then
 		-- If we're not in a BG and the frame wasn't shown before opening settings, hide it
 		_G['fosterFrameDisplay']:Hide()
+	else
+		-- In all other cases (like being in a BG), ensure it STAYS shown
+		_G['fosterFrameDisplay']:Show()
 	end 
 
 	TARGETFRAMECASTBARsettings(false)
