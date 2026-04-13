@@ -162,9 +162,9 @@ function setupSettings()
 	end
 	settings.header.t:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'], .9)
 
-	MAINSETTINGSInit(enemyFactionColor)
-	TACTICALSETTINGSInit(enemyFactionColor)
-	DISPLAYSETTINGSInit(enemyFactionColor)
+	        if MAINSETTINGSInit then MAINSETTINGSInit(enemyFactionColor) end
+        if TACTICALSETTINGSInit then TACTICALSETTINGSInit(enemyFactionColor) end
+        if DISPLAYSETTINGSInit then DISPLAYSETTINGSInit(enemyFactionColor) end
 
 	-- general tab by default
 	for j = 1, settings.numTabs do

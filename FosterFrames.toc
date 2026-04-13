@@ -1,32 +1,41 @@
 ## Interface: 11200
-## Title: |cffffd700FosterFrames|r
+## Title: |cffffd700FosterFrames|r |cffcccccc[Fostercare]|r
 ## Notes: FosterFrames for Battlegrounds (Turtle WoW 1.18.1)
 ## OptionalDeps: UnitXP_SP3_Addon, NampowerSettings, SuperAPI, SuperAPI_Castlib
 ## SavedVariablesPerCharacter: FOSTERFRAMESPLAYERDATA
 
+# LIBS / HANDLERS
+globals
+esources\globals.lua
 globals\actionHandler.lua
-globals\spellCastingCore.lua
-globals\resources\globals.lua
 globals\wsgHandler.lua
 globals\abHandler.lua
 globals\commHandler.lua
 globals\smoothBar.lua
-globals\settings\settings.lua
+
+# CLASS SPECIFIC
+globals\class
+ogue.lua
+globals\class\paladin.lua
+
+# SETTINGS - Definitions first, then the main file
 globals\settings\general.lua
 globals\settings\features.lua
 globals\settings\optionals.lua
-globals\class\rogue.lua
-globals\class\paladin.lua
+globals\settings\settings.lua
 
-UIElements\BindingsHandler.lua
-UIElements\customBorder.lua
-UIElements\customCooldown.lua
-UIElements\targetframe.lua
-UIElements\UIElementsTemplate.lua
-UIElements\scoreBoard.lua
-UIElements\wsgUI.lua
-
-FosterFrames.lua
+# CORE LOGIC
+globals\spellCastingCore.lua
 FosterFramesCore.lua
 
+# UI
+UIElements\UIElementsTemplate.lua
+UIElements\customBorder.lua
+UIElements\customCooldown.lua
+UIElements	argetframe.lua
+UIElements\scoreBoard.lua
+UIElements\wsgUI.lua
+UIElements\BindingsHandler.lua
 
+# MAIN
+FosterFrames.lua
