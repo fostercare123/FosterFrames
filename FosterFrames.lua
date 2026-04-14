@@ -239,9 +239,9 @@ end
 
 local function defaultVisuals()
 	for i=1, unitLimit do
-		units[i].castbar.icon:SetTexture[[Interface\Icons\Inv_misc_gem_sapphire_01]]
-		units[i].castbar.text:SetText('Entangling Roots')
-		units[i].castbar.text:SetText(string.sub(units[i].castbar.text:GetText(), 1, 18))
+		units[i].ffCastbar.icon:SetTexture[[Interface\Icons\Inv_misc_gem_sapphire_01]]
+		units[i].ffCastbar.text:SetText('Entangling Roots')
+		units[i].ffCastbar.text:SetText(string.sub(units[i].ffCastbar.text:GetText(), 1, 18))
 		units[i].name:SetText('Player'.. i)
 		
 		units[i].raidTarget.icon:SetTexCoord(.75, 1, 0.25, .5)
@@ -268,7 +268,7 @@ local function optionals()
 			units[i].manabar:Show() 
 			if FOSTERFRAMESPLAYERDATA['displayManaValues'] then units[i].manaText:Show() end
 		end
-		if not FOSTERFRAMESPLAYERDATA['castTimers'] 		then units[i].castbar.timer:Hide() else units[i].castbar.timer:Show() end
+		if not FOSTERFRAMESPLAYERDATA['castTimers'] 		then units[i].ffCastbar.timer:Hide() else units[i].ffCastbar.timer:Show() end
 		if not FOSTERFRAMESPLAYERDATA['targetCounter'] 		then units[i].targetCount.text:Hide() else units[i].targetCount.text:Show() end
 	end
 end
@@ -291,7 +291,7 @@ local function arrangeUnits()
 		else
 			if i > unitGroup then
 				if layout == 'hblock' or layout == 'vblock' then
-					units[i]:SetPoint('TOPLEFT', units[i-unitGroup].castbar.iconborder, 'BOTTOMLEFT', 1, -5)
+					units[i]:SetPoint('TOPLEFT', units[i-unitGroup].ffCastbar.iconborder, 'BOTTOMLEFT', 1, -5)
 				else
 					units[i]:SetPoint('TOPLEFT', units[i-unitGroup].cc, 'TOPRIGHT', leftSpacing, 0)
 				end
@@ -299,7 +299,7 @@ local function arrangeUnits()
 				if layout == 'hblock' or layout == 'vblock' then
 					units[i]:SetPoint('TOPLEFT', units[i-1].cc, 'TOPRIGHT', leftSpacing, 0)
 				else
-					units[i]:SetPoint('TOPLEFT', units[i-1].castbar.iconborder, 'BOTTOMLEFT', 1, -5)
+					units[i]:SetPoint('TOPLEFT', units[i-1].ffCastbar.iconborder, 'BOTTOMLEFT', 1, -5)
 				end
 			end
 		end
@@ -359,13 +359,17 @@ local function SetupFrames(maxU)
 	fosterFrame.efcButton:SetScript('OnClick', function()
 		if FOSTERFRAMESPLAYERDATA['efcBGannouncement'] == true then
 			FOSTERFRAMESPLAYERDATA['efcBGannouncement'] = false
-			this.flagTexture:SetVertexColor(.3, .3, .3)
+			fosterFrame.efcButton.flagTexture:SetVertexColor(.3, .3, .3)
 		else
 			FOSTERFRAMESPLAYERDATA['efcBGannouncement'] = true
-			this.flagTexture:SetVertexColor(1, 1, 1)
+			fosterFrame.efcButton.flagTexture:SetVertexColor(1, 1, 1)
 		end
 	end)
-	if FOSTERFRAMESPLAYERDATA['efcBGannouncement'] then this.flagTexture:SetVertexColor(1, 1, 1) else this.flagTexture:SetVertexColor(.3, .3, .3) end
+	if FOSTERFRAMESPLAYERDATA['efcBGannouncement'] then 
+		if fosterFrame.efcButton.flagTexture then fosterFrame.efcButton.flagTexture:SetVertexColor(1, 1, 1) end
+	else 
+		if fosterFrame.efcButton.flagTexture then fosterFrame.efcButton.flagTexture:SetVertexColor(.3, .3, .3) end
+	end
 
 	showHideBars()
 
@@ -383,7 +387,7 @@ local function SetupFrames(maxU)
 	else
 		unitPointBottom = unitGroup
 	end
-	fosterFrame.bottom:SetPoint('TOPLEFT', units[unitPointBottom].castbar.icon, 'BOTTOMLEFT', 1, -6)
+	fosterFrame.bottom:SetPoint('TOPLEFT', units[unitPointBottom].ffCastbar.icon, 'BOTTOMLEFT', 1, -6)
 end
 
 local function round(num, idp)
@@ -482,7 +486,7 @@ local function drawUnits(list)
 		else
 			unitPointBottom = i
 		end
-		fosterFrame.bottom:SetPoint('TOPLEFT', units[unitPointBottom].castbar.icon, 'BOTTOMLEFT', 1, -6)
+		fosterFrame.bottom:SetPoint('TOPLEFT', units[unitPointBottom].ffCastbar.icon, 'BOTTOMLEFT', 1, -6)
 	end
 end
 
@@ -509,20 +513,20 @@ local function updateUnits()
 		
 		-- castbar
 		local castInfo = v['castinfo']
-		units[i].castbar:Hide()
+		units[i].ffCastbar:Hide()
 		if castInfo ~= nil then
-			units[i].castbar:SetMinMaxValues(0, castInfo.timeEnd - castInfo.timeStart)
+			units[i].ffCastbar:SetMinMaxValues(0, castInfo.timeEnd - castInfo.timeStart)
 			if castInfo.inverse then
-				units[i].castbar:SetValue(math.mod((castInfo.timeEnd - now), castInfo.timeEnd - castInfo.timeStart))
+				units[i].ffCastbar:SetValue(math.mod((castInfo.timeEnd - now), castInfo.timeEnd - castInfo.timeStart))
 			else
-				units[i].castbar:SetValue(math.mod((now - castInfo.timeStart), castInfo.timeEnd - castInfo.timeStart))
+				units[i].ffCastbar:SetValue(math.mod((now - castInfo.timeStart), castInfo.timeEnd - castInfo.timeStart))
 			end
 			local charLim = FOSTERFRAMESPLAYERDATA['castTimers'] and 14 or 15
-			units[i].castbar.text:SetText(string.sub(castInfo.spell, 1, charLim))
-			units[i].castbar.timer:SetText(getTimerLeft(castInfo.timeEnd, now))
-			units[i].castbar.icon:SetTexture(castInfo.icon)
-			if castInfo.borderClr then units[i].castbar.b:SetColor(castInfo.borderClr[1], castInfo.borderClr[2], castInfo.borderClr[3]) else units[i].castbar.b:SetColor(.1, .1, .1) end
-			units[i].castbar:Show()
+			units[i].ffCastbar.text:SetText(string.sub(castInfo.spell, 1, charLim))
+			units[i].ffCastbar.timer:SetText(getTimerLeft(castInfo.timeEnd, now))
+			units[i].ffCastbar.icon:SetTexture(castInfo.icon)
+			if castInfo.borderClr then units[i].ffCastbar.b:SetColor(castInfo.borderClr[1], castInfo.borderClr[2], castInfo.borderClr[3]) else units[i].ffCastbar.b:SetColor(.1, .1, .1) end
+			units[i].ffCastbar:Show()
 		end
 		
 		-- cc icon
