@@ -46,7 +46,9 @@
 
 			container.scaleSlider:SetScript('OnValueChanged', function() 
 				FOSTERFRAMESPLAYERDATA['scale'] = this:GetValue() 
-				_G['fosterFrameDisplay']:SetScale(FOSTERFRAMESPLAYERDATA['scale'])
+				if fosterFrameDisplay then
+					fosterFrameDisplay:SetScale(FOSTERFRAMESPLAYERDATA['scale'])
+				end
 			end)
 		end
 

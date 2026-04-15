@@ -207,13 +207,13 @@ settings.unlock:SetScript('OnClick', function()
 	if FOSTERFRAMESPLAYERDATA['frameMovable'] then
 		FOSTERFRAMESPLAYERDATA['frameMovable'] = false
 		this:SetText('Unlock')
-		if getglobal('fosterFrameDisplay').bg then getglobal('fosterFrameDisplay').bg:Hide() end
+		if fosterFrameDisplay and fosterFrameDisplay.bg then fosterFrameDisplay.bg:Hide() end
 	else
 		FOSTERFRAMESPLAYERDATA['frameMovable'] = true
 		this:SetText('Lock')
-		if getglobal('fosterFrameDisplay').bg then getglobal('fosterFrameDisplay').bg:Show() end
+		if fosterFrameDisplay and fosterFrameDisplay.bg then fosterFrameDisplay.bg:Show() end
 	end
-	FOSTERFRAMESsettings()
+	if FOSTERFRAMESsettings then FOSTERFRAMESsettings() end
 end)
 
 -- Reset Button
@@ -222,8 +222,10 @@ settings.reset:SetWidth(90) settings.reset:SetHeight(24)
 settings.reset:SetPoint('BOTTOM', settings.sidebar, 'BOTTOM', 0, 10)
 settings.reset:SetText('Reset Pos')
 settings.reset:SetScript('OnClick', function()
-	getglobal('fosterFrameDisplay'):ClearAllPoints()
-	getglobal('fosterFrameDisplay'):SetPoint('CENTER', UIParent, 0, 0)
+	if fosterFrameDisplay then
+		fosterFrameDisplay:ClearAllPoints()
+		fosterFrameDisplay:SetPoint('CENTER', UIParent, 0, 0)
+	end
 	FOSTERFRAMESPLAYERDATA['offX'] = 0
 	FOSTERFRAMESPLAYERDATA['offY'] = 0
 end)
@@ -245,10 +247,10 @@ function setupSettings()
 	end
 	settings.header.t:SetTextColor(0.68, 0.49, 0.93, .9)
 
-	GENERALSSETTINGSInit(enemyFactionColor)
-	TACTICALSETTINGSInit(enemyFactionColor)
-	AUTOMATIONSETTINGSInit(enemyFactionColor)
-	APPEARANCESETTINGSInit(enemyFactionColor)
+	if GENERALSSETTINGSInit then GENERALSSETTINGSInit(enemyFactionColor) end
+	if TACTICALSETTINGSInit then TACTICALSETTINGSInit(enemyFactionColor) end
+	if AUTOMATIONSETTINGSInit then AUTOMATIONSETTINGSInit(enemyFactionColor) end
+	if APPEARANCESETTINGSInit then APPEARANCESETTINGSInit(enemyFactionColor) end
 
 	-- general tab by default
 	for j = 1, settings.numTabs do
@@ -262,26 +264,26 @@ function setupSettings()
 	settings:Show()
 	settings.unlock:SetText(FOSTERFRAMESPLAYERDATA['frameMovable'] and 'Lock' or 'Unlock')
 	
-	if FOSTERFRAMESPLAYERDATA['enableFrames'] then
-		if getglobal('fosterFrameDisplay'):IsShown() then
+	if FOSTERFRAMESPLAYERDATA['enableFrames'] and fosterFrameDisplay then
+		if fosterFrameDisplay:IsShown() then
 			fosterFramesDisplayShow = true
 		else
 			fosterFramesDisplayShow = false
-			getglobal('fosterFrameDisplay'):Show()
+			fosterFrameDisplay:Show()
 		end		
 	end
 	
-	FOSTERFRAMESsettings()
-	TARGETFRAMECASTBARsettings(true)
+	if FOSTERFRAMESsettings then FOSTERFRAMESsettings() end
+	if TARGETFRAMECASTBARsettings then TARGETFRAMECASTBARsettings(true) end
 end
 
 function closeSettings()
 	-- Only hide the display if the user explicitly disabled the addon frames
-	if FOSTERFRAMESPLAYERDATA and not FOSTERFRAMESPLAYERDATA['enableFrames'] then 
-		getglobal('fosterFrameDisplay'):Hide() 
+	if FOSTERFRAMESPLAYERDATA and not FOSTERFRAMESPLAYERDATA['enableFrames'] and fosterFrameDisplay then 
+		fosterFrameDisplay:Hide() 
 	end
 
-	TARGETFRAMECASTBARsettings(false)
+	if TARGETFRAMECASTBARsettings then TARGETFRAMECASTBARsettings(false) end
 end
 -- x button
 settings.x:SetScript('OnClick', function() 
@@ -303,14 +305,20 @@ local function eventHandler()
 		else
 			print('|cffae7cee[FosterFrames] SuperWOW was not detected. Addon disabled.')
 		end
-		getglobal('fosterFrameDisplay'):SetScale(FOSTERFRAMESPLAYERDATA['scale'])
-		getglobal('fosterFrameDisplay'):SetPoint('CENTER', UIParent, FOSTERFRAMESPLAYERDATA['offX'], FOSTERFRAMESPLAYERDATA['offY'])
+		if fosterFrameDisplay then
+			fosterFrameDisplay:SetScale(FOSTERFRAMESPLAYERDATA['scale'])
+			fosterFrameDisplay:SetPoint('CENTER', UIParent, FOSTERFRAMESPLAYERDATA['offX'], FOSTERFRAMESPLAYERDATA['offY'])
+		end
 	elseif event == 'PLAYER_LOGOUT' then
-		local point, relativeTo, relativePoint, xOfs, yOfs = getglobal('fosterFrameDisplay'):GetPoint()
-		FOSTERFRAMESPLAYERDATA['offX'] = xOfs
-		FOSTERFRAMESPLAYERDATA['offY'] = yOfs
+		if fosterFrameDisplay then
+			local point, relativeTo, relativePoint, xOfs, yOfs = fosterFrameDisplay:GetPoint()
+			FOSTERFRAMESPLAYERDATA['offX'] = xOfs
+			FOSTERFRAMESPLAYERDATA['offY'] = yOfs
+		end
 	elseif event == 'ZONE_CHANGED_NEW_AREA' then
-		insideBG = FOSTERFRAMECOREIsInsideBG()
+		if FOSTERFRAMECOREIsInsideBG then
+			insideBG = FOSTERFRAMECOREIsInsideBG()
+		end
 	end
 end
 
