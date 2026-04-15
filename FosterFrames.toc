@@ -17,15 +17,10 @@ globals\class\rogue.lua
 globals\class\paladin.lua
 globals\class\shaman.lua
 
-# SETTINGS - Definitions first
-globals\settings\settings.lua
-globals\settings\general.lua
-globals\settings\features.lua
-globals\settings\optionals.lua
-
 # CORE LOGIC
 globals\spellCastingCore.lua
 FosterFramesCore.lua
+FosterFrames.lua
 
 # UI
 UIElements\UIElementsTemplate.lua
@@ -36,5 +31,8 @@ UIElements\scoreBoard.lua
 UIElements\wsgUI.lua
 UIElements\BindingsHandler.lua
 
-# MAIN
-FosterFrames.lua
+# SETTINGS - Definitions after UI and Main
+globals\settings\settings.lua
+globals\settings\general.lua
+globals\settings\features.lua
+globals\settings\optionals.lua
