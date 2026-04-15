@@ -5,7 +5,6 @@ local ktInterval, ktEndtime = 3, 0
 local rtMenuInterval, rtMenuEndtime = 5, 0
 local refreshInterval, nextRefresh = 1/60, 0
 -- LISTS
-local playerList = {}
 local unitLimit = 15
 local units = {}
 local raidTargets = {}
@@ -510,10 +509,11 @@ local function updateUnits()
 	if ktEndtime < now then fosterFrame.raidTargetFrame:Hide() end
 	if rtMenuEndtime < now then fosterFrame.raidTargetMenu:Hide() end
 
+	if not fosterFrame.uiList then return end
 	local currentTarget = UnitExists'target' and UnitName'target' or nil
 
 	local i = 1
-	for k, v in pairs(playerList) do
+	for k, v in pairs(fosterFrame.uiList) do
 		-- border
 		if currentTarget == v['name'] then
 			units[i].border:SetColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'])
@@ -661,7 +661,8 @@ end
 -- ─── debug commands ────────────────────────────────────────────────────────
 
 local function debugDisplayPlayerData()
-	for k, v in pairs(playerList) do
+	local list = FOSTERFRAMECOREgetPlayerList and FOSTERFRAMECOREgetPlayerList() or {}
+	for k, v in pairs(list) do
 		print(k .. ':')
 		for i, j in pairs(v) do print(i .. ' ' .. j) end
 	end

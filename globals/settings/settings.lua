@@ -9,8 +9,13 @@ local hasSuperWOW = false
 local hasNampower = false
 local hasUnitXP = false
 
-function FOSTERFRAMESHasSuperWOW()
+local function FOSTERFRAMESHasSuperWOW_Internal()
 	return (type(UnitGUID) == 'function' or type(SetAutoloot) == 'function' or SUPERWOW_VERSION ~= nil)
+end
+
+function FOSTERFRAMESHasSuperWOW()
+	if FosterFrames.Config.hasSuperWOW ~= nil then return FosterFrames.Config.hasSuperWOW end
+	return FOSTERFRAMESHasSuperWOW_Internal()
 end
 
 function FOSTERFRAMESHasGUID()
@@ -72,17 +77,17 @@ function FOSTERFRAMESHasCastInfo()
 end
 
 function FOSTERFRAMESHasNampower()
-	return hasNampower
+	return FosterFrames.Config.hasNampower
 end
 
 function FOSTERFRAMESHasUnitXP()
-	return hasUnitXP
+	return FosterFrames.Config.hasUnitXP
 end
 
 function FOSTERFRAMESPrintDependencyStatus()
-	local superwowState = hasSuperWOW and '|cff00ff00yes|r' or '|cffff1a1ano|r'
-	local nampowerState = hasNampower and '|cff00ff00yes|r' or '|cffff1a1ano|r'
-	local unitxpState = hasUnitXP and '|cff00ff00yes|r' or '|cffff1a1ano|r'
+	local superwowState = FosterFrames.Config.hasSuperWOW and '|cff00ff00yes|r' or '|cffff1a1ano|r'
+	local nampowerState = FosterFrames.Config.hasNampower and '|cff00ff00yes|r' or '|cffff1a1ano|r'
+	local unitxpState = FosterFrames.Config.hasUnitXP and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 
 	print('|cffae7cee[FosterFrames]|r Dependency status: SuperWOW=' .. superwowState .. ', Nampower=' .. nampowerState .. ', UnitXP=' .. unitxpState)
 end
@@ -294,12 +299,12 @@ end)
 local function eventHandler()
 	if event == 'PLAYER_LOGIN' then
 		playerFaction = UnitFactionGroup'player'
-		hasSuperWOW = FOSTERFRAMESHasSuperWOW()
-		hasNampower = IsAddOnLoaded("Nampower") or IsAddOnLoaded("NampowerSettings")
-		hasUnitXP = IsAddOnLoaded("UnitXP_SP3_Addon")
+		FosterFrames.Config.hasSuperWOW = FOSTERFRAMESHasSuperWOW_Internal()
+		FosterFrames.Config.hasNampower = IsAddOnLoaded("Nampower") or IsAddOnLoaded("NampowerSettings")
+		FosterFrames.Config.hasUnitXP = IsAddOnLoaded("UnitXP_SP3_Addon")
 		local tc = 'ae7cee'
 		print('|cff' ..tc.. '[FosterFrames] Use |cffffffff/ffs|cff' ..tc.. ' to open Settings.')
-		if hasSuperWOW then
+		if FosterFrames.Config.hasSuperWOW then
 			print('|cff' ..tc.. '[FosterFrames] Loaded (SuperWOW mode).')
 			FOSTERFRAMESPrintDependencyStatus()
 		else

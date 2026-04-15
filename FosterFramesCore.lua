@@ -420,6 +420,10 @@ function FOSTERFRAMECOREgetPlayer(nameOrGuid)
 	return playerList[nameOrGuid] or playerList[getPlayerGUIDByName(nameOrGuid)]
 end
 
+function FOSTERFRAMECOREgetPlayerList()
+	return playerList
+end
+
 function FOSTERFRAMECOREGetEFCDistance()
 	local enemyFaction = playerFaction == 'Alliance' and 'Horde' or 'Alliance'
 	local efcName = currentFlagCarriers[enemyFaction]

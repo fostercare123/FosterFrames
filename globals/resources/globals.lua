@@ -1,3 +1,8 @@
+-- ─── NAMESPACE ────────────────────────────────────────────────────────────────
+FosterFrames = FosterFrames or {}
+FosterFrames.Config = FosterFrames.Config or {}
+-- ─────────────────────────────────────────────────────────────────────────────
+
     -- RAID_CLASS_COLORS compatibility for TurtleWOW 1.18.1
     if not RAID_CLASS_COLORS then
         RAID_CLASS_COLORS = {
