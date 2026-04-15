@@ -33,7 +33,7 @@
 				container.tacticalList[i].id = checkBoxTactical[i]['id']
 				container.tacticalList[i]:SetScript('OnClick', function()
 					FOSTERFRAMESPLAYERDATA[this.id]	= this:GetChecked()
-					FOSTERFRAMESsettings()
+					if FOSTERFRAMESsettings then FOSTERFRAMESsettings() end
 				end)
 			end
 		end

@@ -30,7 +30,7 @@
 				container.automationList[i].id = checkBoxAuto[i]['id']
 				container.automationList[i]:SetScript('OnClick', function()
 					FOSTERFRAMESPLAYERDATA[this.id]	= this:GetChecked()
-					FOSTERFRAMESsettings()
+					if FOSTERFRAMESsettings then FOSTERFRAMESsettings() end
 				end)
 			end
 		end

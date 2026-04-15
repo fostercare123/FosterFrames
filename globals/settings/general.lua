@@ -27,7 +27,7 @@
 				container.generalList[i].id = checkBoxGeneral[i]['id']
 				container.generalList[i]:SetScript('OnClick', function()
 					FOSTERFRAMESPLAYERDATA[this.id] = this:GetChecked()
-					FOSTERFRAMESsettings()
+					if FOSTERFRAMESsettings then FOSTERFRAMESsettings() end
 				end)
 			end
 			
@@ -91,7 +91,7 @@
 				container.appearanceList[i].id = checkBoxAppearance[i]['id']
 				container.appearanceList[i]:SetScript('OnClick', function()
 					FOSTERFRAMESPLAYERDATA[this.id] = this:GetChecked()
-					FOSTERFRAMESsettings()
+					if FOSTERFRAMESsettings then FOSTERFRAMESsettings() end
 				end)
 			end
 
