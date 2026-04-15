@@ -23,62 +23,63 @@ local BACKDROP = {bgFile = [[Interface\Tooltips\UI-Tooltip-Background]]}
 local enemyFactionColor
 
 fosterFrameDisplay = CreateFrame('Frame', 'fosterFrameDisplay', UIParent)
-fosterFrameDisplay:SetFrameStrata("BACKGROUND")
-fosterFrameDisplay:SetPoint('CENTER', UIParent, UIParent:GetHeight()/3, UIParent:GetHeight()/3)
-fosterFrameDisplay:SetHeight(20)
-fosterFrameDisplay:SetMovable(true)
-fosterFrameDisplay:SetClampedToScreen(true)
+fosterFrame = fosterFrameDisplay
+fosterFrame:SetFrameStrata("BACKGROUND")
+fosterFrame:SetPoint('CENTER', UIParent, UIParent:GetHeight()/3, UIParent:GetHeight()/3)
+fosterFrame:SetHeight(20)
+fosterFrame:SetMovable(true)
+fosterFrame:SetClampedToScreen(true)
 
-fosterFrameDisplay:SetScript('OnDragStart', function()
+fosterFrame:SetScript('OnDragStart', function()
 	local frame = this or self
 	if FOSTERFRAMESPLAYERDATA['frameMovable'] or (_G['fosterFramesSettings'] and _G['fosterFramesSettings']:IsShown()) then
 		frame:StartMoving()
 	end
 end)
-fosterFrameDisplay:SetScript('OnDragStop', function()
+fosterFrame:SetScript('OnDragStop', function()
 	local frame = this or self
 	frame:StopMovingOrSizing()
 end)
-fosterFrameDisplay:RegisterForDrag'LeftButton'
-fosterFrameDisplay:EnableMouse(true)
+fosterFrame:RegisterForDrag'LeftButton'
+fosterFrame:EnableMouse(true)
 
-fosterFrameDisplay.bg = fosterFrameDisplay:CreateTexture(nil, 'BACKGROUND')
-fosterFrameDisplay.bg:SetAllPoints()
-fosterFrameDisplay.bg:SetTexture(0, 0, 0, 0.5)
-fosterFrameDisplay.bg:Hide()
+fosterFrame.bg = fosterFrame:CreateTexture(nil, 'BACKGROUND')
+fosterFrame.bg:SetAllPoints()
+fosterFrame.bg:SetTexture(0, 0, 0, 0.5)
+fosterFrame.bg:Hide()
 
-fosterFrameDisplay.Title = fosterFrameDisplay:CreateFontString(nil, 'OVERLAY')
-fosterFrameDisplay.Title:SetFont(STANDARD_TEXT_FONT, 12, 'OUTLINE')
-fosterFrameDisplay.Title:SetPoint('CENTER', fosterFrameDisplay, 0, 1)
+fosterFrame.Title = fosterFrame:CreateFontString(nil, 'OVERLAY')
+fosterFrame.Title:SetFont(STANDARD_TEXT_FONT, 12, 'OUTLINE')
+fosterFrame.Title:SetPoint('CENTER', fosterFrame, 0, 1)
 
-fosterFrameDisplay.totalPlayers = fosterFrameDisplay:CreateFontString(nil, 'OVERLAY')
-fosterFrameDisplay.totalPlayers:SetFont(STANDARD_TEXT_FONT, 12, 'OUTLINE')
-fosterFrameDisplay.totalPlayers:SetPoint('RIGHT', fosterFrameDisplay, 'RIGHT', -4, 1)
-fosterFrameDisplay.totalPlayers:Hide()
+fosterFrame.totalPlayers = fosterFrame:CreateFontString(nil, 'OVERLAY')
+fosterFrame.totalPlayers:SetFont(STANDARD_TEXT_FONT, 12, 'OUTLINE')
+fosterFrame.totalPlayers:SetPoint('RIGHT', fosterFrame, 'RIGHT', -4, 1)
+fosterFrame.totalPlayers:Hide()
 
-fosterFrameDisplay.spawnText = fosterFrameDisplay:CreateFontString(nil, 'OVERLAY')
-fosterFrameDisplay.spawnText:SetFont(STANDARD_TEXT_FONT, 16, 'OUTLINE')
-fosterFrameDisplay.spawnText:SetPoint('LEFT', fosterFrameDisplay, 'LEFT', 8, 1)
+fosterFrame.spawnText = fosterFrame:CreateFontString(nil, 'OVERLAY')
+fosterFrame.spawnText:SetFont(STANDARD_TEXT_FONT, 16, 'OUTLINE')
+fosterFrame.spawnText:SetPoint('LEFT', fosterFrame, 'LEFT', 8, 1)
 
-fosterFrameDisplay.spawnText.Button = CreateFrame('Button', nil, fosterFrameDisplay)
-fosterFrameDisplay.spawnText.Button:SetHeight(15) fosterFrameDisplay.spawnText.Button:SetWidth(15)
-fosterFrameDisplay.spawnText.Button:SetPoint('CENTER', fosterFrameDisplay.spawnText, 'CENTER')
-fosterFrameDisplay.spawnText.Button:SetScript('OnEnter', function()
-	fosterFrameDisplay.spawnText:SetTextColor(.9, .9, .4)
+fosterFrame.spawnText.Button = CreateFrame('Button', nil, fosterFrame)
+fosterFrame.spawnText.Button:SetHeight(15) fosterFrame.spawnText.Button:SetWidth(15)
+fosterFrame.spawnText.Button:SetPoint('CENTER', fosterFrame.spawnText, 'CENTER')
+fosterFrame.spawnText.Button:SetScript('OnEnter', function()
+	fosterFrame.spawnText:SetTextColor(.9, .9, .4)
 	GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", -30, -30)
-	GameTooltip:SetText(fosterFrameDisplay.spawnText.Button.tt)
+	GameTooltip:SetText(fosterFrame.spawnText.Button.tt)
 	GameTooltip:Show()
 end)
-fosterFrameDisplay.spawnText.Button:SetScript('OnLeave', function()
-	fosterFrameDisplay.spawnText:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'], .9)
+fosterFrame.spawnText.Button:SetScript('OnLeave', function()
+	fosterFrame.spawnText:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'], .9)
 	GameTooltip:Hide()
 end)
 
 -- EFC button
-fosterFrameDisplay.efcButton = CreateFrame('Button', nil, fosterFrameDisplay)
-fosterFrameDisplay.efcButton:SetHeight(15) fosterFrameDisplay.efcButton:SetWidth(15)
-fosterFrameDisplay.efcButton:SetPoint('LEFT', fosterFrameDisplay.Title, 'RIGHT', 2, 0)
-fosterFrameDisplay.efcButton:SetScript('OnEnter', function()
+fosterFrame.efcButton = CreateFrame('Button', nil, fosterFrame)
+fosterFrame.efcButton:SetHeight(15) fosterFrame.efcButton:SetWidth(15)
+fosterFrame.efcButton:SetPoint('LEFT', fosterFrame.Title, 'RIGHT', 2, 0)
+fosterFrame.efcButton:SetScript('OnEnter', function()
 	GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", -30, -30)
 	if FOSTERFRAMESPLAYERDATA['efcDistanceTracking'] then
 		local name, dist = FOSTERFRAMECOREGetEFCDistance()
@@ -92,78 +93,78 @@ fosterFrameDisplay.efcButton:SetScript('OnEnter', function()
 	end
 	GameTooltip:Show()
 end)
-fosterFrameDisplay.efcButton:SetScript('OnLeave', function() GameTooltip:Hide() end)
+fosterFrame.efcButton:SetScript('OnLeave', function() GameTooltip:Hide() end)
 
-fosterFrameDisplay.efcButton.flagTexture = fosterFrameDisplay.efcButton:CreateTexture(nil, 'ARTWORK')
-fosterFrameDisplay.efcButton.flagTexture:SetAllPoints()
+fosterFrame.efcButton.flagTexture = fosterFrame.efcButton:CreateTexture(nil, 'ARTWORK')
+fosterFrame.efcButton.flagTexture:SetAllPoints()
 
-fosterFrameDisplay.efcButton.distText = fosterFrameDisplay.efcButton:CreateFontString(nil, 'OVERLAY')
-fosterFrameDisplay.efcButton.distText:SetFont(STANDARD_TEXT_FONT, 10, 'OUTLINE')
-fosterFrameDisplay.efcButton.distText:SetPoint('LEFT', fosterFrameDisplay.efcButton, 'RIGHT', 2, 0)
-fosterFrameDisplay.efcButton.distText:SetTextColor(1, 1, 1)
+fosterFrame.efcButton.distText = fosterFrame.efcButton:CreateFontString(nil, 'OVERLAY')
+fosterFrame.efcButton.distText:SetFont(STANDARD_TEXT_FONT, 10, 'OUTLINE')
+fosterFrame.efcButton.distText:SetPoint('LEFT', fosterFrame.efcButton, 'RIGHT', 2, 0)
+fosterFrame.efcButton.distText:SetTextColor(1, 1, 1)
 
 -- top / bottom frames
-fosterFrameDisplay.top = CreateFrame('Frame', nil, fosterFrameDisplay)
-fosterFrameDisplay.top:SetFrameLevel(0)
-fosterFrameDisplay.top:ClearAllPoints()
-fosterFrameDisplay.top:SetHeight(fosterFrameDisplay:GetHeight())
-fosterFrameDisplay.top:SetBackdrop(BACKDROP)
-fosterFrameDisplay.top:SetBackdropColor(0, 0, 0, .6)
-fosterFrameDisplay.top.border = CreateBorder(nil, fosterFrameDisplay.top, 13)
+fosterFrame.top = CreateFrame('Frame', nil, fosterFrame)
+fosterFrame.top:SetFrameLevel(0)
+fosterFrame.top:ClearAllPoints()
+fosterFrame.top:SetHeight(fosterFrame:GetHeight())
+fosterFrame.top:SetBackdrop(BACKDROP)
+fosterFrame.top:SetBackdropColor(0, 0, 0, .6)
+fosterFrame.top.border = CreateBorder(nil, fosterFrame.top, 13)
 
-fosterFrameDisplay.bottom = CreateFrame('Frame', nil, fosterFrameDisplay)
-fosterFrameDisplay.bottom:SetFrameLevel(0)
-fosterFrameDisplay.bottom:ClearAllPoints()
-fosterFrameDisplay.bottom:SetHeight(fosterFrameDisplay:GetHeight())
-fosterFrameDisplay.bottom:SetBackdrop(BACKDROP)
-fosterFrameDisplay.bottom:SetBackdropColor(0, 0, 0, .6)
-fosterFrameDisplay.bottom.border = CreateBorder(nil, fosterFrameDisplay.bottom, 13)
+fosterFrame.bottom = CreateFrame('Frame', nil, fosterFrame)
+fosterFrame.bottom:SetFrameLevel(0)
+fosterFrame.bottom:ClearAllPoints()
+fosterFrame.bottom:SetHeight(fosterFrame:GetHeight())
+fosterFrame.bottom:SetBackdrop(BACKDROP)
+fosterFrame.bottom:SetBackdropColor(0, 0, 0, .6)
+fosterFrame.bottom.border = CreateBorder(nil, fosterFrame.bottom, 13)
 
 -- raid target display frame
-fosterFrameDisplay.raidTargetFrame = CreateFrame('Frame', nil, fosterFrameDisplay)
-fosterFrameDisplay.raidTargetFrame:SetFrameLevel(2)
-fosterFrameDisplay.raidTargetFrame:SetHeight(36) fosterFrameDisplay.raidTargetFrame:SetWidth(36)
-fosterFrameDisplay.raidTargetFrame:SetPoint('CENTER', UIParent, 'CENTER', 0, 160)
-fosterFrameDisplay.raidTargetFrame:Hide()
+fosterFrame.raidTargetFrame = CreateFrame('Frame', nil, fosterFrame)
+fosterFrame.raidTargetFrame:SetFrameLevel(2)
+fosterFrame.raidTargetFrame:SetHeight(36) fosterFrame.raidTargetFrame:SetWidth(36)
+fosterFrame.raidTargetFrame:SetPoint('CENTER', UIParent, 'CENTER', 0, 160)
+fosterFrame.raidTargetFrame:Hide()
 
-fosterFrameDisplay.raidTargetFrame.text = fosterFrameDisplay.raidTargetFrame:CreateFontString(nil, 'OVERLAY')
-fosterFrameDisplay.raidTargetFrame.text:SetFont(STANDARD_TEXT_FONT, 18, 'OUTLINE')
-fosterFrameDisplay.raidTargetFrame.text:SetTextColor(.8, .8, .8, .8)
-fosterFrameDisplay.raidTargetFrame.text:SetPoint('CENTER', fosterFrameDisplay.raidTargetFrame)
-fosterFrameDisplay.raidTargetFrame.text:SetText('Player')
+fosterFrame.raidTargetFrame.text = fosterFrame.raidTargetFrame:CreateFontString(nil, 'OVERLAY')
+fosterFrame.raidTargetFrame.text:SetFont(STANDARD_TEXT_FONT, 18, 'OUTLINE')
+fosterFrame.raidTargetFrame.text:SetTextColor(.8, .8, .8, .8)
+fosterFrame.raidTargetFrame.text:SetPoint('CENTER', fosterFrame.raidTargetFrame)
+fosterFrame.raidTargetFrame.text:SetText('Player')
 
-fosterFrameDisplay.raidTargetFrame.iconl = fosterFrameDisplay.raidTargetFrame:CreateTexture(nil, 'OVERLAY')
-fosterFrameDisplay.raidTargetFrame.iconl:SetTexture[[Interface\TargetingFrame\UI-RaidTargetingIcons]]
-fosterFrameDisplay.raidTargetFrame.iconl:SetTexCoord(.75, 1, 0.25, .5)
-fosterFrameDisplay.raidTargetFrame.iconl:SetHeight(36) fosterFrameDisplay.raidTargetFrame.iconl:SetWidth(36)
-fosterFrameDisplay.raidTargetFrame.iconl:SetPoint('RIGHT', fosterFrameDisplay.raidTargetFrame.text, 'LEFT', -6, 0)
+fosterFrame.raidTargetFrame.iconl = fosterFrame.raidTargetFrame:CreateTexture(nil, 'OVERLAY')
+fosterFrame.raidTargetFrame.iconl:SetTexture[[Interface\TargetingFrame\UI-RaidTargetingIcons]]
+fosterFrame.raidTargetFrame.iconl:SetTexCoord(.75, 1, 0.25, .5)
+fosterFrame.raidTargetFrame.iconl:SetHeight(36) fosterFrame.raidTargetFrame.iconl:SetWidth(36)
+fosterFrame.raidTargetFrame.iconl:SetPoint('RIGHT', fosterFrame.raidTargetFrame.text, 'LEFT', -6, 0)
 
-fosterFrameDisplay.raidTargetFrame.iconr = fosterFrameDisplay.raidTargetFrame:CreateTexture(nil, 'OVERLAY')
-fosterFrameDisplay.raidTargetFrame.iconr:SetTexture[[Interface\TargetingFrame\UI-RaidTargetingIcons]]
-fosterFrameDisplay.raidTargetFrame.iconr:SetTexCoord(.75, 1, 0.25, .5)
-fosterFrameDisplay.raidTargetFrame.iconr:SetHeight(36) fosterFrameDisplay.raidTargetFrame.iconr:SetWidth(36)
-fosterFrameDisplay.raidTargetFrame.iconr:SetPoint('LEFT', fosterFrameDisplay.raidTargetFrame.text, 'RIGHT', 6, 0)
+fosterFrame.raidTargetFrame.iconr = fosterFrame.raidTargetFrame:CreateTexture(nil, 'OVERLAY')
+fosterFrame.raidTargetFrame.iconr:SetTexture[[Interface\TargetingFrame\UI-RaidTargetingIcons]]
+fosterFrame.raidTargetFrame.iconr:SetTexCoord(.75, 1, 0.25, .5)
+fosterFrame.raidTargetFrame.iconr:SetHeight(36) fosterFrame.raidTargetFrame.iconr:SetWidth(36)
+fosterFrame.raidTargetFrame.iconr:SetPoint('LEFT', fosterFrame.raidTargetFrame.text, 'RIGHT', 6, 0)
 
 -- raid target menu
 local rtMenuIconsize = 26
-fosterFrameDisplay.raidTargetMenu = CreateFrame('Frame', nil, fosterFrameDisplay)
-fosterFrameDisplay.raidTargetMenu:SetFrameLevel(7)
-fosterFrameDisplay.raidTargetMenu:SetHeight(rtMenuIconsize * 2 + 4) fosterFrameDisplay.raidTargetMenu:SetWidth(rtMenuIconsize * 4 + 10)
-fosterFrameDisplay.raidTargetMenu:SetBackdrop(BACKDROP)
-fosterFrameDisplay.raidTargetMenu:SetBackdropColor(0, 0, 0, .6)
-fosterFrameDisplay.raidTargetMenu:Hide()
-fosterFrameDisplay.raidTargetMenu.border = CreateBorder(nil, fosterFrameDisplay.raidTargetMenu, 10)
-fosterFrameDisplay.raidTargetMenu.icons = {}
+fosterFrame.raidTargetMenu = CreateFrame('Frame', nil, fosterFrame)
+fosterFrame.raidTargetMenu:SetFrameLevel(7)
+fosterFrame.raidTargetMenu:SetHeight(rtMenuIconsize * 2 + 4) fosterFrame.raidTargetMenu:SetWidth(rtMenuIconsize * 4 + 10)
+fosterFrame.raidTargetMenu:SetBackdrop(BACKDROP)
+fosterFrame.raidTargetMenu:SetBackdropColor(0, 0, 0, .6)
+fosterFrame.raidTargetMenu:Hide()
+fosterFrame.raidTargetMenu.border = CreateBorder(nil, fosterFrame.raidTargetMenu, 10)
+fosterFrame.raidTargetMenu.icons = {}
 
 for j=1, raidIconsN do
-	local btn = CreateFrame('Button', 'fosterFrameDisplay.raidTargetMenu.icons'..j, fosterFrameDisplay.raidTargetMenu)
+	local btn = CreateFrame('Button', 'fosterFrame.raidTargetMenu.icons'..j, fosterFrame.raidTargetMenu)
 	btn:SetHeight(rtMenuIconsize) btn:SetWidth(rtMenuIconsize)
 	if j == 1 then
-		btn:SetPoint('TOPLEFT', fosterFrameDisplay.raidTargetMenu, 'TOPLEFT', 1, -1)
+		btn:SetPoint('TOPLEFT', fosterFrame.raidTargetMenu, 'TOPLEFT', 1, -1)
 	elseif j < 5 then
-		btn:SetPoint('LEFT', fosterFrameDisplay.raidTargetMenu.icons[j-1], 'RIGHT', 2, 0)
+		btn:SetPoint('LEFT', fosterFrame.raidTargetMenu.icons[j-1], 'RIGHT', 2, 0)
 	else
-		btn:SetPoint('TOP', fosterFrameDisplay.raidTargetMenu.icons[j-4], 'BOTTOM', 0, -2)
+		btn:SetPoint('TOP', fosterFrame.raidTargetMenu.icons[j-4], 'BOTTOM', 0, -2)
 	end
 	btn.id = j
 	btn.tex = btn:CreateTexture(nil, 'OVERLAY')
@@ -174,22 +175,22 @@ for j=1, raidIconsN do
 	btn.tex:SetAllPoints()
 	btn:SetScript('OnEnter', function() this.tex:SetAlpha(1) end)
 	btn:SetScript('OnLeave', function() this.tex:SetAlpha(.6) end)
-	fosterFrameDisplay.raidTargetMenu.icons[j] = btn
+	fosterFrame.raidTargetMenu.icons[j] = btn
 end
 
 local function spawnRTMenu(b, tar)
-	fosterFrameDisplay.raidTargetMenu:SetPoint('TOP', b, 'BOTTOM', rtMenuIconsize/2, 0)
-	if fosterFrameDisplay.raidTargetMenu.target == tar and rtMenuEndtime > GetTime() then 
-		fosterFrameDisplay.raidTargetMenu:Hide()
+	fosterFrame.raidTargetMenu:SetPoint('TOP', b, 'BOTTOM', rtMenuIconsize/2, 0)
+	if fosterFrame.raidTargetMenu.target == tar and rtMenuEndtime > GetTime() then 
+		fosterFrame.raidTargetMenu:Hide()
 		return 
 	end
-	fosterFrameDisplay.raidTargetMenu.target = tar
-	fosterFrameDisplay.raidTargetMenu:Show()
+	fosterFrame.raidTargetMenu.target = tar
+	fosterFrame.raidTargetMenu:Show()
 	rtMenuEndtime = GetTime() + rtMenuInterval
 	for j=1, raidIconsN do
-		fosterFrameDisplay.raidTargetMenu.icons[j]:SetScript('OnClick', function()
+		fosterFrame.raidTargetMenu.icons[j]:SetScript('OnClick', function()
 			FOSTERFRAMECORESendRaidTarget(raidIcons[this.id], tar)
-			fosterFrameDisplay.raidTargetMenu:Hide()
+			fosterFrame.raidTargetMenu:Hide()
 			rtMenuEndtime = 0
 		end)
 	end
@@ -200,7 +201,7 @@ local leftSpacing = 5
 
 -- draw player unit frames
 for i=1, unitLimit do
-	units[i] = CreateEnemyUnitFrame('fosterFrameUnit'..i, fosterFrameDisplay)
+	units[i] = CreateEnemyUnitFrame('fosterFrameUnit'..i, fosterFrame)
 	units[i].index = i
 	units[i].hoverEnabled = false
 
@@ -630,7 +631,7 @@ function FOSTERFRAMESInitialize(maxU, isBG)
 
 		if insideBG and GetZoneText() == 'Warsong Gulch' then fosterFrame.efcButton:Show() else fosterFrame.efcButton:Hide() end
 
-		if FOSTERFRAMESPLAYERDATA['enableFrames'] then fosterFrame:Show() end
+		if FOSTERFRAMESPLAYERDATA['enableFrames'] or insideBG then fosterFrame:Show() else fosterFrame:Hide() end
 		fosterFrame:SetScript('OnUpdate', fosterFramesOnUpdate)
 	else
 		fosterFrame:SetScript('OnUpdate', nil)
@@ -650,25 +651,12 @@ function FOSTERFRAMESsettings()
 		if insideBG and GetZoneText() == 'Warsong Gulch' then fosterFrame.efcButton:Show() else fosterFrame.efcButton:Hide() end
 	end
 	arrangeUnits()
-	if FOSTERFRAMESPLAYERDATA['enableFrames'] then fosterFrame:Show() else fosterFrame:Hide() end
+	if FOSTERFRAMESPLAYERDATA['enableFrames'] or insideBG then fosterFrame:Show() else fosterFrame:Hide() end
 	
 	if not enabled and not (_G['fosterFramesSettings'] and _G['fosterFramesSettings']:IsShown()) then
 		for i=1, unitLimit do units[i]:Hide() end
 	end
 end
-
--- ─── events ────────────────────────────────────────────────────────────────
-
-local function eventHandler()
-	if (event == 'PLAYER_ENTERING_WORLD' or event == 'ZONE_CHANGED_NEW_AREA') and enabled then
-		enabled = false
-		fosterFrame:Hide()
-	end
-end
-
-fosterFrame:RegisterEvent'PLAYER_ENTERING_WORLD'
-fosterFrame:RegisterEvent'ZONE_CHANGED_NEW_AREA'
-fosterFrame:SetScript('OnEvent', eventHandler)
 
 -- ─── debug commands ────────────────────────────────────────────────────────
 

@@ -5,7 +5,7 @@ local bgs = {['Warsong Gulch'] = 10,
 			 ['Lordaeron Arena'] = 10,
 			 ['Sunstrider Court'] = 10,
 			 ['Thorn Gorge'] = 15,
-			 --['Alterac Valley'] = 40
+			 ['Alterac Valley'] = 40
 			 }
 -- TIMERS
 local playerListInterval, playerListRefresh, enemyNearbyInterval, enemyNearbyRefresh = 30, 0, .3, 0
@@ -721,6 +721,10 @@ SlashCmdList["FOSTERFRAMECORE"] = function(msg)
 		print('playerlist:')
 		for k, v in pairs(playerList) do
 			print(v['name'] .. ' (' .. k .. ')')
+		end
+	end
+end
+
 		end
 	end
 end
