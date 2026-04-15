@@ -1,7 +1,6 @@
 local playerFaction
 local insideBG = false
 -- TIMERS
-local ktInterval, ktEndtime = 3, 0
 local rtMenuInterval, rtMenuEndtime = 5, 0
 local refreshInterval, nextRefresh = 1/60, 0
 -- LISTS
@@ -506,7 +505,6 @@ end
 local function updateUnits()
 	local now = GetTime()
 
-	if ktEndtime < now then fosterFrame.raidTargetFrame:Hide() end
 	if rtMenuEndtime < now then fosterFrame.raidTargetMenu:Hide() end
 
 	if not fosterFrame.uiList then return end
@@ -605,18 +603,6 @@ end
 
 function FOSTERFRAMESUpdatePlayers(list)
 	drawUnits(list)
-end
-
-function FOSTERFRAMESAnnounceRT(rt, p)
-	raidTargets = rt
-	fosterFrame.raidTargetFrame.text:SetText(p['name'])
-	fosterFrame.raidTargetFrame.text:SetTextColor(RAID_CLASS_COLORS[p['class']].r, RAID_CLASS_COLORS[p['class']].g, RAID_CLASS_COLORS[p['class']].b)
-	local tCoords = RAID_TARGET_TCOORDS[raidTargets[p['name']]['icon']]
-	fosterFrame.raidTargetFrame.iconl:SetTexCoord(tCoords[1], tCoords[2], tCoords[3], tCoords[4])
-	fosterFrame.raidTargetFrame.iconr:SetTexCoord(tCoords[1], tCoords[2], tCoords[3], tCoords[4])
-	PlaySound('RaidWarning', 'master')
-	fosterFrame.raidTargetFrame:Show()
-	ktEndtime = GetTime() + ktInterval
 end
 
 function FOSTERFRAMESInitialize(maxU, isBG)
