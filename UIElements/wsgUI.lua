@@ -98,16 +98,15 @@
 	local w, timeInterval = 100, 4
 	local efcLowHealth = function()
 		local f = UnitFactionGroup'player'
-		local x = UnitFactionGroup'player' == 'Alliance' and 'Horde' or 'Alliance'
+		local x = f == 'Alliance' and 'Horde' or 'Alliance'
 
 		local now = GetTime()
-		if flagCarriers[f] and fcHealth[f]  then
-			for i = 1, tlength(healthWarnings) do
-				if fcHealth[f] < healthWarnings[i]  then
+		if flagCarriers[x] and fcHealth[x]  then
+			for i = 1, table.getn(healthWarnings) do
+				if fcHealth[x] < healthWarnings[i]  then
 					if (not sentAnnoucement or healthWarnings[i] < w) and now > nextAnnouncement then
 						nextAnnouncement = now + timeInterval
 						w = healthWarnings[i]
-						--print('EFC has less than '..healthWarnings[i]..'%! Get ready to cap!')
 						local msgb = flagCarriers[x] and ' Get ready to cap!' or ''
 						SendChatMessage('EFC has less than '..healthWarnings[i]..'% Health!'.. msgb, 'BATTLEGROUND')
 						sentAnnoucement = true

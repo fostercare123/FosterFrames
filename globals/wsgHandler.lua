@@ -13,14 +13,14 @@
 			local score = 'captured the (.+) (.+)!'					local bscore = string.find(arg1, score)
 			
 			if bpick then
-				local flag 		= gsub(arg1, pick, '%1')
-				local carrier 	= gsub(arg1, pick, '%3')
+				local flag 		= string.gsub(arg1, pick, '%1')
+				local carrier 	= string.gsub(arg1, pick, '%3')
 				
 				flagCarriers[flag] = carrier
 			end
 			
 			if bdrop then
-				local flag 		= gsub(arg1, drop, '%1')
+				local flag 		= string.gsub(arg1, drop, '%1')
 				
 				flagCarriers[flag] = nil
 			end

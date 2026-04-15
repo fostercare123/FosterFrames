@@ -32,7 +32,7 @@
 				new = value
 			end
 			bar:SetValue_(new)
-			if cur == value or abs(new - value) < 2 then
+			if cur == value or math.abs(new - value) < 2 then
 				bar:SetValue_(new) -- Use new here to ensure it reaches the final target
 				smoothing[bar] = nil
 			end

@@ -542,7 +542,7 @@ function FOSTERFRAMECOREIsInsideBG()
 end
 
 FOSTERFRAMECOREgetPlayerTargetCounter = function()
-	return tlength(playerTargetCounterList)
+	return table.getn(playerTargetCounterList)
 end
 
 local function fosterFramesCoreOnUpdate()

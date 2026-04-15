@@ -104,8 +104,8 @@
 	end
 	local getTimerLeft = function(tEnd, l)
 		local t = tEnd - GetTime()
-		if not l then l = 3 end
-		if t > l then return round(t, 0) else return round(t, 1) end
+		local limit = l or 3
+		if t > limit then return round(t, 0) else return round(t, 1) end
 	end
 	-------------------------------------------------------------------------------
 	local showCast = function()
@@ -142,13 +142,13 @@
 					TargetFrame.IntegratedCastBar:SetMinMaxValues(0, v.timeEnd - v.timeStart)
 					local sparkPosition
 					if v.inverse then
-						TargetFrame.EFcast:SetValue(mod((v.timeEnd - GetTime()), v.timeEnd - v.timeStart))
-						TargetFrame.IntegratedCastBar:SetValue(mod((v.timeEnd - GetTime()), v.timeEnd - v.timeStart))
+						TargetFrame.EFcast:SetValue(math.mod((v.timeEnd - GetTime()), v.timeEnd - v.timeStart))
+						TargetFrame.IntegratedCastBar:SetValue(math.mod((v.timeEnd - GetTime()), v.timeEnd - v.timeStart))
 						
 						sparkPosition = (v.timeEnd - GetTime()) / (v.timeEnd - v.timeStart)
 					else
-						TargetFrame.EFcast:SetValue(mod((GetTime() - v.timeStart), v.timeEnd - v.timeStart))
-						TargetFrame.IntegratedCastBar:SetValue(mod((GetTime() - v.timeStart), v.timeEnd - v.timeStart))	
+						TargetFrame.EFcast:SetValue(math.mod((GetTime() - v.timeStart), v.timeEnd - v.timeStart))
+						TargetFrame.IntegratedCastBar:SetValue(math.mod((GetTime() - v.timeStart), v.timeEnd - v.timeStart))	
 
 						sparkPosition = (GetTime() - v.timeStart) / (v.timeEnd - v.timeStart)
 					end
@@ -163,7 +163,7 @@
 					TargetFrame.EFcast.border:SetColor(v.borderClr[1], v.borderClr[2], v.borderClr[3])
 					--
 					-- spark
-					if ( sparkPosition < 0 ) then
+					if not sparkPosition or sparkPosition < 0 then
 						sparkPosition = 0
 					end
 					TargetFrame.IntegratedCastBar.spark:SetPoint('CENTER', TargetFrame.IntegratedCastBar, 'LEFT', sparkPosition * TargetFrameNameBackground:GetWidth(), -1)
@@ -255,9 +255,12 @@
 		
 		button.cd = CreateCooldown(button.f, .4, true)
 		
-		getglobal(button:GetName()..'Icon'):SetTexCoord(.05, .95, .05, .95)
-		if getglobal(button:GetName()..'Count') then
-			getglobal(button:GetName()..'Count'):SetPoint('TOP', button, 'TOP', 0, -1)
+		local icon = getglobal(button:GetName()..'Icon')
+		if icon then icon:SetTexCoord(.05, .95, .05, .95) end
+		
+		local count = getglobal(button:GetName()..'Count')
+		if count then
+			count:SetPoint('TOP', button, 'TOP', 0, -1)
 		end
 	end
 	-------------------------------------------------------------------------------
@@ -282,10 +285,10 @@
 	end
 	-------------------------------------------------------------------------------
 	local limits = {MAX_TARGET_BUFFS, MAX_TARGET_DEBUFFS}
-	local debuff, button
 	local function displayTimers(debuffList)
 		if debuffList == nil then return end		
 		
+		local debuff, button, debuffStack, debuffType
 		for i=1, 2 do
 			for j=1, limits[i] do
 				if i == 1 then
