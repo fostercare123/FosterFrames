@@ -540,6 +540,17 @@ local function updateUnits()
 		units[i].cc.cd:Hide()
 		units[i].cc.border:SetColor(.1, .1, .1)
 		units[i].cc.duration:SetText("")
+
+		-- trinket icon
+		local trinket = FOSTERFRAMECOREGetTrinketCooldown(v['guid'])
+		if trinket then
+			units[i].trinket.icon:SetTexture(trinket.icon or [[Interface\Icons\inv_jewelry_trinketpvp_01]])
+			units[i].trinket.cd:SetTimers(trinket.start, trinket.end)
+			units[i].trinket.cd:Show()
+			units[i].trinket:Show()
+		else
+			units[i].trinket:Hide()
+		end
 		
 		-- raid icon
 		if v['name'] and raidTargets[v['name']] then
@@ -629,6 +640,10 @@ function FOSTERFRAMESsettings()
 	end
 	arrangeUnits()
 	if FOSTERFRAMESPLAYERDATA['enableFrames'] then fosterFrame:Show() else fosterFrame:Hide() end
+	
+	if not enabled and not (_G['fosterFramesSettings'] and _G['fosterFramesSettings']:IsShown()) then
+		for i=1, unitLimit do units[i]:Hide() end
+	end
 end
 
 -- ─── events ────────────────────────────────────────────────────────────────

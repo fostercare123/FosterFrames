@@ -30,6 +30,7 @@ local f = CreateFrame('Frame', 'fosterFramesCore', UIParent)
 local playerTargetCounter = 0
 local currentFlagCarriers = {}
 local activeCC = nil
+local trinketTimers = {}
 
 -- confirm hostile nearbyPlayers
 local function applyNearbyPlayer(v, now, nextCheck)
@@ -172,6 +173,28 @@ local function scanCombatLog(now)
 
 	processUnit(sourceGUID, sourceName, sourceFlags)
 	processUnit(destGUID, destName, destFlags)
+
+	-- Trinket Detection
+	if event == "SPELL_CAST_SUCCESS" then
+		local spellID, spellName = arg12, arg13
+		if spellName == "Insignia of the Horde" or spellName == "Insignia of the Alliance" or spellName == "Champion's Insignia" then
+			if sourceGUID and sourceGUID ~= "" then
+				trinketTimers[sourceGUID] = { ["start"] = now, ["end"] = now + 180, ["icon"] = arg15 }
+			end
+		end
+	end
+end
+
+function FOSTERFRAMECOREGetTrinketCooldown(guid)
+	if guid and trinketTimers[guid] then
+		local t = trinketTimers[guid]
+		if GetTime() < t["end"] then
+			return t
+		else
+			trinketTimers[guid] = nil
+		end
+	end
+	return nil
 end
 local function checkPrioMembers(now)
 	for k, v in pairs(prioMembers) do

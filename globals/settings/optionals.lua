@@ -9,12 +9,11 @@
 			container:EnableMouse(true)
 			container:Hide()
 			
-			local checkBoxAutoN, checkBoxAuto  = 4, {    [1] = {['id'] = 'openWorldScanning', 	['label'] = 'Enable Open World Enemy Scan'},
-																[2] = {['id'] = 'smartDistanceSorting', ['label'] = 'Enable Smart Distance Sorting'},
-																[3] = {['id'] = 'efcDistanceTracking', 	['label'] = 'Track EFC Proximity (WSG)'},
-                                                                [4] = {['id'] = 'efcBGannouncement', 	['label'] = 'Low Health EFC Alert (BATTLEGROUND)'},
-															}
-			
+			local checkBoxAutoN, checkBoxAuto  = 4, {    [1] = {['id'] = 'openWorldScanning', 	['label'] = 'Scan Players in Open World (Non-BG)'},
+																[2] = {['id'] = 'smartDistanceSorting', ['label'] = 'Sort Frames by Distance (Closest first)'},
+																[3] = {['id'] = 'efcDistanceTracking', 	['label'] = 'Track Distance to Flag Carrier (WSG)'},
+			[4] = {['id'] = 'efcBGannouncement', 	['label'] = 'Alert Chat when EFC has Low Health'},
+			}			
 			-- automation header
 			container.automation = container:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
 			container.automation:SetPoint('TOPLEFT', container, 'TOPLEFT', 20, -20)

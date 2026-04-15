@@ -9,7 +9,7 @@
 			container:EnableMouse(true)
 			container:Hide()
 			
-			local checkBoxGeneralN, checkBoxGeneral  = 1, { 	[1] = {['id'] = 'enableFrames', 		['label'] = 'Show FosterFrames'},
+			local checkBoxGeneralN, checkBoxGeneral  = 1, { 	[1] = {['id'] = 'enableFrames', 		['label'] = 'Enable Addon (Show Frames)'},
 															}
 			
 			-- general checkbox
@@ -71,10 +71,9 @@
 			container:EnableMouse(true)
 			container:Hide()
 
-            local checkBoxAppearanceN, checkBoxAppearance  = 2, { 	[1] = {['id'] = 'displayNames', 		['label'] = 'Display Unit Names'},
-                                                                    [2] = {['id'] = 'displayManabar', 		['label'] = 'Display Power Bar (Mana/Rage)'},
-															}
-			
+            local checkBoxAppearanceN, checkBoxAppearance  = 2, { 	[1] = {['id'] = 'displayNames', 		['label'] = 'Show Player Names on Frames'},
+                                                                    [2] = {['id'] = 'displayManabar', 		['label'] = 'Show Mana/Rage/Energy Bar'},
+            }			
 			-- appearance checkboxes
 			container.appearanceList = {}
 			for i = 1, checkBoxAppearanceN, 1 do

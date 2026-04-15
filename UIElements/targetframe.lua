@@ -1,13 +1,4 @@
 	-------------------------------------------------------------------------------
-	local raidTargetFrame = CreateFrame('Frame', nil, TargetFrame)
-	raidTargetFrame:SetFrameLevel(2)
-	raidTargetFrame:SetHeight(36)	raidTargetFrame:SetWidth(36)
-	raidTargetFrame:SetPoint('CENTER', TargetPortrait, 'TOP')
-	
-	raidTargetFrame.icon = raidTargetFrame:CreateTexture(nil, 'OVERLAY')
-	raidTargetFrame.icon:SetTexture([[Interface\TargetingFrame\UI-RaidTargetingIcons]])
-	raidTargetFrame.icon:SetAllPoints()
-	-------------------------------------------------------------------------------
 	local refreshInterval, nextRefresh = 1/60, 0
 	local flagCarriers = {}
 	local showText = true
@@ -315,18 +306,6 @@
 			end
 		end
 	end
-	-------------------------------------------------------------------------------
-	local function raidTargetOnUpdate()
-		local rt = FOSTERFRAMECOREGetRaidTarget()
-		local guid = UnitExists'target' and FOSTERFRAMESHasGUID() and UnitGUID'target'
-		if guid and rt[guid] then
-			local tCoords = RAID_TARGET_TCOORDS[rt[guid]['icon']]
-			raidTargetFrame.icon:SetTexCoord(tCoords[1], tCoords[2], tCoords[3], tCoords[4])
-			raidTargetFrame:Show()
-		else
-			raidTargetFrame:Hide()
-		end
-	end
 	-------------------------------------------------------------------------------	
 	local dummyFrame = CreateFrame'Frame'
 	dummyFrame:SetScript('OnUpdate', function()
@@ -347,9 +326,6 @@
 			if UnitExists('target') then
 				displayTimers(SPELLCASTINGCOREgetBuffs(UnitName('target'), 'target'))
 			end
-			
-			-- raidtarget
-			raidTargetOnUpdate()
 			
 			nextRefresh = refreshInterval			
 		end

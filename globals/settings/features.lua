@@ -9,14 +9,13 @@
 			container:EnableMouse(true)
 			container:Hide()
 			
-			local checkBoxTacticalN, checkBoxTactical  = 5, {
-																[1] = {['id'] = 'mouseOver', 			['label'] = 'Mouseover Cast On Frames'},	
-																[2] = {['id'] = 'targetFrameCastbar', 	['label'] = 'Movable Target Cast Bar'},														
-																[3] = {['id'] = 'integratedTargetFrameCastbar', 	['label'] = 'Integrated Target Cast Bar'},
-																[4] = {['id'] = 'targetDebuffTimers', 	['label'] = 'Debuff Timers On Target'},
-                                                                [5] = {['id'] = 'specSpecificIcons', 	['label'] = 'Spec-Specific Icons'},
-                                                                [6] = {['id'] = 'ccAnnounce', 	        ['label'] = 'CC Announcement (/say, /bg)'},
-																
+			local checkBoxTacticalN, checkBoxTactical  = 6, {    
+																[1] = {['id'] = 'mouseOver', 			['label'] = 'Enable Mouseover Cast (on Frames)'},
+																[2] = {['id'] = 'targetFrameCastbar', 	['label'] = 'Movable Casting Bar for Target'},
+																[3] = {['id'] = 'integratedTargetFrameCastbar', 	['label'] = 'Compact Casting Bar (inside Name)'},
+																[4] = {['id'] = 'targetDebuffTimers', 	['label'] = 'Show Timer Text on Target Debuffs'},
+			[5] = {['id'] = 'specSpecificIcons', 	['label'] = 'Show Talent Spec Icons (instead of Class)'},
+			[6] = {['id'] = 'ccAnnounce', 	        ['label'] = 'Announce CCs to Chat (/say, /bg)'},
 															}
 			
 			-- tactical header

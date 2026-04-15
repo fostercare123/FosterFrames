@@ -153,6 +153,25 @@
 		-- cooldown
 		this.cc.cd = CreateCooldown(this.cc, .58, true)
 		this.cc.cd:SetAlpha(1)
+		
+		---- TRINKET ----
+		this.trinket = CreateFrame('Frame', name..'Trinket', this)
+		this.trinket:SetWidth(ccIconWidth) this.trinket:SetHeight(unitHeight)
+		this.trinket:SetPoint('TOPLEFT', this.cc, 'TOPRIGHT', 3, 0)
+		
+		this.trinket.border = CreateBorder(nil, this.trinket, 12.8, 1/4.5)
+		this.trinket.border:SetFrameLevel(5)
+		
+		this.trinket.icon = this.trinket:CreateTexture(nil, 'ARTWORK')
+		this.trinket.icon:SetAllPoints()
+		this.trinket.icon:SetTexCoord(.1, .9, .25, .75)
+		
+		this.trinket.bg = this.trinket:CreateTexture(nil, 'BACKGROUND')
+		this.trinket.bg:SetTexture(0, 0, 0, .6)
+		this.trinket.bg:SetAllPoints()
+		
+		this.trinket.cd = CreateCooldown(this.trinket, .58, true)
+		this.trinket.cd:SetAlpha(1)
 	
 		return this
 	end
