@@ -1,35 +1,45 @@
-# FosterFrames v3.0 [Modernized]
-**The Professional Enemy Tracking Suite for Turtle WoW.**
+# FosterFrames v3.1 [DLL-Enhanced]
 
-FosterFrames is a high-performance, DLL-enhanced unit frame addon designed for elite PvP. It leverages the modern C++ hooks of **SuperWOW** and **UnitXP** to provide data and features previously impossible in the 1.12.1 engine.
+FosterFrames is a high-performance, minimalist unit frame suite designed for competitive PvP on Turtle WoW. It is built strictly for **Lua 5.0** and requires **SuperWOW** and **UnitXP** to function. By offloading data processing to C++ hooks, FosterFrames provides real-time enemy tracking and specialized features impossible with the standard 1.12.1 API.
 
-## 🚀 Pro Features
-*   **Zone-Wide Radar (Network Effect):** If *one* person in your raid spots an enemy (via the 200yd combat log), they appear on *everyone's* frames instantly via Peer-to-Peer synchronization.
-*   **DLL-Perfect Cast Bars:** 100% accurate casting data from **SuperWOW**, including latency, channeled spells, and grey-bordered "non-interruptible" indicators.
-*   **Real-Time Health & Mana:** Actual numeric values (not percentages) powered by the **UnitXP** DLL.
-*   **Smart Distance Sorting:** Automatically sorts the unit list by proximity, placing the nearest (and most dangerous) enemies at the top.
-*   **CC Announcements:** Automatically alerts your team in `/say` and `/bg` when you are **Sapped** or **Sheeped**.
-*   **Battleground Optimization:**
-    *   **AV Cap:** Automatically limits the display to 15 players in 40v40 matches to keep your screen clear.
-    *   **Scoreboard Sync:** Strict synchronization removes players who leave the BG instantly, preventing "ghost" frames.
-*   **Spec-Specific Icons:** Automatically detects and displays specialization icons (e.g., Shadow, Arms, Restoration) for instant target prioritization.
-*   **Tactical WSG Suite:** Real-time health, distance tracking, and low-health alerts for Flag Carriers.
+## Core Mandates
+- **Performance First:** Minimal CPU overhead; updates are throttled and event-driven.
+- **DLL Driven:** Relies on SuperWOW for GUID-based unit tracking and UnitXP for precise health/power data.
+- **PvP Focused:** Automated visibility in Battlegrounds and advanced CC/Trinket detection.
 
-## 🛠️ Commands
-*   `/ffs` - Open the Intuitive 4-Tab Settings Menu (General, Tactical, Automation, Appearance).
-*   `/ffc` - Display current player list data and sync status.
-*   `/ffd` - Debug mode for developers.
+## Key Features
 
-## 🖱️ Interaction
-*   **Left-Click:** Target the enemy player.
-*   **Right-Click:** Open the Raid Icon menu (Skull, Moon, etc.).
-*   **Drag Frames:** Open settings (`/ffs`) and click **Unlock** in the General tab.
+### 1. DLL-Enhanced Unit Frames
+- **SmoothBar Tech:** Fluid health and mana transitions (supports Rage, Energy, and Mana).
+- **Precise Data:** Leverages UnitXP for exact health values and power updates without unit-throttling.
+- **Spec Detection:** Dynamic Spec-specific icons via SuperWOW hooks.
 
-## 📦 Requirements
-This addon is **DLL-Dependent**. You must have these in your Turtle WoW folder:
-1.  **SuperWoW.dll** (Essential for casting, GUIDs, and 200yd scanning)
-2.  **UnitXP_SP3.dll** (Essential for real health/mana values)
-3.  **Nampower.dll** (Recommended for optimized communication)
+### 2. Battleground Intelligence
+- **Auto-Sync:** Frames automatically populate/depopulate based on the Battleground scoreboard.
+- **EFC Tracking:** Integrated Warsong Gulch Flag Carrier tracking with distance estimates (<10yd to 30yd).
+- **Hard-Coded Visibility:** Frames are guaranteed to show in BGs (WSG, AB, AV, etc.) regardless of global settings.
+- **AV Support:** Optimized for 40-man Alterac Valley with Smart Distance Sorting.
+
+### 3. Combat Awareness
+- **Integrated Castbars:** High-precision enemy castbars on both the unit frames and the default TargetFrame.
+- **Trinket Detection:** Visual cooldown tracking for enemy PvP Insignias.
+- **CC Announcement:** Automated "SAY" and "BATTLEGROUND" announcements when the player is Sapped or Polymorphed.
+- **World Scanning:** (SuperWOW) Scans combat logs for hidden enemy units and broadcasts spotted targets to your group.
+
+### 4. Customization & UI
+- **Flexible Layouts:** Block, Vertical, and Horizontal layouts with adjustable group sizes.
+- **Raid Targeting:** Integrated custom Raid Target menu (Right-Click) and on-screen RT announcements.
+- **Settings GUI:** Modern settings menu for scale, layout, and feature toggles.
+
+## Slash Commands
+- `/ffs` or `/fosterframes`: Open the Settings menu.
+- `/ffd`: Access debug tools (Player data, CC testing).
+- `/ffc`: Access core logic status and dependency checks.
+
+## Technical Dependencies
+- **SuperWOW.dll:** Required for GUID tracking, spell casting info, and spec detection.
+- **UnitXP_SP3.dll:** Required for high-precision health and smooth status bar updates.
+- **Nampower (Optional):** Enhanced communication and packet handling.
 
 ---
-*Developed for the Turtle WoW community to bridge the gap between classic gameplay and modern technical standards.*
+*Note: This addon is designed for the 1.12.1 (Turtle WoW) client. Ensure your DLLs are up to date to avoid FrameXML errors.*
