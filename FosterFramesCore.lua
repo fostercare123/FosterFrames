@@ -578,7 +578,7 @@ local function fosterFramesCoreOnUpdate()
 		globalNearbyCheckNext = now + globalNearbyCheckTimer
 	end
 
-	if FOSTERFRAMESPLAYERDATA and FOSTERFRAMESPLAYERDATA['enableFrames'] then
+	if FOSTERFRAMESPLAYERDATA and (FOSTERFRAMESPLAYERDATA['enableFrames'] or insideBG) then
 		if refreshUnits then
 			refreshUnits = false
 			FOSTERFRAMESUpdatePlayers(orderUnitsforOutput())
@@ -649,7 +649,7 @@ local function checkPlayerCC()
     if foundCC and activeCC ~= foundCC then
         activeCC = foundCC
         SendChatMessage(foundCC, 'SAY')
-        if IsInsideBG() then
+        if insideBG then
             SendChatMessage(foundCC, 'BATTLEGROUND')
         end
     elseif not foundCC then
@@ -732,10 +732,6 @@ SlashCmdList["FOSTERFRAMECORE"] = function(msg)
 		print('playerlist:')
 		for k, v in pairs(playerList) do
 			print(v['name'] .. ' (' .. k .. ')')
-		end
-	end
-end
-
 		end
 	end
 end

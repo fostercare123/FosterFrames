@@ -656,9 +656,17 @@ end
 
 local function debugCooldownTest()
 	for i=1, unitLimit do
+		units[i].name:SetText('Dummy'..i)
+		units[i].hpbar:SetMinMaxValues(0, 100)
+		units[i].hpbar:SetValue(math.random(20, 100))
+		units[i].manabar:SetMinMaxValues(0, 100)
+		units[i].manabar:SetValue(math.random(20, 100))
 		units[i].cc.cd:SetTimers(GetTime(), GetTime() + 8)
 		units[i].cc.cd:Show()
+		units[i]:Show()
 	end
+	fosterFrame:Show()
+	fosterFrame.Title:SetText('DEBUG MODE')
 end
 
 SLASH_FOSTERFRAMES1 = '/ffd'
@@ -667,6 +675,7 @@ SlashCmdList["FOSTERFRAMES"] = function(msg)
 	if msg then
 		if 		msg == 'data' 	then 	debugDisplayPlayerData()	 
 		elseif 	msg =='cd' 		then	debugCooldownTest()
+		elseif  msg == 'hide'   then    for i=1, unitLimit do units[i]:Hide() end
 		end		
 	end
 end
