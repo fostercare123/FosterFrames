@@ -17,21 +17,25 @@ globals\class\rogue.lua
 globals\class\paladin.lua
 globals\class\shaman.lua
 
+# UI TEMPLATES
+UIElements\customBorder.lua
+UIElements\customCooldown.lua
+UIElements\UIElementsTemplate.lua
+
 # CORE LOGIC
 globals\spellCastingCore.lua
 FosterFramesCore.lua
+
+# MAIN
 FosterFrames.lua
 
-# UI
-UIElements\UIElementsTemplate.lua
-UIElements\customBorder.lua
-UIElements\customCooldown.lua
+# UI ELEMENTS
 UIElements\targetframe.lua
 UIElements\scoreBoard.lua
 UIElements\wsgUI.lua
 UIElements\BindingsHandler.lua
 
-# SETTINGS - Definitions after UI and Main
+# SETTINGS
 globals\settings\settings.lua
 globals\settings\general.lua
 globals\settings\features.lua

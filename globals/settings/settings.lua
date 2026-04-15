@@ -310,7 +310,7 @@ local function eventHandler()
 		FOSTERFRAMESPLAYERDATA['offX'] = xOfs
 		FOSTERFRAMESPLAYERDATA['offY'] = yOfs
 	elseif event == 'ZONE_CHANGED_NEW_AREA' then
-		insideBG = IsInsideBG()
+		insideBG = FOSTERFRAMECOREIsInsideBG()
 	end
 end
 

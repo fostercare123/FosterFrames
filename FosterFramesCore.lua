@@ -537,7 +537,7 @@ function FOSTERFRAMECOREGetRaidTargetbyIcon(icon)
 	end
 end
 
-IsInsideBG = function()
+function FOSTERFRAMECOREIsInsideBG()
 	return insideBG
 end
 
