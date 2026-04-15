@@ -114,7 +114,7 @@
 				local g = v == 0 and 1 or (v == 1 or v == 2) and 5 or v == 3 and 2 or 15
 				FOSTERFRAMESPLAYERDATA['layout'] 	= a
 				FOSTERFRAMESPLAYERDATA['groupsize']  = g
-				FOSTERFRAMESsettings()
+				if FOSTERFRAMESsettings then FOSTERFRAMESsettings() end
 			end)
 		end
 
