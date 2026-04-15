@@ -148,9 +148,9 @@ local function scanCombatLog(now)
 		if not guid or guid == "" or not name or name == "" then return end
 		-- Check if it's a player and from the enemy faction
 		-- Flags: bit 0-1 (type), bit 4-5 (controller), bit 6 (reaction)
-		-- Reaction: bit 6 (Hostile=0x40)
-		local isEnemy = bit.band(flags, 0x00000040) ~= 0
-		local isPlayer = bit.band(flags, 0x00000400) ~= 0 -- bit 10 is PC
+		-- Reaction: bit 6 (Hostile=64)
+		local isEnemy = bit.band(flags, 64) ~= 0
+		local isPlayer = bit.band(flags, 1024) ~= 0 -- bit 10 is PC
 
 		if isPlayer and isEnemy then
 			local id = guid or name
