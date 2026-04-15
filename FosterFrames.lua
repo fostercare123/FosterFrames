@@ -318,28 +318,34 @@ local function showHideBars()
 end
 
 local function SetupFrames(maxU)
-	maxUnits = maxU
+	maxUnits = maxU or 15
+	if maxUnits < 1 then maxUnits = 1 end
 	playerFaction = UnitFactionGroup('player')
 
 	if playerFaction == 'Alliance' then 
 		enemyFactionColor = RGB_FACTION_COLORS['Horde']
-		fosterFrame.Title:SetText('Horde')
+		fosterFrameDisplay.Title:SetText('Horde')
 	else 
 		enemyFactionColor = RGB_FACTION_COLORS['Alliance']
-		fosterFrame.Title:SetText('Alliance')
+		fosterFrameDisplay.Title:SetText('Alliance')
 	end
 
-	fosterFrame.Title:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'], .9)
-	fosterFrame.spawnText:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'], .9)
-	fosterFrame.totalPlayers:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'], .9)
+	fosterFrameDisplay.Title:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'], .9)
+	fosterFrameDisplay.spawnText:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'], .9)
+	fosterFrameDisplay.totalPlayers:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'], .9)
 
-	local layout = FOSTERFRAMESPLAYERDATA['layout']
-	local col = layout == 'hblock' and 5 or layout == 'vblock' and 2 or layout == 'vertical' and 1 or maxUnits / FOSTERFRAMESPLAYERDATA['groupsize']
-	fosterFrame:SetWidth((unitWidth + ccIconWidth + 5) * col + leftSpacing * (col - 1))
-	fosterFrame.top:SetWidth(fosterFrame:GetWidth())
-	fosterFrame.top:SetPoint('CENTER', fosterFrame)
+	local layout = FOSTERFRAMESPLAYERDATA['layout'] or 'block'
+	local groupSize = FOSTERFRAMESPLAYERDATA['groupsize'] or 5
+	if groupSize < 1 then groupSize = 5 end
+	
+	local col = layout == 'hblock' and 5 or layout == 'vblock' and 2 or layout == 'vertical' and 1 or math.floor(maxUnits / groupSize)
+	if col < 1 then col = 1 end
+	
+	fosterFrameDisplay:SetWidth((unitWidth + ccIconWidth + 5) * col + leftSpacing * (col - 1))
+	fosterFrameDisplay.top:SetWidth(fosterFrameDisplay:GetWidth())
+	fosterFrameDisplay.top:SetPoint('CENTER', fosterFrameDisplay)
 
-	fosterFrame.spawnText.Button:SetScript('OnClick', function()
+	fosterFrameDisplay.spawnText.Button:SetScript('OnClick', function()
 		if FOSTERFRAMESPLAYERDATA['frameMovable'] then
 			FOSTERFRAMESPLAYERDATA['frameMovable'] = false
 		else
@@ -347,29 +353,30 @@ local function SetupFrames(maxU)
 		end
 		showHideBars()
 		GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", -30, -60)
-		GameTooltip:SetText(fosterFrame.spawnText.Button.tt)
+		GameTooltip:SetText(fosterFrameDisplay.spawnText.Button.tt)
 		GameTooltip:Show()
 	end)
 
-	fosterFrame.efcButton.flagTexture:SetTexture('Interface\\WorldStateFrame\\'.. playerFaction ..'Flag')
-	fosterFrame.efcButton:SetScript('OnClick', function()
+	fosterFrameDisplay.efcButton.flagTexture:SetTexture('Interface\\WorldStateFrame\\'.. (playerFaction or 'Alliance') ..'Flag')
+	fosterFrameDisplay.efcButton:SetScript('OnClick', function()
 		if FOSTERFRAMESPLAYERDATA['efcBGannouncement'] == true then
 			FOSTERFRAMESPLAYERDATA['efcBGannouncement'] = false
-			fosterFrame.efcButton.flagTexture:SetVertexColor(.3, .3, .3)
+			fosterFrameDisplay.efcButton.flagTexture:SetVertexColor(.3, .3, .3)
 		else
 			FOSTERFRAMESPLAYERDATA['efcBGannouncement'] = true
-			fosterFrame.efcButton.flagTexture:SetVertexColor(1, 1, 1)
+			fosterFrameDisplay.efcButton.flagTexture:SetVertexColor(1, 1, 1)
 		end
 	end)
-if FOSTERFRAMESPLAYERDATA['efcBGannouncement'] then
-	if fosterFrame.efcButton.flagTexture then fosterFrame.efcButton.flagTexture:SetVertexColor(1, 1, 1) end
-else
-	if fosterFrame.efcButton.flagTexture then fosterFrame.efcButton.flagTexture:SetVertexColor(.3, .3, .3) end
-end
+	
+	if FOSTERFRAMESPLAYERDATA['efcBGannouncement'] then
+		if fosterFrameDisplay.efcButton.flagTexture then fosterFrameDisplay.efcButton.flagTexture:SetVertexColor(1, 1, 1) end
+	else
+		if fosterFrameDisplay.efcButton.flagTexture then fosterFrameDisplay.efcButton.flagTexture:SetVertexColor(.3, .3, .3) end
+	end
+	
 	showHideBars()
 
-	fosterFrame.bottom:SetWidth(fosterFrame:GetWidth())
-	local unitGroup = FOSTERFRAMESPLAYERDATA['groupsize']
+	fosterFrameDisplay.bottom:SetWidth(fosterFrameDisplay:GetWidth())
 	local unitPointBottom
 	if layout == 'hblock' then
 		unitPointBottom = maxUnits - 4
@@ -377,12 +384,16 @@ end
 		unitPointBottom = (math.mod(maxUnits, 2) == 0) and maxUnits - 1 or maxUnits
 	elseif layout == 'vertical' then
 		unitPointBottom = maxUnits
-	elseif maxUnits < unitGroup then
+	elseif maxUnits < groupSize then
 		unitPointBottom = maxUnits
 	else
-		unitPointBottom = unitGroup
+		unitPointBottom = groupSize
 	end
-	fosterFrame.bottom:SetPoint('TOPLEFT', units[unitPointBottom].ffCastbar.icon, 'BOTTOMLEFT', 1, -6)
+	
+	if unitPointBottom < 1 then unitPointBottom = 1 end
+	if units[unitPointBottom] then
+		fosterFrameDisplay.bottom:SetPoint('TOPLEFT', units[unitPointBottom].ffCastbar.icon, 'BOTTOMLEFT', 1, -6)
+	end
 end
 
 local function round(num, idp)
