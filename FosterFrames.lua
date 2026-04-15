@@ -407,10 +407,10 @@ local getTimerLeft = function(tEnd, now)
 end
 
 local function drawUnits(list)
-	playerList = list
+	fosterFrame.uiList = list
 	local i, nearU = 1, 0
 
-	for k, v in pairs(playerList) do
+	for k, v in pairs(fosterFrame.uiList) do
 		local class = v['class'] or 'WARRIOR'
 		local powerType = v['powerType'] or 'mana'
 		local colour = RAID_CLASS_COLORS[class] or RAID_CLASS_COLORS['WARRIOR']
