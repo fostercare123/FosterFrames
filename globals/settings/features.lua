@@ -1,71 +1,47 @@
 	-------------------------------------------------------------------------------
-	FEATURESSETTINGSInit = function(color)
+	TACTICALSETTINGSInit = function(color)
 		local content = _G['fosterFramesSettingsContent']
-		local container = _G['fosterFramesSettingsfeaturesContainer']
+		local container = _G['fosterFramesSettingstacticalContainer']
 
 		if not container then
-			container = CreateFrame('Frame', 'fosterFramesSettingsfeaturesContainer', content)
+			container = CreateFrame('Frame', 'fosterFramesSettingstacticalContainer', content)
 			container:SetAllPoints(content)
 			container:EnableMouse(true)
 			container:Hide()
 			
-			local checkBoxFeaturesN, checkBoxFeatures  = 4, {
+			local checkBoxTacticalN, checkBoxTactical  = 5, {
 																[1] = {['id'] = 'mouseOver', 			['label'] = 'Mouseover Cast On Frames'},	
 																[2] = {['id'] = 'targetFrameCastbar', 	['label'] = 'Movable Target Cast Bar'},														
 																[3] = {['id'] = 'integratedTargetFrameCastbar', 	['label'] = 'Integrated Target Cast Bar'},
 																[4] = {['id'] = 'targetDebuffTimers', 	['label'] = 'Debuff Timers On Target'},
+                                                                [5] = {['id'] = 'specSpecificIcons', 	['label'] = 'Spec-Specific Icons'},
+                                                                [6] = {['id'] = 'ccAnnounce', 	        ['label'] = 'CC Announcement (/say, /bg)'},
 																
 															}
-			local checkBoxFeaturesBGN, checkBoxFeaturesBG  = 2, {	[1] = {['id'] = 'efcBGannouncement', 	['label'] = 'Low Health EFC Announcement'},
-																	[2] = {['id'] = 'efcDistanceTracking', 	['label'] = 'Track EFC Distance'},
-																}
 			
-			-- features
-			container.features = container:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
-			container.features:SetPoint('TOPLEFT', container, 'TOPLEFT', 20, -20)
-			container.features:SetText'Features'
+			-- tactical header
+			container.tactical = container:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
+			container.tactical:SetPoint('TOPLEFT', container, 'TOPLEFT', 20, -20)
+			container.tactical:SetText'Tactical Features'
 
-			container.featuresList = {}
-			for i = 1, checkBoxFeaturesN, 1 do
-				container.featuresList[i] = CreateFrame('CheckButton', 'fosterFramesFeaturesCheckButton'..i, container, 'UICheckButtonTemplate')
-				container.featuresList[i]:SetHeight(24) 	container.featuresList[i]:SetWidth(24)
-				container.featuresList[i]:SetPoint('TOPLEFT', i == 1 and container.features or container.featuresList[i-1], 'BOTTOMLEFT', 0, i == 1 and -10 or -10)
-				_G[container.featuresList[i]:GetName()..'Text']:SetText(checkBoxFeatures[i]['label'])
-				_G[container.featuresList[i]:GetName()..'Text']:SetPoint('LEFT', container.featuresList[i], 'RIGHT', 6, 0)
-				container.featuresList[i].id = checkBoxFeatures[i]['id']
-				container.featuresList[i]:SetScript('OnClick', function()
-					FOSTERFRAMESPLAYERDATA[this.id]	= this:GetChecked()
-					FOSTERFRAMESsettings()
-				end)
-			end
-			
-			container.bgLabel = container:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
-			container.bgLabel:SetPoint('TOPLEFT', container.featuresList[checkBoxFeaturesN], 'BOTTOMLEFT', 0, -20)
-			container.bgLabel:SetText'Battlegrounds'
-			
-			container.bgList = {}
-			for i = 1, checkBoxFeaturesBGN, 1 do
-				container.bgList[i] = CreateFrame('CheckButton', 'fosterFramesFeaturesBGCheckButton'..i, container, 'UICheckButtonTemplate')
-				container.bgList[i]:SetHeight(24) 	container.bgList[i]:SetWidth(24)
-				container.bgList[i]:SetPoint('TOPLEFT', i == 1 and container.bgLabel or container.bgList[i-1], 'BOTTOMLEFT', 0, i == 1 and -10 or -10)
-				_G[container.bgList[i]:GetName()..'Text']:SetText(checkBoxFeaturesBG[i]['label'])
-				_G[container.bgList[i]:GetName()..'Text']:SetPoint('LEFT', container.bgList[i], 'RIGHT', 6, 0)
-				container.bgList[i].id = checkBoxFeaturesBG[i]['id']
-				container.bgList[i]:SetScript('OnClick', function()
+			container.tacticalList = {}
+			for i = 1, 6, 1 do
+				container.tacticalList[i] = CreateFrame('CheckButton', 'fosterFramesTacticalCheckButton'..i, container, 'UICheckButtonTemplate')
+				container.tacticalList[i]:SetHeight(24) 	container.tacticalList[i]:SetWidth(24)
+				container.tacticalList[i]:SetPoint('TOPLEFT', i == 1 and container.tactical or container.tacticalList[i-1], 'BOTTOMLEFT', 0, i == 1 and -10 or -10)
+				_G[container.tacticalList[i]:GetName()..'Text']:SetText(checkBoxTactical[i]['label'])
+				_G[container.tacticalList[i]:GetName()..'Text']:SetPoint('LEFT', container.tacticalList[i], 'RIGHT', 6, 0)
+				container.tacticalList[i].id = checkBoxTactical[i]['id']
+				container.tacticalList[i]:SetScript('OnClick', function()
 					FOSTERFRAMESPLAYERDATA[this.id]	= this:GetChecked()
 					FOSTERFRAMESsettings()
 				end)
 			end
 		end
 
-		for i = 1, table.getn(container.featuresList) do
-			_G[container.featuresList[i]:GetName()..'Text']:SetTextColor(color['r'], color['g'], color['b'], .9)
-			container.featuresList[i]:SetChecked(FOSTERFRAMESPLAYERDATA[container.featuresList[i].id])
-		end
-		
-		for i = 1, table.getn(container.bgList) do
-			_G[container.bgList[i]:GetName()..'Text']:SetTextColor(color['r'], color['g'], color['b'], .9)
-			container.bgList[i]:SetChecked(FOSTERFRAMESPLAYERDATA[container.bgList[i].id])
+		for i = 1, table.getn(container.tacticalList) do
+			_G[container.tacticalList[i]:GetName()..'Text']:SetTextColor(color['r'], color['g'], color['b'], .9)
+			container.tacticalList[i]:SetChecked(FOSTERFRAMESPLAYERDATA[container.tacticalList[i].id])
 		end
 	end
 	-------------------------------------------------------------------------------

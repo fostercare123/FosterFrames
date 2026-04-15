@@ -1,48 +1,44 @@
 	-------------------------------------------------------------------------------
-	OPTIONALSSETTINGSInit = function(color)
+	AUTOMATIONSETTINGSInit = function(color)
 		local content = _G['fosterFramesSettingsContent']
-		local container = _G['fosterFramesSettingsoptionalsContainer']
+		local container = _G['fosterFramesSettingsautomationContainer']
 
 		if not container then
-			container = CreateFrame('Frame', 'fosterFramesSettingsoptionalsContainer', content)
+			container = CreateFrame('Frame', 'fosterFramesSettingsautomationContainer', content)
 			container:SetAllPoints(content)
 			container:EnableMouse(true)
 			container:Hide()
 			
-			local checkBoxOptionalsN, checkBoxOptionals  = 7, { [1] = {['id'] = 'displayNames', 		['label'] = 'Display Names'}, 
-																[2] = {['id'] = 'displayHealthValues', 	['label'] = 'Display Health Values'},
-																[3] = {['id'] = 'displayManaValues', 	['label'] = 'Display Mana Values'},
-																[4] = {['id'] = 'displayManabar', 		['label'] = 'Display Mana Bar'},
-																[5] = {['id'] = 'castTimers', 			['label'] = 'Display Cast Timers'},
-																[6] = {['id'] = 'displayOnlyNearby', 	['label'] = 'Display Nearby Units Only'},
-																[7] = {['id'] = 'targetCounter', 		['label'] = 'Display Target Counter'},
-																
+			local checkBoxAutoN, checkBoxAuto  = 4, {    [1] = {['id'] = 'openWorldScanning', 	['label'] = 'Enable Open World Enemy Scan'},
+																[2] = {['id'] = 'smartDistanceSorting', ['label'] = 'Enable Smart Distance Sorting'},
+																[3] = {['id'] = 'efcDistanceTracking', 	['label'] = 'Track EFC Proximity (WSG)'},
+                                                                [4] = {['id'] = 'efcBGannouncement', 	['label'] = 'Low Health EFC Alert (BATTLEGROUND)'},
 															}
 			
-			-- optionals
-			container.optionals = container:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
-			container.optionals:SetPoint('TOPLEFT', container, 'TOPLEFT', 20, -20)
-			container.optionals:SetText'Optionals'
+			-- automation header
+			container.automation = container:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
+			container.automation:SetPoint('TOPLEFT', container, 'TOPLEFT', 20, -20)
+			container.automation:SetText'Automation & Battlegrounds'
 
-			container.optinalsList = {}
-			for i = 1, checkBoxOptionalsN, 1 do
-				container.optinalsList[i] = CreateFrame('CheckButton', 'fosterFramesOptionalsCheckButton'..i, container, 'UICheckButtonTemplate')
-				container.optinalsList[i]:SetHeight(24) 	container.optinalsList[i]:SetWidth(24)
-				container.optinalsList[i]:SetPoint('TOPLEFT', i == 1 and container.optionals or container.optinalsList[i-1], 'BOTTOMLEFT', 0, i == 1 and -10 or -10)
-				_G[container.optinalsList[i]:GetName()..'Text']:SetText(checkBoxOptionals[i]['label'])
-				_G[container.optinalsList[i]:GetName()..'Text']:SetPoint('LEFT', container.optinalsList[i], 'RIGHT', 6, 0)
+			container.automationList = {}
+			for i = 1, checkBoxAutoN, 1 do
+				container.automationList[i] = CreateFrame('CheckButton', 'fosterFramesAutomationCheckButton'..i, container, 'UICheckButtonTemplate')
+				container.automationList[i]:SetHeight(24) 	container.automationList[i]:SetWidth(24)
+				container.automationList[i]:SetPoint('TOPLEFT', i == 1 and container.automation or container.automationList[i-1], 'BOTTOMLEFT', 0, i == 1 and -10 or -10)
+				_G[container.automationList[i]:GetName()..'Text']:SetText(checkBoxAuto[i]['label'])
+				_G[container.automationList[i]:GetName()..'Text']:SetPoint('LEFT', container.automationList[i], 'RIGHT', 6, 0)
 
-				container.optinalsList[i].id = checkBoxOptionals[i]['id']
-				container.optinalsList[i]:SetScript('OnClick', function()
+				container.automationList[i].id = checkBoxAuto[i]['id']
+				container.automationList[i]:SetScript('OnClick', function()
 					FOSTERFRAMESPLAYERDATA[this.id]	= this:GetChecked()
 					FOSTERFRAMESsettings()
 				end)
 			end
 		end
 
-		for i = 1, table.getn(container.optinalsList) do
-			_G[container.optinalsList[i]:GetName()..'Text']:SetTextColor(color['r'], color['g'], color['b'], .9)
-			container.optinalsList[i]:SetChecked(FOSTERFRAMESPLAYERDATA[container.optinalsList[i].id])
+		for i = 1, table.getn(container.automationList) do
+			_G[container.automationList[i]:GetName()..'Text']:SetTextColor(color['r'], color['g'], color['b'], .9)
+			container.automationList[i]:SetChecked(FOSTERFRAMESPLAYERDATA[container.automationList[i].id])
 		end
 	end
 	-------------------------------------------------------------------------------

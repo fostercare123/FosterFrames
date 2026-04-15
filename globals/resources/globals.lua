@@ -62,6 +62,7 @@
 	local iconFolders = 
 	{
 		['class'] 		= [[Interface\AddOns\fosterFrames\globals\resources\ClassIcons\ClassIcon_]],
+		['spec'] 		= [[Interface\AddOns\fosterFrames\globals\resources\SpecIcons\]],
 	}
 
 	GET_DEFAULT_ICON = function(op, value)

@@ -6,7 +6,7 @@
 	-------------------------------------------------------------------------------
 	local h = WorldStateAlwaysUpFrame:CreateFontString(nil, 'OVERLAY')
     h:SetFontObject(GameFontNormalSmall)
-    h:SetTextColor(RGB_FACTION_COLORS['Alliance']['r'], RGB_FACTION_COLORS['Alliance']['g'], RGB_FACTION_COLORS['Alliance']['b'])
+    h:SetTextColor(RGB_FACTION_COLORS['Horde']['r'], RGB_FACTION_COLORS['Horde']['g'], RGB_FACTION_COLORS['Horde']['b'])
     h:SetJustifyH'LEFT'
 	h:SetText('Horde')
 	
@@ -25,7 +25,7 @@
 	
     local a = WorldStateAlwaysUpFrame:CreateFontString(nil, 'OVERLAY')
     a:SetFontObject(GameFontNormalSmall)
-	a:SetTextColor(RGB_FACTION_COLORS['Horde']['r'], RGB_FACTION_COLORS['Horde']['g'], RGB_FACTION_COLORS['Horde']['b'])
+	a:SetTextColor(RGB_FACTION_COLORS['Alliance']['r'], RGB_FACTION_COLORS['Alliance']['g'], RGB_FACTION_COLORS['Alliance']['b'])
     a:SetJustifyH'LEFT'
 	a:SetText('Alliance')
 	
@@ -54,7 +54,7 @@
 	local OnLeave = function(self)
 		local button = self or this
 		local label = button == hb and h or a
-		local f = label == a and 'Horde' or 'Alliance'
+		local f = label == a and 'Alliance' or 'Horde'
 		label:SetTextColor(RGB_FACTION_COLORS[f]['r'], RGB_FACTION_COLORS[f]['g'], RGB_FACTION_COLORS[f]['b'])
 		GameTooltip:Hide()
 	end
@@ -79,18 +79,18 @@
 		flagCarriers = fc
 		
 		if flagCarriers['Alliance'] then
-			a:SetText(flagCarriers['Alliance'])
+			h:SetText(flagCarriers['Alliance'])
 		else
-			a:SetText('')
-			ah:SetText('')
+			h:SetText('')
+			hh:SetText('')
 			fcHealth['Alliance'] = nil
 		end
 		
 		if flagCarriers['Horde'] then
-			h:SetText(flagCarriers['Horde'])
+			a:SetText(flagCarriers['Horde'])
 		else
-			h:SetText('')
-			hh:SetText('')
+			a:SetText('')
+			ah:SetText('')
 			fcHealth['Horde'] = nil
 		end
 	end
@@ -132,11 +132,11 @@
 			if not UnitIsPlayer(unit) then return end
 			if UnitName(unit) == flagCarriers['Alliance'] then
 				fcHealth['Alliance'] = getPerc(unit)
-				ah:SetText(fcHealth['Alliance']..'%')
+				hh:SetText(fcHealth['Alliance']..'%')
 			end
 			if UnitName(unit) == flagCarriers['Horde'] then
 				fcHealth['Horde'] = getPerc(unit)
-				hh:SetText(fcHealth['Horde']..'%')
+				ah:SetText(fcHealth['Horde']..'%')
 			end
 		end
 		

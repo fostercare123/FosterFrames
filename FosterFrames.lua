@@ -66,7 +66,7 @@ fosterFrame.spawnText.Button:SetPoint('CENTER', fosterFrame.spawnText, 'CENTER')
 fosterFrame.spawnText.Button:SetScript('OnEnter', function()
 	fosterFrame.spawnText:SetTextColor(.9, .9, .4)
 	GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", -30, -30)
-	GameTooltip:SetText(this.tt)
+	GameTooltip:SetText(fosterFrame.spawnText.Button.tt)
 	GameTooltip:Show()
 end)
 fosterFrame.spawnText.Button:SetScript('OnLeave', function()
@@ -254,19 +254,15 @@ local function defaultVisuals()
 end
 
 local function optionals()
-	for i=1, unitLimit do
+	for i = 1, unitLimit do
 		if not FOSTERFRAMESPLAYERDATA['displayNames'] 		then units[i].name:Hide() 	else units[i].name:Show() end
-		if not FOSTERFRAMESPLAYERDATA['displayHealthValues'] then units[i].hpText:Hide() else units[i].hpText:Show() end
-		if not FOSTERFRAMESPLAYERDATA['displayManaValues']   then units[i].manaText:Hide() else units[i].manaText:Show() end
 		
 		if not FOSTERFRAMESPLAYERDATA['displayManabar'] 	then 
 			units[i].hpbar:SetHeight(unitHeight)
 			units[i].manabar:Hide()
-			units[i].manaText:Hide()
 		else 
 			units[i].hpbar:SetHeight(unitHeight - manaBarHeight)
 			units[i].manabar:Show() 
-			if FOSTERFRAMESPLAYERDATA['displayManaValues'] then units[i].manaText:Show() end
 		end
 		if not FOSTERFRAMESPLAYERDATA['castTimers'] 		then units[i].castbar.timer:Hide() else units[i].castbar.timer:Show() end
 		if not FOSTERFRAMESPLAYERDATA['targetCounter'] 		then units[i].targetCount.text:Hide() else units[i].targetCount.text:Show() end
@@ -351,7 +347,7 @@ local function SetupFrames(maxU)
 		end
 		showHideBars()
 		GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT", -30, -60)
-		GameTooltip:SetText(this.tt)
+		GameTooltip:SetText(fosterFrame.spawnText.Button.tt)
 		GameTooltip:Show()
 	end)
 
@@ -359,13 +355,13 @@ local function SetupFrames(maxU)
 	fosterFrame.efcButton:SetScript('OnClick', function()
 		if FOSTERFRAMESPLAYERDATA['efcBGannouncement'] == true then
 			FOSTERFRAMESPLAYERDATA['efcBGannouncement'] = false
-			this.flagTexture:SetVertexColor(.3, .3, .3)
+			fosterFrame.efcButton.flagTexture:SetVertexColor(.3, .3, .3)
 		else
 			FOSTERFRAMESPLAYERDATA['efcBGannouncement'] = true
-			this.flagTexture:SetVertexColor(1, 1, 1)
+			fosterFrame.efcButton.flagTexture:SetVertexColor(1, 1, 1)
 		end
 	end)
-	if FOSTERFRAMESPLAYERDATA['efcBGannouncement'] then this.flagTexture:SetVertexColor(1, 1, 1) else this.flagTexture:SetVertexColor(.3, .3, .3) end
+	if FOSTERFRAMESPLAYERDATA["efcBGannouncement"] then if fosterFrame.efcButton.flagTexture then fosterFrame.efcButton.flagTexture:SetVertexColor(1, 1, 1) end else if fosterFrame.efcButton.flagTexture then fosterFrame.efcButton.flagTexture:SetVertexColor(.3, .3, .3) end end
 
 	showHideBars()
 
@@ -428,6 +424,13 @@ local function drawUnits(list)
 		units[i].tar = v['name']
 		units[i].guid = v['guid']
 		
+		-- cc icon (support for spec icons)
+        local icon = v['fc'] and SPELLINFO_WSG_FLAGS[playerFaction]['icon'] or GET_DEFAULT_ICON('class', v['class'])
+        if not v['fc'] and FOSTERFRAMESPLAYERDATA['specSpecificIcons'] and v['spec'] then
+            icon = GET_DEFAULT_ICON('spec', v['spec'])
+        end
+		units[i].cc.icon:SetTexture(icon)
+
 		-- target count
 		units[i].targetCount.text:SetText(v['targetcount'] and (v['targetcount'] > 0 and v['targetcount'] or '') or '')
 		
@@ -526,7 +529,11 @@ local function updateUnits()
 		end
 		
 		-- cc icon
-		units[i].cc.icon:SetTexture(v['fc'] and SPELLINFO_WSG_FLAGS[playerFaction]['icon'] or GET_DEFAULT_ICON('class', v['class']))
+        local icon = v['fc'] and SPELLINFO_WSG_FLAGS[playerFaction]['icon'] or GET_DEFAULT_ICON('class', v['class'])
+        if not v['fc'] and FOSTERFRAMESPLAYERDATA['specSpecificIcons'] and v['spec'] then
+            icon = GET_DEFAULT_ICON('spec', v['spec'])
+        end
+		units[i].cc.icon:SetTexture(icon)
 		units[i].cc.cd:Hide()
 		units[i].cc.border:SetColor(.1, .1, .1)
 		units[i].cc.duration:SetText("")

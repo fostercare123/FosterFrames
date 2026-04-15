@@ -21,7 +21,7 @@
 			RaidNotice_AddMessage(RaidWarningFrame, msg, ChatTypeInfo['RAID_WARNING'])
 		end
 		if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
-			DEFAULT_CHAT_FRAME:AddMessage('|cffff3030[FosterFrames]|r ' .. msg)
+			DEFAULT_CHAT_FRAME:AddMessage('|cffae7cee[FosterFrames]|r ' .. msg)
 		end
 	end
 	-------------------------------------------------------------------------------

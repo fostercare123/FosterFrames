@@ -17,6 +17,56 @@ function FOSTERFRAMESHasGUID()
 	return type(UnitGUID) == 'function'
 end
 
+function FOSTERFRAMESHasSpecDetection()
+	return type(UnitTalent) == 'function' or type(UnitSpec) == 'function'
+end
+
+function FOSTERFRAMESGetUnitSpec(unit)
+    if not unit or not UnitExists(unit) then return nil end
+    
+    -- Try SuperWOW UnitSpec directly
+    if type(UnitSpec) == 'function' then
+        local spec = UnitSpec(unit)
+        if spec and spec ~= "" then return spec end
+    end
+    
+    -- Fallback/Alternative: UnitTalent scanning
+    if type(UnitTalent) == 'function' then
+        local tabs = { [1]=0, [2]=0, [3]=0 }
+        for i=1, 3 do
+            local _, _, points = UnitTalent(unit, i)
+            tabs[i] = points or 0
+        end
+        
+        local maxPoints, specIndex = 0, 1
+        for i, points in pairs(tabs) do
+            if points > maxPoints then
+                maxPoints = points
+                specIndex = i
+            end
+        end
+        
+        local _, class = UnitClass(unit)
+        if not class then return nil end
+        
+        local specs = {
+            ['WARRIOR'] = {[1]='Arms', [2]='Fury', [3]='Protection'},
+            ['PALADIN'] = {[1]='Holy', [2]='Protection', [3]='Retribution'},
+            ['HUNTER']  = {[1]='BeastMastery', [2]='Marksmanship', [3]='Survival'},
+            ['ROGUE']   = {[1]='Assassination', [2]='Combat', [3]='Subtlety'},
+            ['PRIEST']  = {[1]='Holy', [2]='Discipline', [3]='Shadow'},
+            ['SHAMAN']  = {[1]='Elemental', [2]='Enhancement', [3]='Restoration'},
+            ['MAGE']    = {[1]='Arcane', [2]='Fire', [3]='Frost'},
+            ['WARLOCK'] = {[1]='Affliction', [2]='Demonology', [3]='Destruction'},
+            ['DRUID']   = {[1]='Balance', [2]='Feral', [3]='Restoration'}
+        }
+        
+        if specs[class] then return specs[class][specIndex] end
+    end
+    
+    return nil
+end
+
 function FOSTERFRAMESHasCastInfo()
 	return type(UnitCastingInfo) == 'function' and type(UnitChannelInfo) == 'function'
 end
@@ -34,7 +84,7 @@ function FOSTERFRAMESPrintDependencyStatus()
 	local nampowerState = hasNampower and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 	local unitxpState = hasUnitXP and '|cff00ff00yes|r' or '|cffff1a1ano|r'
 
-	print('[FosterFrames] Dependency status: SuperWOW=' .. superwowState .. ', Nampower=' .. nampowerState .. ', UnitXP=' .. unitxpState)
+	print('|cffae7cee[FosterFrames]|r Dependency status: SuperWOW=' .. superwowState .. ', Nampower=' .. nampowerState .. ', UnitXP=' .. unitxpState)
 end
 
 if FOSTERFRAMESPLAYERDATA == nil then
@@ -52,13 +102,15 @@ if FOSTERFRAMESPLAYERDATA == nil then
 	['integratedTargetFrameCastbar']		= true,
 	['targetDebuffTimers']		= false,
 	['playerTargetCounter']		= false,
+	['openWorldScanning']		= true,
+	['specSpecificIcons']		= true,
+	['smartDistanceSorting']	= false,
+	['ccAnnounce']				= false,
 	-- bgs
 	['efcBGannouncement']		= true,
 	['efcDistanceTracking']		= true,
 	-- optionals
 	['displayNames']			= true,
-	['displayHealthValues'] 	= false,
-	['displayManaValues'] 		= false,
 	['displayManabar']			= false,
 	['displayOnlyNearby']		= false,
 	['castTimers']				= false,		
@@ -121,8 +173,8 @@ settings.header.t:SetPoint('TOP', settings.header, 0, -14)
 settings.header.t:SetText'FosterFrames Settings'
 
 -- Sidebar Buttons
-settings.numTabs = 3
-local tabNames = {'General', 'Features', 'Optionals'}
+settings.numTabs = 4
+local tabNames = {'General', 'Tactical', 'Automation', 'Appearance'}
 settings.tabs = {}
 for i = 1, settings.numTabs do
 	settings.tabs[i] = CreateFrame('Button', 'fosterFramesSettingsSideButton'..i, settings.sidebar, 'UIPanelButtonTemplate')
@@ -191,11 +243,12 @@ function setupSettings()
 	else 
 		enemyFactionColor = RGB_FACTION_COLORS['Alliance']	
 	end
-	settings.header.t:SetTextColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'], .9)
+	settings.header.t:SetTextColor(0.68, 0.49, 0.93, .9)
 
 	GENERALSSETTINGSInit(enemyFactionColor)
-	FEATURESSETTINGSInit(enemyFactionColor)
-	OPTIONALSSETTINGSInit(enemyFactionColor)
+	TACTICALSETTINGSInit(enemyFactionColor)
+	AUTOMATIONSETTINGSInit(enemyFactionColor)
+	APPEARANCESETTINGSInit(enemyFactionColor)
 
 	-- general tab by default
 	for j = 1, settings.numTabs do
@@ -242,13 +295,13 @@ local function eventHandler()
 		hasSuperWOW = FOSTERFRAMESHasSuperWOW()
 		hasNampower = IsAddOnLoaded("Nampower") or IsAddOnLoaded("NampowerSettings")
 		hasUnitXP = IsAddOnLoaded("UnitXP_SP3_Addon")
-		local tc = playerFaction == 'Alliance' and 'FF1A1A' or '00ADF0'
+		local tc = 'ae7cee'
 		print('|cff' ..tc.. '[FosterFrames] Use |cffffffff/ffs|cff' ..tc.. ' to open Settings.')
 		if hasSuperWOW then
 			print('|cff' ..tc.. '[FosterFrames] Loaded (SuperWOW mode).')
 			FOSTERFRAMESPrintDependencyStatus()
 		else
-			print('|cffff1a1a[FosterFrames] SuperWOW was not detected. Addon disabled.')
+			print('|cffae7cee[FosterFrames] SuperWOW was not detected. Addon disabled.')
 		end
 		getglobal('fosterFrameDisplay'):SetScale(FOSTERFRAMESPLAYERDATA['scale'])
 		getglobal('fosterFrameDisplay'):SetPoint('CENTER', UIParent, FOSTERFRAMESPLAYERDATA['offX'], FOSTERFRAMESPLAYERDATA['offY'])

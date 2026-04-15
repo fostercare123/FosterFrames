@@ -89,18 +89,6 @@
                 this.name:SetFont(STANDARD_TEXT_FONT, 11, 'OUTLINE')
                 this.name:SetTextColor(.8, .8, .8, .8)
                 this.name:SetPoint('CENTER', this.hpbar)
-
-                this.hpText = this.hpbar:CreateFontString(nil, 'OVERLAY')
-                this.hpText:SetFont(STANDARD_TEXT_FONT, 8, 'OUTLINE')
-                this.hpText:SetTextColor(1, 1, 1, .8)
-                this.hpText:SetPoint('LEFT', this.hpbar, 2, 0)
-                this.hpText:Hide()
-
-                this.manaText = this.manabar:CreateFontString(nil, 'OVERLAY')
-                this.manaText:SetFont(STANDARD_TEXT_FONT, 8, 'OUTLINE')
-                this.manaText:SetTextColor(1, 1, 1, .8)
-                this.manaText:SetPoint('LEFT', this.manabar, 2, 0)
-                this.manaText:Hide()
 	
 		--this.name:SetPoint('RIGHT', this.hpbar, -2, 0)
 		
