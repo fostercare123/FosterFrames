@@ -22,7 +22,7 @@ MOUSEOVERUNINAME = nil
 local BACKDROP = {bgFile = [[Interface\Tooltips\UI-Tooltip-Background]]}
 local enemyFactionColor
 
-local fosterFrame = CreateFrame('Frame', 'fosterFrameDisplay', UIParent)
+fosterFrame = CreateFrame('Frame', 'fosterFrameDisplay', UIParent)
 fosterFrame:SetFrameStrata("BACKGROUND")
 fosterFrame:SetPoint('CENTER', UIParent, UIParent:GetHeight()/3, UIParent:GetHeight()/3)
 fosterFrame:SetHeight(20)
