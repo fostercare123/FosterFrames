@@ -1,4 +1,5 @@
 <Bindings>
+	<Binding name="SETSKULL"  					>setIconBind('skull')</Binding>
 	<Binding name="SETMOON"  					>setIconBind('moon')</Binding>
 	<Binding name="SETSQUARE"  					>setIconBind('square')</Binding>
 	<Binding name="SETTRIANGLE"  				>setIconBind('triangle')</Binding>
