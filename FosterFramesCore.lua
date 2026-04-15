@@ -1,3 +1,10 @@
+if not bit then
+    bit = {
+        band = function(a, b) return math.mod(math.floor(a/b), 2) == 1 and b or 0 end, -- Very basic fallback
+    }
+    if type(math.bit) == 'table' then bit = math.bit end -- SuperWOW often puts it here
+end
+
 local playerFaction
 local bgs = {['Warsong Gulch'] = 10, 
 			 ['Arathi Basin'] = 15, 

@@ -22,7 +22,7 @@ local enemyFactionColor
 
 fosterFrameDisplay = CreateFrame('Frame', 'fosterFrameDisplay', UIParent)
 fosterFrame = fosterFrameDisplay
-fosterFrame:SetFrameStrata("BACKGROUND")
+fosterFrame:SetFrameStrata("LOW")
 fosterFrame:SetPoint('CENTER', UIParent, UIParent:GetHeight()/3, UIParent:GetHeight()/3)
 fosterFrame:SetHeight(20)
 fosterFrame:SetMovable(true)
