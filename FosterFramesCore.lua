@@ -564,6 +564,11 @@ end
 local function fosterFramesCoreOnUpdate()
 	local now = GetTime()
 
+	if insideBG and now > playerListRefresh then
+		RequestBattlefieldScoreData()
+		playerListRefresh = now + playerListInterval
+	end
+
     -- Basic unit info updates (every frame for target/mouseover is fine)
 	verifyUnitInfo('target', now)
 	verifyUnitInfo('mouseover', now)
@@ -610,7 +615,6 @@ local function fosterFramesCoreOnUpdate()
 		end
 	end
 end
-
 local function initializeValues()
 	playerFaction = UnitFactionGroup('player')
     local zone = GetZoneText()
@@ -723,6 +727,7 @@ end
 
 f:RegisterEvent'PLAYER_ENTERING_WORLD'
 f:RegisterEvent'ZONE_CHANGED_NEW_AREA'
+f:RegisterEvent'UPDATE_BATTLEFIELD_SCORE'
 f:RegisterEvent'UNIT_HEALTH'
 f:RegisterEvent'UNIT_PVP_UPDATE'
 f:RegisterEvent'UNIT_AURA'
