@@ -525,9 +525,12 @@ local function updateUnits()
 
 	if not fosterFrame.uiList then return end
 	local currentTarget = UnitExists'target' and UnitName'target' or nil
+    local currentMouseover = UnitExists'mouseover' and UnitName'mouseover' or nil
 
 	local i = 1
 	for k, v in pairs(fosterFrame.uiList) do
+        local unitID = (currentTarget == v['name'] and 'target') or (currentMouseover == v['name'] and 'mouseover') or nil
+
 		-- border
 		if currentTarget == v['name'] then
 			units[i].border:SetColor(enemyFactionColor['r'], enemyFactionColor['g'], enemyFactionColor['b'])
@@ -540,7 +543,7 @@ local function updateUnits()
 		end
 		
 		-- castbar
-		local castInfo = v['castinfo']
+		local castInfo = SPELLCASTINGCOREgetCast(v['name'], unitID)
 		units[i].ffCastbar:Hide()
 		if castInfo ~= nil then
 			units[i].ffCastbar:SetMinMaxValues(0, castInfo.timeEnd - castInfo.timeStart)

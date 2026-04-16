@@ -95,8 +95,8 @@ FosterFrames.Config = FosterFrames.Config or {}
 	
 	local iconFolders = 
 	{
-		['class'] 		= [[Interface\AddOns\fosterFrames\globals\resources\ClassIcons\ClassIcon_]],
-		['spec'] 		= [[Interface\AddOns\fosterFrames\globals\resources\SpecIcons\]],
+		['class'] 		= [[Interface\AddOns\FosterFrames\globals\resources\ClassIcons\ClassIcon_]],
+		['spec'] 		= [[Interface\AddOns\FosterFrames\globals\resources\SpecIcons\]],
 	}
 
 	GET_DEFAULT_ICON = function(op, value)

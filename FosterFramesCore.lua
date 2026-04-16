@@ -43,23 +43,11 @@ local trinketTimers = {}
 
 -- confirm hostile nearbyPlayers
 local function applyNearbyPlayer(v, now, nextCheck)
-	local id = v['guid'] or v['name']
+	local id = v['name'] -- Primary key is NAME for compatibility
 	
 	if playerList[id] == nil then
-		-- if we only have name, check if we already have this player by GUID
-		if not v['guid'] then
-			for guid, p in pairs(playerList) do
-				if p.name == v.name then
-					id = guid
-					break
-				end
-			end
-		end
-		
-		if playerList[id] == nil then
-			playerList[id] = v
-			refreshUnits = true
-		end
+        playerList[id] = v
+        refreshUnits = true
 	end
 
 	local p = playerList[id]
@@ -69,15 +57,13 @@ local function applyNearbyPlayer(v, now, nextCheck)
 		if v['mana'] then p['mana'] = v['mana'] end
 		if v['maxmana'] then p['maxmana'] = v['maxmana'] end
 		if v['sex'] then p['sex'] = v['sex'] end
-		if v['powerType'] then p['powerType'] = v['powerType'] end
+        if v['guid'] then p['guid'] = v['guid'] end
 		
-		-- Robust Update GUID: If we just found a real GUID for a player previously tracked only by name
-		if v['guid'] and v['guid'] ~= "" and p['guid'] == p['name'] then
-			playerList[v['guid']] = p
-			playerList[v['name']] = nil
-			p['guid'] = v['guid']
-            refreshUnits = true
-		end
+		if v['powerType'] then 
+            p['powerType'] = v['powerType'] 
+        else
+            p['powerType'] = (p['class'] == 'WARRIOR' and 'rage') or (p['class'] == 'ROGUE' and 'energy') or 'mana'
+        end
 
 		if now > enemyNearbyRefresh then
 			p['targetcount'] = p['targetcount'] and p['targetcount'] + 1 or 1
@@ -129,7 +115,7 @@ local function verifyUnitInfo(unit, now)
 		applyNearbyPlayer(u, now, now + nextPlayerCheck)
 
 		-- Update distance and fc health
-		local p = FOSTERFRAMECOREgetPlayer(u['guid'] or u['name'])
+		local p = playerList[u['name']]
 		if p then 
             updateUnitDistance(p, unit)
             if p['fc'] then WSGUIupdateFChealth(unit) end 

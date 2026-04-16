@@ -1,8 +1,8 @@
 	_G = getfenv(0)
 -------------------------------------------------------------------------------
-	local TEXTURE 	= [[Interface\AddOns\fosterFrames\globals\resources\barTexture]]
+	local TEXTURE 	= [[Interface\AddOns\FosterFrames\globals\resources\barTexture]]
 	local BACKDROP 	= {bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],}
-	local ISTEXTURE = [[Interface\AddOns\fosterFrames\globals\resources\arrow2]]
+	local ISTEXTURE = [[Interface\AddOns\FosterFrames\globals\resources\arrow2]]
 	-------------------------------------------------------------------------------
 	local unitWidth, unitHeight, castBarHeight, ccIconWidth, manaBarHeight = 64, 22, 8, 28, 6
 	UIElementsGetDimensions = function()

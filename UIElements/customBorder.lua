@@ -1,6 +1,6 @@
 	_G = getfenv(0)
 	-------------------------------------------------------------------------------
-	local borderTexture = [[Interface\AddOns\fosterFrames\globals\resources\border.tga]]
+	local borderTexture = [[Interface\AddOns\FosterFrames\globals\resources\border.tga]]
 	local BACKDROP 	= {bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],}
 		
 	local defaultTcut = 1/4.2

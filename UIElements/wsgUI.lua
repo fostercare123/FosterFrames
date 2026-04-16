@@ -147,15 +147,15 @@
 		end
 	end
 	-------------------------------------------------------------------------------
-	WSGUIinit = function(insideBG)
-		if insideBG then
+	WSGUIinit = function(isBG)
+		if isBG then
 			local hdb = _G['AlwaysUpFrame1DynamicIconButton']
 			h:SetPoint('LEFT', hdb, 'RIGHT', 4, 2)
 			h:Show()
 			h:SetText('')
 			hh:Show()		
 			hh:SetText('')
-			
+
 			local adb = _G['AlwaysUpFrame2DynamicIconButton']
 			a:SetPoint('LEFT', adb, 'RIGHT', 4, 2)
 			a:Show()
