@@ -1,3 +1,4 @@
+	_G = getfenv(0)
 	-------------------------------------------------------------------------------
 	TACTICALSETTINGSInit = function(color)
 		local content = _G['fosterFramesSettingsContent']

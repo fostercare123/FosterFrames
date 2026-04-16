@@ -1,4 +1,6 @@
 
+_G = getfenv(0)
+
 	local enabled = false
 	
 	-- Binding Variables

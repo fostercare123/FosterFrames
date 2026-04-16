@@ -1,4 +1,5 @@
-	-------------------------------------------------------------------------------
+	_G = getfenv(0)
+-------------------------------------------------------------------------------
 	local TEXTURE 	= [[Interface\AddOns\fosterFrames\globals\resources\barTexture]]
 	local BACKDROP 	= {bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],}
 	local ISTEXTURE = [[Interface\AddOns\fosterFrames\globals\resources\arrow2]]

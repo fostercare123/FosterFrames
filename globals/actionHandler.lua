@@ -1,4 +1,6 @@
 
+_G = getfenv(0)
+
 	-- Modernized Action Handler for SuperWOW / TurtleWoW 1.12.1
 	-- Handles Mouseover casting integration for standard action bars.
 

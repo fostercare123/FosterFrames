@@ -1,3 +1,4 @@
+	_G = getfenv(0)
 	-------------------------------------------------------------------------------
 	AUTOMATIONSETTINGSInit = function(color)
 		local content = _G['fosterFramesSettingsContent']

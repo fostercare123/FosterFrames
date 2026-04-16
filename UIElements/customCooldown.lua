@@ -1,3 +1,4 @@
+	_G = getfenv(0)
 	-------------------------------------------------------------------------------
 	local OnUpdateAnimation = function()
 		if GetTime() < this.timeEnd then

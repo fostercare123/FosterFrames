@@ -1,3 +1,4 @@
+	_G = getfenv(0)
 	-------------------------------------------------------------------------------
 	local index, buttonName, name, class, numScores
 	EFWorldStateScoreFrame_Update = WorldStateScoreFrame_Update

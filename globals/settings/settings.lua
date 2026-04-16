@@ -1,4 +1,5 @@
 
+_G = getfenv(0)
 print = function(m) DEFAULT_CHAT_FRAME:AddMessage(m) end
 tlength = function(t)	local i = 0 for k, j in pairs(t) do i = i + 1 end return i end
 
@@ -371,14 +372,26 @@ f:SetScript('OnEvent', eventHandler)
 settings:SetScript('OnHide', closeSettings)
 
 
-SLASH_FOSTERFRAMESSETTINGS1 = '/ffs'
-SLASH_FOSTERFRAMESSETTINGS2 = '/fosterframes'
-SLASH_FOSTERFRAMESSETTINGS3 = '/ffsettings'
-SlashCmdList["FOSTERFRAMESSETTINGS"] = function(msg)
-	if settings:IsShown() then
-		closeSettings()
-		settings:Hide()
+SLASH_FOSTERFRAMES1 = '/ff'
+SLASH_FOSTERFRAMES2 = '/fosterframes'
+SlashCmdList["FOSTERFRAMES"] = function(msg)
+	if msg == 'debug' or msg == 'cd' then
+		FOSTERFRAMES_DebugCooldownTest()
+	elseif msg == 'hide' then
+		FOSTERFRAMES_HideFrames()
+	elseif msg == 'data' then
+		FOSTERFRAMES_DebugDisplayPlayerData()
+	elseif msg == 'deps' then
+		print('|cffae7ceeFosterFrames|r Dependencies:')
+		print('  SuperWOW: ' .. (FosterFrames.Config.hasSuperWOW and '|cff00ff00Detected|r' or '|cffff0000Not Found|r'))
+		print('  UnitXP: ' .. (FOSTERFRAMESHasUnitXP() and '|cff00ff00Detected|r' or '|cffff0000Not Found|r'))
+		print('  Nampower: ' .. (FOSTERFRAMESHasNampower() and '|cff00ff00Detected|r' or '|cffff0000Not Found|r'))
 	else
-		setupSettings()
+		if settings:IsShown() then
+			closeSettings()
+			settings:Hide()
+		else
+			setupSettings()
+		end
 	end
 end

@@ -1,4 +1,6 @@
 
+_G = getfenv(0)
+
 -- Optimized for SuperWOW / TurtleWoW DLLs
 -- Legacy combat log parsing removed
 

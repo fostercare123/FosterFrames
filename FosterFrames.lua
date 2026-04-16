@@ -1,3 +1,4 @@
+_G = getfenv(0)
 local playerFaction
 local insideBG = false
 -- TIMERS
@@ -32,7 +33,7 @@ fosterFrame:SetClampedToScreen(true)
 
 fosterFrame:SetScript('OnDragStart', function()
 	local frame = this or self
-	if FOSTERFRAMESPLAYERDATA['frameMovable'] or (_G['fosterFramesSettings'] and _G['fosterFramesSettings']:IsShown()) then
+	if FOSTERFRAMESPLAYERDATA['frameMovable'] or (fosterFramesSettings and fosterFramesSettings:IsShown()) then
 		frame:StartMoving()
 	end
 end)
@@ -641,7 +642,7 @@ end
 
 function FOSTERFRAMESsettings()
 	optionals()
-	if not enabled or (not insideBG and (_G['fosterFramesSettings'] and _G['fosterFramesSettings']:IsShown())) then
+	if not enabled or (not insideBG and (fosterFramesSettings and fosterFramesSettings:IsShown())) then
 		SetupFrames(15)
 		defaultVisuals()
 		setccIcon()
@@ -654,14 +655,14 @@ function FOSTERFRAMESsettings()
 	arrangeUnits()
 	if FOSTERFRAMESPLAYERDATA['enableFrames'] or insideBG then fosterFrame:Show() else fosterFrame:Hide() end
 	
-	if not enabled and not (_G['fosterFramesSettings'] and _G['fosterFramesSettings']:IsShown()) then
+	if not enabled and not (fosterFramesSettings and fosterFramesSettings:IsShown()) then
 		for i=1, unitLimit do units[i]:Hide() end
 	end
 end
 
 -- ─── debug commands ────────────────────────────────────────────────────────
 
-local function debugDisplayPlayerData()
+FOSTERFRAMES_DebugDisplayPlayerData = function()
 	local list = FOSTERFRAMECOREgetPlayerList and FOSTERFRAMECOREgetPlayerList() or {}
 	for k, v in pairs(list) do
 		print(k .. ':')
@@ -669,7 +670,7 @@ local function debugDisplayPlayerData()
 	end
 end
 
-local function debugCooldownTest()
+FOSTERFRAMES_DebugCooldownTest = function()
 	FOSTERFRAMES_DEBUG = true
 	local classes = {'WARRIOR', 'PALADIN', 'HUNTER', 'ROGUE', 'PRIEST', 'SHAMAN', 'MAGE', 'WARLOCK', 'DRUID'}
     local powers = {'rage', 'mana', 'mana', 'energy', 'mana', 'mana', 'mana', 'mana', 'mana'}
@@ -700,16 +701,8 @@ local function debugCooldownTest()
     fosterFrameDisplay.bg:Show()
 end
 
-SLASH_FOSTERFRAMES1 = '/ffd'
-SLASH_FOSTERFRAMES2 = '/fosterframesdebug'
-SlashCmdList["FOSTERFRAMES"] = function(msg)
-	if msg then
-		if 		msg == 'data' 	then 	debugDisplayPlayerData()	 
-		elseif 	msg =='cd' 		then	debugCooldownTest()
-		elseif  msg == 'hide'   then    
-			FOSTERFRAMES_DEBUG = false
-			for i=1, unitLimit do units[i]:Hide() end
-			fosterFrame:Hide()
-		end		
-	end
+FOSTERFRAMES_HideFrames = function()
+	FOSTERFRAMES_DEBUG = false
+	for i=1, unitLimit do units[i]:Hide() end
+	if fosterFrameDisplay then fosterFrameDisplay:Hide() end
 end

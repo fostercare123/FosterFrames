@@ -1,3 +1,5 @@
+_G = getfenv(0)
+
 if not bit then
     bit = {
         band = function(a, b) return math.mod(math.floor(a/b), 2) == 1 and b or 0 end, -- Very basic fallback
@@ -593,18 +595,18 @@ local function fosterFramesCoreOnUpdate()
 			FOSTERFRAMESUpdatePlayers(orderUnitsforOutput())
 		end
 
-		if FOSTERFRAMES_DEBUG or (_G['fosterFramesSettings'] and _G['fosterFramesSettings']:IsShown()) then
-            _G['fosterFrameDisplay']:Show()
-		elseif _G['fosterFrameDisplay'] then
-            if FOSTERFRAMESPLAYERDATA['enableFrames'] or insideBG then
-                if insideBG and next(playerList) == nil then
-                    _G['fosterFrameDisplay']:Hide()
-                else
-                    _G['fosterFrameDisplay']:Show()
-                end
-            else
-                _G['fosterFrameDisplay']:Hide()
-            end
+		if fosterFrameDisplay then
+			if FOSTERFRAMES_DEBUG or (fosterFramesSettings and fosterFramesSettings:IsShown()) then
+				fosterFrameDisplay:Show()
+			elseif FOSTERFRAMESPLAYERDATA['enableFrames'] then
+				if insideBG and next(playerList) == nil then
+					fosterFrameDisplay:Hide()
+				else
+					fosterFrameDisplay:Show()
+				end
+			else
+				fosterFrameDisplay:Hide()
+			end
 		end
 	end
 end
