@@ -587,20 +587,24 @@ local function fosterFramesCoreOnUpdate()
 		globalNearbyCheckNext = now + globalNearbyCheckTimer
 	end
 
-	if FOSTERFRAMESPLAYERDATA and (FOSTERFRAMESPLAYERDATA['enableFrames'] or insideBG) then
+	if FOSTERFRAMESPLAYERDATA then
 		if refreshUnits then
 			refreshUnits = false
 			FOSTERFRAMESUpdatePlayers(orderUnitsforOutput())
 		end
-...
-		if _G['fosterFramesSettings'] and not _G['fosterFramesSettings']:IsShown() then
-			if next(playerList) == nil then
-				_G['fosterFrameDisplay']:Hide()
-			else
-				_G['fosterFrameDisplay']:Show()
-			end
+
+		if FOSTERFRAMES_DEBUG or (_G['fosterFramesSettings'] and _G['fosterFramesSettings']:IsShown()) then
+            _G['fosterFrameDisplay']:Show()
 		elseif _G['fosterFrameDisplay'] then
-			_G['fosterFrameDisplay']:Show()
+            if FOSTERFRAMESPLAYERDATA['enableFrames'] or insideBG then
+                if insideBG and next(playerList) == nil then
+                    _G['fosterFrameDisplay']:Hide()
+                else
+                    _G['fosterFrameDisplay']:Show()
+                end
+            else
+                _G['fosterFrameDisplay']:Hide()
+            end
 		end
 	end
 end
@@ -609,19 +613,19 @@ local function initializeValues()
 	playerFaction = UnitFactionGroup('player')
     local zone = GetZoneText()
 	insideBG = bgs[zone] and true or false
-	
+
 	if insideBG then
 		f:RegisterEvent'UPDATE_BATTLEFIELD_SCORE'
 		RequestBattlefieldScoreData()
 	else
 		f:UnregisterEvent'UPDATE_BATTLEFIELD_SCORE'
 	end
-    
+
     -- Special logic for Alterac Valley: Suggest Smart Distance Sorting
     if zone == 'Alterac Valley' and FOSTERFRAMESPLAYERDATA['smartDistanceSorting'] == nil then
         FOSTERFRAMESPLAYERDATA['smartDistanceSorting'] = true
     end
-	
+
 	playerList = {}
 	raidTargets = {}
 	prioMembers = {}
@@ -630,13 +634,15 @@ local function initializeValues()
 
 	-- Always cap the UI display to 15 for a clean screen, even in 40-man AV
 	local maxUnits = maxUnitsDisplayed
-	
+
 	f:SetScript('OnUpdate', fosterFramesCoreOnUpdate)
 	FOSTERFRAMESInitialize(maxUnits, insideBG)
-	bindingsInit()
-	WSGUIinit(insideBG)
-end
+	if bindingsInit then bindingsInit() end
+	if WSGUIinit then WSGUIinit(insideBG) end
 
+    -- Force initial refresh
+    refreshUnits = true
+end
 local function checkPlayerCC()
     if not FOSTERFRAMESPLAYERDATA['ccAnnounce'] then return end
     

@@ -12,6 +12,7 @@ local raidIcons, raidIconsN = {[1] = 'skull', [2] = 'moon', [3] = 'square', [4] 
 
 local enabled = false
 local maxUnits = 15
+FOSTERFRAMES_DEBUG = false
 
 MOUSEOVERUNINAME = nil
 
@@ -23,7 +24,8 @@ local enemyFactionColor
 fosterFrameDisplay = CreateFrame('Frame', 'fosterFrameDisplay', UIParent)
 fosterFrame = fosterFrameDisplay
 fosterFrame:SetFrameStrata("LOW")
-fosterFrame:SetPoint('CENTER', UIParent, UIParent:GetHeight()/3, UIParent:GetHeight()/3)
+-- Default to a safe center position if not already placed
+fosterFrame:SetPoint('CENTER', UIParent, 0, 100)
 fosterFrame:SetHeight(20)
 fosterFrame:SetMovable(true)
 fosterFrame:SetClampedToScreen(true)
@@ -391,8 +393,12 @@ local function SetupFrames(maxU)
 	
 	if unitPointBottom < 1 then unitPointBottom = 1 end
 	if units[unitPointBottom] then
-		fosterFrameDisplay.bottom:SetPoint('TOPLEFT', units[unitPointBottom].ffCastbar.icon, 'BOTTOMLEFT', 1, -6)
+		fosterFrameDisplay.bottom:SetPoint('TOPLEFT', units[unitPointBottom].ffCastbar.iconborder, 'BOTTOMLEFT', 1, -6)
 	end
+    
+    if FOSTERFRAMES_DEBUG then
+        for i=1, maxUnits do units[i]:Show() end
+    end
 end
 
 local function round(num, idp)
@@ -664,18 +670,34 @@ local function debugDisplayPlayerData()
 end
 
 local function debugCooldownTest()
+	FOSTERFRAMES_DEBUG = true
+	local classes = {'WARRIOR', 'PALADIN', 'HUNTER', 'ROGUE', 'PRIEST', 'SHAMAN', 'MAGE', 'WARLOCK', 'DRUID'}
+    local powers = {'rage', 'mana', 'mana', 'energy', 'mana', 'mana', 'mana', 'mana', 'mana'}
+    
 	for i=1, unitLimit do
+        local c = classes[math.mod(i-1, 9) + 1]
+        local p = powers[math.mod(i-1, 9) + 1]
+        
 		units[i].name:SetText('Dummy'..i)
+        
+        local colour = RAID_CLASS_COLORS[c] or RAID_CLASS_COLORS['WARRIOR']
+        local powerColor = RGB_POWER_COLORS[p] or RGB_POWER_COLORS['mana']
+        
+        units[i].hpbar:SetStatusBarColor(colour.r, colour.g, colour.b)
+        units[i].manabar:SetStatusBarColor(powerColor[1], powerColor[2], powerColor[3])
 		units[i].hpbar:SetMinMaxValues(0, 100)
 		units[i].hpbar:SetValue(math.random(20, 100))
 		units[i].manabar:SetMinMaxValues(0, 100)
 		units[i].manabar:SetValue(math.random(20, 100))
+        
+        units[i].cc.icon:SetTexture(GET_DEFAULT_ICON('class', c))
 		units[i].cc.cd:SetTimers(GetTime(), GetTime() + 8)
 		units[i].cc.cd:Show()
 		units[i]:Show()
 	end
-	fosterFrame:Show()
-	fosterFrame.Title:SetText('DEBUG MODE')
+	fosterFrameDisplay:Show()
+	fosterFrameDisplay.Title:SetText('DEBUG MODE')
+    fosterFrameDisplay.bg:Show()
 end
 
 SLASH_FOSTERFRAMES1 = '/ffd'
@@ -684,7 +706,10 @@ SlashCmdList["FOSTERFRAMES"] = function(msg)
 	if msg then
 		if 		msg == 'data' 	then 	debugDisplayPlayerData()	 
 		elseif 	msg =='cd' 		then	debugCooldownTest()
-		elseif  msg == 'hide'   then    for i=1, unitLimit do units[i]:Hide() end
+		elseif  msg == 'hide'   then    
+			FOSTERFRAMES_DEBUG = false
+			for i=1, unitLimit do units[i]:Hide() end
+			fosterFrame:Hide()
 		end		
 	end
 end

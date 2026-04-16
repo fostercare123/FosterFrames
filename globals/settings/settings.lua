@@ -1,9 +1,44 @@
 
 print = function(m) DEFAULT_CHAT_FRAME:AddMessage(m) end
-
 tlength = function(t)	local i = 0 for k, j in pairs(t) do i = i + 1 end return i end
 
 FOSTERFRAMESVERSION = 3.0
+
+-- Initialize SavedVariables immediately if they don't exist
+if FOSTERFRAMESPLAYERDATA == nil then
+	FOSTERFRAMESPLAYERDATA = 
+	{
+	-- options
+	['scale']					= 1,
+	['groupsize']				= 5,
+	['layout']					= 'block',
+	['frameMovable'] 			= true,
+	['enableFrames']			= true,
+	-- features
+	['mouseOver']				= false,
+	['targetFrameCastbar']		= true,
+	['integratedTargetFrameCastbar']		= true,
+	['targetDebuffTimers']		= false,
+	['playerTargetCounter']		= false,
+	['openWorldScanning']		= true,
+	['specSpecificIcons']		= true,
+	['smartDistanceSorting']	= false,
+	['ccAnnounce']				= false,
+	['displayHealthValues']     = false,
+	['displayManaValues']       = false,
+	-- bgs
+	['efcBGannouncement']		= true,
+	['efcDistanceTracking']		= true,
+	-- optionals
+	['displayNames']			= true,
+	['displayManabar']			= false,
+	['displayOnlyNearby']		= false,
+	['castTimers']				= false,		
+	['targetCounter']			= false,
+	['offX']				= 0,
+	['offY']				= 0,
+    }
+end
 
 local hasSuperWOW = false
 local hasNampower = false
