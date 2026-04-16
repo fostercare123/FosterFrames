@@ -2,7 +2,7 @@
 	local msgPrefix = {['RT'] = 'BGEFRT', ['EFC'] = 'BGEFEFC', ['BF'] = 'BGEFEBF', ['SCAN'] = 'BGEFSCN'}
 	-------------------------------------------------------------------------------
 	function sendMSG(typ, d, icon, bg)	
-		if icon == nil then icon = '' end
+		if icon == nil or icon == '' then icon = ' ' end
 		d = UnitName'player' .. '/' .. d .. '/' .. icon
 		local channel = bg and 'BATTLEGROUND' or UnitInRaid('player') and 'RAID' or 'PARTY'
 		if (not UnitInRaid('player') and GetNumPartyMembers() == 0) then return end
@@ -10,72 +10,46 @@
 	end
 	-------------------------------------------------------------------------------
 	local handleScan = function(message)
-		local m = '(.+)/(.+)/(.+)/(.+)'	local fm = string.find(message, m)
+		local m = '([^/]+)/([^/]+)/([^/]+)/([^/]+)'
+		local _, _, sender, name, class, guid = string.find(message, m)
 				
-		if fm then
-			local sender 	= string.gsub(message, m, '%1')
-			local name 		= string.gsub(message, m, '%2')
-			local class 	= string.gsub(message, m, '%3')
-			local guid 		= string.gsub(message, m, '%4')
-			
-			if sender ~= UnitName'player' then
-				local u = {}
-				u['name'] = name
-				u['class'] = class ~= ' ' and class or nil
-				u['guid'] = guid ~= ' ' and guid or nil
-				FOSTERFRAMECOREAddSpottedUnit(u)
-			end
+		if sender and sender ~= UnitName'player' then
+			local u = {}
+			u['name'] = name
+			u['class'] = class ~= ' ' and class or nil
+			u['guid'] = guid ~= ' ' and guid or nil
+			FOSTERFRAMECOREAddSpottedUnit(u)
 		end
 	end
 	-------------------------------------------------------------------------------
 	local raidTarget = function(message)
-		local m = '(.+)/(.+)/(.+)'	local fm = string.find(message, m)
+		local m = '([^/]+)/([^/]+)/([^/]+)'
+		local _, _, sender, target, icon = string.find(message, m)
 				
-		if fm then
-			local sender 	= string.gsub(message, m, '%1')
-			local target 	= string.gsub(message, m, '%2')
-			local icon 		= string.gsub(message, m, '%3')
-			--print(sender .. ' sets ' .. icon .. ' on ' .. target)
+		if sender then
 			FOSTERFRAMECORESetRaidTarget(sender, target, icon)
 		end
 	end
 	-------------------------------------------------------------------------------
 	local efc = function(message)
-		local m = '(.+)/(.+)/(.+)'	local fm = string.find(message, m)
+		local m = '([^/]+)/([^/]+)/([^/]+)'
+		local _, _, sender, allianceEFC, hordeEFC = string.find(message, m)
 				
-		if fm then
+		if sender and sender ~= UnitName'player' then
 			local flagCarriers = {}
+			flagCarriers['Alliance'] = allianceEFC ~= ' ' and allianceEFC or nil
+			flagCarriers['Horde'] 	 = hordeEFC ~= ' ' and hordeEFC or nil
 			
-			local sender 			 = string.gsub(message, m, '%1')
-			if sender ~= UnitName'player' then
-				flagCarriers['Alliance'] = string.gsub(message, m, '%2')
-				flagCarriers['Horde'] 	 = string.gsub(message, m, '%3')
-				
-				if flagCarriers['Alliance'] == ' ' then flagCarriers['Alliance'] = nil
-				--print('no one with alliance flag')
-				end
-				if flagCarriers['Horde'] 	== ' ' then flagCarriers['Horde'] = nil
-				--print('no one with horde flag')
-				end
-				
-				FOSTERFRAMECOREUpdateFlagCarriers(flagCarriers)				
-			end
-			--print(prefix .. ' - ' .. message)
+			FOSTERFRAMECOREUpdateFlagCarriers(flagCarriers)				
 		end
 	end
 	-------------------------------------------------------------------------------
 	local handleBuff = function(message)
-		local m = '(.+)/(.+)/(.+)/(.+)'	local fm = string.find(message, m)
+		local m = '([^/]+)/([^/]+)/([^/]+)/([^/]+)'
+		local _, _, caster, tar, spell, dur = string.find(message, m)
 		
-		if fm then
-			local caster 	= string.gsub(message, m, '%1')
-			local tar 		= string.gsub(message, m, '%2')
-			local spell		= string.gsub(message, m, '%3')
-			local dur		= string.gsub(message, m, '%4')
-			
-			if caster ~= UnitName'player' then
-				SPELLCASTINGCOREaddBuff(tar, spell, dur)
-			end
+		if caster and caster ~= UnitName'player' then
+			SPELLCASTINGCOREaddBuff(tar, spell, dur)
 		end
 	end
 	-------------------------------------------------------------------------------

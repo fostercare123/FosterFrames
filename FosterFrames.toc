@@ -30,7 +30,6 @@ FosterFramesCore.lua
 FosterFrames.lua
 
 # UI ELEMENTS
-UIElements\targetframe.lua
 UIElements\scoreBoard.lua
 UIElements\wsgUI.lua
 UIElements\BindingsHandler.lua

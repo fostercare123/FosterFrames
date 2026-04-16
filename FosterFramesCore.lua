@@ -62,7 +62,6 @@ local function applyNearbyPlayer(v, now, nextCheck)
 
 	local p = playerList[id]
 	if p then
-		refreshUnits = true
 		p['health'] = v['health']
 		if v['maxhealth'] then p['maxhealth'] = v['maxhealth'] end
 		if v['mana'] then p['mana'] = v['mana'] end
@@ -70,11 +69,12 @@ local function applyNearbyPlayer(v, now, nextCheck)
 		if v['sex'] then p['sex'] = v['sex'] end
 		if v['powerType'] then p['powerType'] = v['powerType'] end
 		
-		-- Update GUID if we just found it
-		if v['guid'] and not p['guid'] then
+		-- Robust Update GUID: If we just found a real GUID for a player previously tracked only by name
+		if v['guid'] and v['guid'] ~= "" and p['guid'] == p['name'] then
 			playerList[v['guid']] = p
 			playerList[v['name']] = nil
 			p['guid'] = v['guid']
+            refreshUnits = true
 		end
 
 		if now > enemyNearbyRefresh then
@@ -96,7 +96,10 @@ local function updateUnitDistance(p, unit)
     elseif CheckInteractDistance(unit, 1) then distance = 30
     end
 
-    p['distance'] = distance
+    if p['distance'] ~= distance then
+        p['distance'] = distance
+        refreshUnits = true
+    end
 end
 
 local function verifyUnitInfo(unit, now)
@@ -111,11 +114,11 @@ local function verifyUnitInfo(unit, now)
 		u['maxhealth'] = UnitHealthMax(unit)
 
 		u['mana'] = UnitMana(unit)
-		u['maxmana'] = UnitHealthMax(unit)
+		u['maxmana'] = UnitManaMax(unit)
 		local power = UnitPowerType(unit)
 		u['powerType'] = power == 3 and 'energy' or power == 1 and 'rage' or 'mana'
 
-		u['guid'] = FOSTERFRAMESHasGUID() and UnitGUID(unit)
+		u['guid'] = FOSTERFRAMESHasGUID() and UnitGUID(unit) or u['name']
 
         if FOSTERFRAMESHasSpecDetection() then
             u['spec'] = FOSTERFRAMESGetUnitSpec(unit)
@@ -559,6 +562,7 @@ end
 local function fosterFramesCoreOnUpdate()
 	local now = GetTime()
 
+    -- Basic unit info updates (every frame for target/mouseover is fine)
 	verifyUnitInfo('target', now)
 	verifyUnitInfo('mouseover', now)
 
@@ -568,10 +572,15 @@ local function fosterFramesCoreOnUpdate()
 		getRaidMembersTarget(now)
 		checkPrioMembers(now)
 		enemyNearbyRefresh = now + enemyNearbyInterval
+        refreshUnits = true -- Force a refresh after scanning raid targets
 	end
 
 	updatePlayerListInfo(now)
-	calculateEFCDistance(now)
+
+    -- EFC distance check (only if in WSG and EFC tracked)
+    if insideBG and GetZoneText() == 'Warsong Gulch' then
+        calculateEFCDistance(now)
+    end
 
 	if now > globalNearbyCheckNext then
 		globalNearbyMaintenance(now)
@@ -583,7 +592,7 @@ local function fosterFramesCoreOnUpdate()
 			refreshUnits = false
 			FOSTERFRAMESUpdatePlayers(orderUnitsforOutput())
 		end
-
+...
 		if _G['fosterFramesSettings'] and not _G['fosterFramesSettings']:IsShown() then
 			if next(playerList) == nil then
 				_G['fosterFrameDisplay']:Hide()

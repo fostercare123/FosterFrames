@@ -455,7 +455,12 @@ local function drawUnits(list)
 		
 		if FOSTERFRAMESPLAYERDATA['displayHealthValues'] then
 			units[i].hpText:SetText(currHP .. " / " .. maxHP)
-		end
+            units[i].hpText:Show()
+            units[i].name:Hide()
+		else
+            units[i].hpText:Hide()
+            if FOSTERFRAMESPLAYERDATA['displayNames'] then units[i].name:Show() end
+        end
 
 		local maxMana = v['maxmana'] or 100
 		local currMana = v['mana'] or (not v['nearby'] and maxMana) or 100
@@ -465,10 +470,14 @@ local function drawUnits(list)
 		if FOSTERFRAMESPLAYERDATA['displayManaValues'] then
 			if v['class'] ~= 'WARRIOR' and v['class'] ~= 'ROGUE' then
 				units[i].manaText:SetText(currMana .. " / " .. maxMana)
+                units[i].manaText:Show()
 			else
 				units[i].manaText:SetText("")
+                units[i].manaText:Hide()
 			end
-		end
+		else
+            units[i].manaText:Hide()
+        end
 		
 		if FOSTERFRAMESPLAYERDATA['displayOnlyNearby'] and not v['nearby'] then units[i]:Hide()	else units[i]:Show() end
 

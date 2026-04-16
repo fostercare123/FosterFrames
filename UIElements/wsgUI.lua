@@ -78,37 +78,39 @@
 	WSGUIupdateFC = function(fc)
 		flagCarriers = fc
 		
-		if flagCarriers['Alliance'] then
-			h:SetText(flagCarriers['Alliance'])
+		-- AlwaysUpFrame1 = Alliance Flag (taken by Horde EFC)
+		if flagCarriers['Horde'] then
+			h:SetText(flagCarriers['Horde'])
 		else
 			h:SetText('')
 			hh:SetText('')
-			fcHealth['Alliance'] = nil
+			fcHealth['Horde'] = nil
 		end
 		
-		if flagCarriers['Horde'] then
-			a:SetText(flagCarriers['Horde'])
+		-- AlwaysUpFrame2 = Horde Flag (taken by Alliance EFC)
+		if flagCarriers['Alliance'] then
+			a:SetText(flagCarriers['Alliance'])
 		else
 			a:SetText('')
 			ah:SetText('')
-			fcHealth['Horde'] = nil
+			fcHealth['Alliance'] = nil
 		end
 	end
 	-------------------------------------------------------------------------------
 	local w, timeInterval = 100, 4
 	local efcLowHealth = function()
-		local f = UnitFactionGroup'player'
-		local x = f == 'Alliance' and 'Horde' or 'Alliance'
+		local playerFaction = UnitFactionGroup'player'
+		local enemyFaction = playerFaction == 'Alliance' and 'Horde' or 'Alliance'
 
 		local now = GetTime()
-		if flagCarriers[x] and fcHealth[x]  then
+		-- We care about the health of the ENEMY flag carrier (who has OUR flag)
+		if flagCarriers[enemyFaction] and fcHealth[enemyFaction] then
 			for i = 1, table.getn(healthWarnings) do
-				if fcHealth[x] < healthWarnings[i]  then
+				if fcHealth[enemyFaction] < healthWarnings[i] then
 					if (not sentAnnoucement or healthWarnings[i] < w) and now > nextAnnouncement then
 						nextAnnouncement = now + timeInterval
 						w = healthWarnings[i]
-						local msgb = flagCarriers[x] and ' Get ready to cap!' or ''
-						SendChatMessage('EFC has less than '..healthWarnings[i]..'% Health!'.. msgb, 'BATTLEGROUND')
+						SendChatMessage('Enemy Flag Carrier ('..flagCarriers[enemyFaction]..') has less than '..healthWarnings[i]..'% Health! Get ready to cap!', 'BATTLEGROUND')
 						sentAnnoucement = true
 					end
 					return
@@ -129,13 +131,13 @@
 	WSGUIupdateFChealth = function(unit)
 		if unit then
 			if not UnitIsPlayer(unit) then return end
-			if UnitName(unit) == flagCarriers['Alliance'] then
-				fcHealth['Alliance'] = getPerc(unit)
-				hh:SetText(fcHealth['Alliance']..'%')
-			end
-			if UnitName(unit) == flagCarriers['Horde'] then
+			local name = UnitName(unit)
+			if name == flagCarriers['Horde'] then
 				fcHealth['Horde'] = getPerc(unit)
-				ah:SetText(fcHealth['Horde']..'%')
+				hh:SetText(fcHealth['Horde']..'%')
+			elseif name == flagCarriers['Alliance'] then
+				fcHealth['Alliance'] = getPerc(unit)
+				ah:SetText(fcHealth['Alliance']..'%')
 			end
 		end
 		

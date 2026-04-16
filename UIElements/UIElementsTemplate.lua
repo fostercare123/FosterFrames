@@ -83,19 +83,24 @@
 		this.ffCastbar.timer:SetShadowColor(0.4, 0.4, 0.4)
 		this.ffCastbar.timer:SetPoint('RIGHT', this.ffCastbar, 'RIGHT', 0, 0)
 		this.ffCastbar.timer:SetText('1.5')
-		--------------
+				--------------
 
 		this.name = this:CreateFontString(nil, 'OVERLAY')
-                this.name:SetFont(STANDARD_TEXT_FONT, 11, 'OUTLINE')
-                this.name:SetTextColor(.8, .8, .8, .8)
-                this.name:SetPoint('CENTER', this.hpbar)
+		this.name:SetFont(STANDARD_TEXT_FONT, 11, 'OUTLINE')
+		this.name:SetTextColor(.8, .8, .8, .8)
+		this.name:SetPoint('CENTER', this.hpbar)
 	
-		--this.name:SetPoint('RIGHT', this.hpbar, -2, 0)
-		
-		--this.hpText = this:CreateFontString(nil, 'OVERLAY')
-		--this.hpText:SetFont(STANDARD_TEXT_FONT, 7, 'OUTLINE')
-		--this.hpText:SetTextColor(.8, .8, .8, .8)
-		--this.hpText:SetPoint('LEFT', this.hpbar, 2, 0)
+		this.hpText = this.hpbar:CreateFontString(nil, 'OVERLAY')
+		this.hpText:SetFont(STANDARD_TEXT_FONT, 8, 'OUTLINE')
+		this.hpText:SetTextColor(1, 1, 1, .9)
+		this.hpText:SetPoint('CENTER', this.hpbar, 0, 0)
+		this.hpText:Hide()
+
+		this.manaText = this.manabar:CreateFontString(nil, 'OVERLAY')
+		this.manaText:SetFont(STANDARD_TEXT_FONT, 8, 'OUTLINE')
+		this.manaText:SetTextColor(1, 1, 1, .9)
+		this.manaText:SetPoint('CENTER', this.manabar, 0, 0)
+		this.manaText:Hide()
 		
 		--- TARGET COUNT ---
 		this.targetCount = CreateFrame('Frame', nil, this)
